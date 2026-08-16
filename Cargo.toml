@@ -1,0 +1,20 @@
+[package]
+name = "xpui-boards"
+description = "The panels this framework has been run on, as data"
+readme = "README.md"
+keywords = ["ui", "embedded", "no-std", "eink", "xpui"]
+categories = ["embedded", "gui", "no-std"]
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lib]
+name = "xpui_boards"
+crate-type = ["rlib"]
+
+[dependencies]
+# Only for the token presets. A board describes a panel; the chrome sized for
+# it is the one thing it borrows.
+xpui-chrome.workspace = true
