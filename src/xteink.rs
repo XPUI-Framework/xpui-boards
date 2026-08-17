@@ -7,7 +7,7 @@
 //! canvas is the framebuffer turned a quarter. The framebuffer itself is never
 //! rotated: a renderer transforms each pixel on its way out.
 
-use crate::{Bezel, Board, KeyAction, Orientation, PhysicalButton};
+use crate::{Bezel, Board, Key, KeyAction, Orientation, PhysicalButton, Plan, Run};
 use xpui::Button;
 use xpui_chrome::Tokens;
 
@@ -83,14 +83,25 @@ impl Board {
         orientation: Orientation::Portrait,
         diagonal_hundredths_inch: Some(426),
         ui_scale_percent: 120,
-        tokens: Tokens::DEFAULT.scaled(120),
+        tokens: Tokens::DEFAULT.scaled(120).without_button_hints(),
         touch: true,
         refresh_ms: 1200,
         bezel: Some(X4_PRO_BEZEL),
     };
 }
 
-/// The X3's body: four keys along the bottom, one on each side edge.
+/// The row every reader here carries along its footer.
+///
+/// Its pins are named back, confirm, left and right; the labels are what a list
+/// screen prints above them, which is where Up and Down come from.
+const READER_FOOTER: [Key; 4] = [
+    Key::new("Back", Button::Back),
+    Key::new("Select", Button::Confirm),
+    Key::new("Up", Button::Left),
+    Key::new("Down", Button::Right),
+];
+
+/// The X3's body: four keys along the footer, one on each side edge.
 ///
 /// **The millimetres are estimated.** Xteink publish no mechanical drawing, so
 /// the body is derived from the panel — 792x528 at roughly 257 ppi is about
@@ -101,165 +112,73 @@ impl Board {
 /// and the X4 Pro as the boards whose page keys sit on the screen's left and
 /// right edges, and the themes lay out Up on the left and Down on the right
 /// against exactly that.
-pub const X3_BEZEL: Bezel = Bezel {
-    body: (620, 1010),
-    panel_origin: (75, 80),
-    panel_size: (470, 705),
-    buttons: &[
-        // The side pair. Their pins are named up and down, which is a leftover
-        // from the X4's rocker: on this board they sit on the screen's left and
-        // right edges and turn pages. In a list they move the selection, a row
-        // per tap and a page per hold.
-        PhysicalButton {
-            label: "Prev",
-            action: KeyAction::Press(Button::PageBack),
-            centre: (37, 380),
-            size: (50, 170),
-        },
-        PhysicalButton {
-            label: "Next",
-            action: KeyAction::Press(Button::PageForward),
-            centre: (583, 380),
-            size: (50, 170),
-        },
-        PhysicalButton {
-            label: "Sleep",
-            action: KeyAction::Press(Button::Power),
-            centre: (583, 170),
-            size: (50, 110),
-        },
-        // The bottom row. Its pins are named back, confirm, left and right;
-        // the labels are what a list screen prints above them, which is where
-        // Up and Down come from.
-        PhysicalButton {
-            label: "Back",
-            action: KeyAction::Press(Button::Back),
-            centre: (95, 905),
-            size: (125, 60),
-        },
-        PhysicalButton {
-            label: "Select",
-            action: KeyAction::Press(Button::Confirm),
-            centre: (240, 905),
-            size: (125, 60),
-        },
-        PhysicalButton {
-            label: "Up",
-            action: KeyAction::Press(Button::Left),
-            centre: (385, 905),
-            size: (125, 60),
-        },
-        PhysicalButton {
-            label: "Down",
-            action: KeyAction::Press(Button::Right),
-            centre: (525, 905),
-            size: (125, 60),
-        },
-    ],
-    artwork: None,
-};
+///
+/// The side pair's pins are named up and down, a leftover from the X4's rocker:
+/// on this board they sit on the screen's left and right edges and turn pages.
+/// In a list they move the selection, a row per tap and a page per hold.
+const X3: Plan = Plan::new((620, 1010), (470, 705), 80)
+    .footer(Run::new((125, 60), &READER_FOOTER))
+    .left(Run::new((50, 170), &[Key::new("Prev", Button::PageBack)]))
+    .right(Run::new(
+        (50, 170),
+        &[
+            Key::new("Sleep", Button::Power).spanning(110),
+            Key::new("Next", Button::PageForward),
+        ],
+    ));
 
-/// The X4's body: four keys along the bottom, and a page rocker stacked on the
-/// right rather than split across both edges.
+const X3_KEYS: [PhysicalButton; X3.count()] = X3.keys();
+pub const X3_BEZEL: Bezel = X3.bezel(&X3_KEYS);
+
+/// The X4's body: the same footer, and a page rocker stacked on the right
+/// rather than split across both edges.
 ///
 /// **Estimated**, as the X3's is. The stacked rocker is not: the themes branch
 /// on it, drawing both keys on one side for this board and one per edge for the
 /// X3 and the X4 Pro.
-pub const X4_BEZEL: Bezel = Bezel {
-    body: (580, 1020),
-    panel_origin: (80, 80),
-    panel_size: (420, 700),
-    buttons: &[
-        // Both page keys stacked on one side rather than one per edge — the
-        // firmware's themes branch on exactly this, drawing their hints in two
-        // different places.
-        PhysicalButton {
-            label: "Sleep",
-            action: KeyAction::Press(Button::Power),
-            centre: (545, 200),
-            size: (50, 110),
-        },
-        PhysicalButton {
-            label: "Prev",
-            action: KeyAction::Press(Button::PageBack),
-            centre: (545, 380),
-            size: (50, 140),
-        },
-        PhysicalButton {
-            label: "Next",
-            action: KeyAction::Press(Button::PageForward),
-            centre: (545, 540),
-            size: (50, 140),
-        },
-        PhysicalButton {
-            label: "Back",
-            action: KeyAction::Press(Button::Back),
-            centre: (90, 915),
-            size: (115, 60),
-        },
-        PhysicalButton {
-            label: "Select",
-            action: KeyAction::Press(Button::Confirm),
-            centre: (220, 915),
-            size: (115, 60),
-        },
-        PhysicalButton {
-            label: "Up",
-            action: KeyAction::Press(Button::Left),
-            centre: (350, 915),
-            size: (115, 60),
-        },
-        PhysicalButton {
-            label: "Down",
-            action: KeyAction::Press(Button::Right),
-            centre: (480, 915),
-            size: (115, 60),
-        },
-    ],
-    artwork: None,
-};
+const X4: Plan = Plan::new((580, 1020), (420, 700), 80)
+    .footer(Run::new((115, 60), &READER_FOOTER))
+    .right(Run::new(
+        (50, 140),
+        &[
+            Key::new("Sleep", Button::Power).spanning(110),
+            Key::new("Prev", Button::PageBack),
+            Key::new("Next", Button::PageForward),
+        ],
+    ));
+
+const X4_KEYS: [PhysicalButton; X4.count()] = X4.keys();
+pub const X4_BEZEL: Bezel = X4.bezel(&X4_KEYS);
 
 /// The X4 Pro's body: a Home key below the panel, the page pair on the side
 /// edges, and the touchscreen for everything else.
 ///
-/// **Estimated**, as the others are. What is not: Back and Confirm are absent
-/// as keys because the touch controller supplies them, the two wired keys are
-/// the page pair one per edge, and the Home key is capacitive and sits below
-/// the panel rather than being a pin.
-pub const X4_PRO_BEZEL: Bezel = Bezel {
-    body: (580, 1020),
-    panel_origin: (80, 80),
-    panel_size: (420, 700),
-    buttons: &[
-        // Previous on the left edge, next on the right, and sleep above next.
-        // There is no bottom row: this board leaves back, confirm, left and
-        // right unassigned and takes them from the touchscreen instead.
-        PhysicalButton {
-            label: "Prev",
-            action: KeyAction::Press(Button::PageBack),
-            centre: (30, 380),
-            size: (44, 160),
-        },
-        PhysicalButton {
-            label: "Sleep",
-            action: KeyAction::Press(Button::Power),
-            centre: (550, 200),
-            size: (44, 110),
-        },
-        PhysicalButton {
-            label: "Next",
-            action: KeyAction::Press(Button::PageForward),
-            centre: (550, 380),
-            size: (44, 160),
-        },
-        // Round, and capacitive: the touch controller reports it rather than a
-        // pin, which is why it is a gesture and not a key press.
-        PhysicalButton {
-            label: "Home",
-            action: KeyAction::Home,
-            centre: (270, 910),
-            size: (100, 100),
-        },
-    ],
-    artwork: None,
-};
+/// **Estimated**, as the others are. What is not: there is no footer row
+/// because this board leaves back, confirm, left and right unassigned and takes
+/// them from the touchscreen, the two wired keys are the page pair one per
+/// edge, and the Home key is capacitive rather than a pin.
+///
+/// What sits below the panel is the Home pad alone, in no row and no column —
+/// the one-off [`Plan::loose`] exists for.
+const X4_PRO: Plan = Plan::new((580, 1020), (420, 700), 80)
+    .left(Run::new((44, 160), &[Key::new("Prev", Button::PageBack)]))
+    .right(Run::new(
+        (44, 160),
+        &[
+            Key::new("Sleep", Button::Power).spanning(110),
+            Key::new("Next", Button::PageForward),
+        ],
+    ))
+    // Round, and capacitive: the touch controller reports it rather than a pin,
+    // which is why it is a gesture and not a key press. Its centre is the
+    // middle of the body and the middle of the chin, stated because a lone key
+    // has no run to derive them from.
+    .loose(&[PhysicalButton::round(
+        "Home",
+        KeyAction::Home,
+        (290, 900),
+        100,
+    )]);
+
+const X4_PRO_KEYS: [PhysicalButton; X4_PRO.count()] = X4_PRO.keys();
+pub const X4_PRO_BEZEL: Bezel = X4_PRO.bezel(&X4_PRO_KEYS);

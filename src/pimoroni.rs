@@ -1,6 +1,6 @@
-//! Pimoroni's RP2040 badges.
+//! Pimoroni's RP2040 boards.
 
-use crate::{Bezel, Board, KeyAction, Orientation, PhysicalButton};
+use crate::{Bezel, Board, Key, Orientation, PhysicalButton, Plan, Run};
 use xpui::Button;
 use xpui_chrome::Tokens;
 
@@ -22,7 +22,7 @@ impl Board {
         // Pimoroni's 2.9" UC8151 strip.
         diagonal_hundredths_inch: Some(290),
         ui_scale_percent: 100,
-        tokens: Tokens::SMALL,
+        tokens: Tokens::SMALL.with_hint_slots(3),
         touch: false,
         // A full UC8151 update is close to a second; the partial modes are
         // faster but still nothing you would drive an animation with.
@@ -48,10 +48,41 @@ impl Board {
         // Pimoroni's 2.4" ST7789v.
         diagonal_hundredths_inch: Some(240),
         ui_scale_percent: 100,
-        tokens: Tokens::COMPACT,
+        tokens: Tokens::COMPACT.with_hint_slots(3),
         touch: false,
         refresh_ms: 0,
         bezel: Some(TUFTY_BEZEL),
+    };
+
+    /// Pimoroni Inky Frame 5.7" — RP2040 with a Pico W aboard, 600x448
+    /// seven-colour e-ink (E Ink Gallery Palette 4000).
+    ///
+    /// The first board here whose keys are only a footer: five of them, A to E,
+    /// and nothing down either edge. Buttons only, so the baseline scale, and
+    /// at 131 ppi a 40px row is 7.7mm — the roomiest chrome of the seven.
+    ///
+    /// Five keys means five hint slots, one more than the standard four have
+    /// labels for, so the last is left blank rather than shifting every label
+    /// one key to the left.
+    pub const INKY_FRAME: Board = Board {
+        name: "Inky Frame 5.7\"",
+        slug: "inkyframe",
+        width: 600,
+        height: 448,
+        framebuffer: (600, 448),
+        orientation: Orientation::Landscape,
+        // The size Pimoroni sell it as. Their published 0.1915mm dot pitch puts
+        // the active area's own diagonal a shade under that, at 5.65".
+        diagonal_hundredths_inch: Some(570),
+        ui_scale_percent: 100,
+        tokens: Tokens::DEFAULT.with_hint_slots(5),
+        touch: false,
+        // **A documented estimate.** Pimoroni quote "about 30 seconds"; a
+        // seven-colour panel cycles through each colour, and the figure people
+        // report runs from twenty to forty. Two orders of magnitude slower than
+        // the readers, which is the fact a screen would need to know.
+        refresh_ms: 30_000,
+        bezel: Some(INKY_FRAME_BEZEL),
     };
 }
 
@@ -64,44 +95,25 @@ impl Board {
 /// Button placement is **estimated** from product photographs: A, B and C run
 /// along the bottom edge, with up and down stacked on the right-hand side.
 /// Pimoroni publish the GPIO map but not the millimetre positions.
-pub const BADGER_BEZEL: Bezel = Bezel {
-    body: (856, 487),
-    panel_origin: (94, 60),
-    panel_size: (669, 291),
-    buttons: &[
-        PhysicalButton {
-            label: "A",
-            action: KeyAction::Press(Button::Back),
-            centre: (150, 430),
-            size: (90, 60),
-        },
-        PhysicalButton {
-            label: "B",
-            action: KeyAction::Press(Button::Confirm),
-            centre: (300, 430),
-            size: (90, 60),
-        },
-        PhysicalButton {
-            label: "C",
-            action: KeyAction::Press(Button::PageForward),
-            centre: (450, 430),
-            size: (90, 60),
-        },
-        PhysicalButton {
-            label: "Up",
-            action: KeyAction::Press(Button::Up),
-            centre: (800, 150),
-            size: (70, 60),
-        },
-        PhysicalButton {
-            label: "Dn",
-            action: KeyAction::Press(Button::Down),
-            centre: (800, 260),
-            size: (70, 60),
-        },
-    ],
-    artwork: None,
-};
+///
+/// A single press of a confirms; two in quick succession go back, because there
+/// is no key for it.
+const BADGER: Plan = Plan::new((856, 487), (669, 291), 60)
+    .footer(Run::new((110, 60), &BADGE_FOOTER))
+    .right(Run::new((60, 60), &BADGE_EDGE));
+
+const BADGER_KEYS: [PhysicalButton; BADGER.count()] = BADGER.keys();
+pub const BADGER_BEZEL: Bezel = BADGER.bezel(&BADGER_KEYS);
+
+/// a, b and c along the footer, as the silkscreen has them, on both badges.
+const BADGE_FOOTER: [Key; 3] = [
+    Key::new("a", Button::Confirm),
+    Key::new("b", Button::Left),
+    Key::new("c", Button::Right),
+];
+
+/// Up and down beside the screen, stacked on the right edge.
+const BADGE_EDGE: [Key; 2] = [Key::new("Up", Button::Up), Key::new("Dn", Button::Down)];
 
 /// The Tufty's body and its five buttons.
 ///
@@ -110,41 +122,42 @@ pub const BADGER_BEZEL: Bezel = Bezel {
 ///
 /// Button placement is **estimated** from product photographs, as for the
 /// Badger: A, B and C along the bottom, up and down on the right edge.
-pub const TUFTY_BEZEL: Bezel = Bezel {
-    body: (652, 527),
-    panel_origin: (81, 60),
-    panel_size: (489, 367),
-    buttons: &[
-        PhysicalButton {
-            label: "A",
-            action: KeyAction::Press(Button::Back),
-            centre: (130, 470),
-            size: (80, 55),
-        },
-        PhysicalButton {
-            label: "B",
-            action: KeyAction::Press(Button::Confirm),
-            centre: (250, 470),
-            size: (80, 55),
-        },
-        PhysicalButton {
-            label: "C",
-            action: KeyAction::Press(Button::PageForward),
-            centre: (370, 470),
-            size: (80, 55),
-        },
-        PhysicalButton {
-            label: "Up",
-            action: KeyAction::Press(Button::Up),
-            centre: (600, 160),
-            size: (60, 55),
-        },
-        PhysicalButton {
-            label: "Dn",
-            action: KeyAction::Press(Button::Down),
-            centre: (600, 270),
-            size: (60, 55),
-        },
+const TUFTY: Plan = Plan::new((652, 527), (489, 367), 60)
+    .footer(Run::new((95, 55), &BADGE_FOOTER))
+    .right(Run::new((55, 55), &BADGE_EDGE));
+
+const TUFTY_KEYS: [PhysicalButton; TUFTY.count()] = TUFTY.keys();
+pub const TUFTY_BEZEL: Bezel = TUFTY.bezel(&TUFTY_KEYS);
+
+/// The Inky Frame's body: five keys along the footer, and nothing on the edges.
+///
+/// Body from Pimoroni's published dimensions: 131.4 x 127.5 mm. The panel is
+/// 600x448 pixels at the 0.1915mm dot pitch they quote, which is 114.9 x 85.8
+/// mm of active area — so 8.3mm of bezel each side, and the rest of the board
+/// below the panel where the buttons and the Pico W sit.
+///
+/// **The forehead and the button size are estimated** from product
+/// photographs, as the badges' are: Pimoroni publish the board's outline and
+/// the dot pitch but not where the buttons sit on it. 8.3mm above the panel is
+/// the side bezel repeated, which leaves a 33mm chin.
+///
+/// The five keys are not estimated — Pimoroni's own module exposes
+/// `button_a` through `button_e` — and neither is the shape: they are a row
+/// along the footer with no edge keys at all, which is the whole reason this
+/// board is here. Five centres, and not one of them written down.
+const INKY_FRAME: Plan = Plan::new((1314, 1275), (1149, 858), 83).footer(Run::new(
+    (60, 60),
+    &[
+        Key::new("A", Button::Back),
+        Key::new("B", Button::Confirm),
+        Key::new("C", Button::Left),
+        Key::new("D", Button::Right),
+        // The fifth key is the one a hint bar has no label for, so it takes the
+        // job that needs none: these frames sleep between refreshes and wake on
+        // a press.
+        Key::new("E", Button::Power),
     ],
-    artwork: None,
-};
+));
+
+const INKY_FRAME_KEYS: [PhysicalButton; INKY_FRAME.count()] = INKY_FRAME.keys();
+pub const INKY_FRAME_BEZEL: Bezel = INKY_FRAME.bezel(&INKY_FRAME_KEYS);

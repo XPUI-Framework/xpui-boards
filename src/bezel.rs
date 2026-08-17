@@ -40,6 +40,29 @@ pub struct PhysicalButton {
     pub size: (i32, i32),
 }
 
+impl PhysicalButton {
+    /// A round key of `diameter`, placed by hand.
+    ///
+    /// For a one-off that is in no row and no column — the reader with a
+    /// capacitive Home pad below its panel is the one here. Square by
+    /// construction, because a round key described as a rectangle one unit off
+    /// square is drawn as an ellipse, and that is a mistake nobody sees until
+    /// it is rendered.
+    pub const fn round(
+        label: &'static str,
+        action: KeyAction,
+        centre: (i32, i32),
+        diameter: i32,
+    ) -> PhysicalButton {
+        PhysicalButton {
+            label,
+            action,
+            centre,
+            size: (diameter, diameter),
+        }
+    }
+}
+
 /// The body around a panel.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub struct Bezel {

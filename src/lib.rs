@@ -17,10 +17,12 @@
 
 mod bezel;
 mod pimoroni;
+mod plan;
 mod seeed;
 mod xteink;
 
 pub use bezel::{Bezel, KeyAction, PhysicalButton};
+pub use plan::{Key, Plan, Run};
 
 pub use xpui_chrome::Tokens;
 
@@ -127,13 +129,14 @@ pub struct Board {
 impl Board {
     /// Every board, so an example can offer them all without a table of its own
     /// that would fall behind this one.
-    pub const ALL: [Board; 6] = [
+    pub const ALL: [Board; 7] = [
         Board::X3,
         Board::X4,
         Board::X4_PRO,
         Board::STICKY,
         Board::BADGER_2040,
         Board::TUFTY_2040,
+        Board::INKY_FRAME,
     ];
 
     /// Looks a board up by its short name, for a command line.

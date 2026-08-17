@@ -166,16 +166,47 @@ fn the_touch_boards_are_the_scaled_ones() {
 }
 
 /// A board carries both the factor and the chrome it produced, so the two can
-/// disagree. This is what stops them.
+/// disagree. This is what stops them, and it spells out the whole derivation:
+/// the preset its panel calls for, at its own scale, without a hint band if it
+/// has no keys to name.
 #[test]
 fn a_boards_chrome_is_its_own_preset_scaled() {
     for board in Board::ALL {
+        let expected = Tokens::for_panel(board.width, board.height).scaled(board.ui_scale_percent);
+        let expected = if board.touch {
+            expected.without_button_hints()
+        } else {
+            expected.with_hint_slots(bottom_keys(board))
+        };
+
         assert_eq!(
-            board.tokens,
-            Tokens::for_panel(board.width, board.height).scaled(board.ui_scale_percent),
+            board.tokens, expected,
             "{}: its tokens are not the preset for its panel at its own scale",
             board.name
         );
+    }
+}
+
+/// A device that takes Back and Confirm from its touchscreen has no row of keys
+/// along the bottom, so a hint bar there names keys that do not exist.
+///
+/// The firmware's themes return before drawing one on exactly these boards.
+#[test]
+fn only_a_board_with_keys_reserves_a_hint_band() {
+    for board in Board::ALL {
+        if board.touch {
+            assert_eq!(
+                board.tokens.button_hints_height, 0,
+                "{}: a touch board must not reserve a band for keys it lacks",
+                board.name
+            );
+        } else {
+            assert!(
+                board.tokens.button_hints_height > 0,
+                "{}: its keys need labelling",
+                board.name
+            );
+        }
     }
 }
 
@@ -467,21 +498,266 @@ fn the_x4_pro_is_the_x4_with_a_touchscreen() {
     assert_ne!(Board::X4.slug, Board::X4_PRO.slug);
 }
 
-/// A panel sits in the middle of its body.
+/// A panel sits in the middle of what is left for it.
 ///
-/// Off-centre by forty units is not subtle once it is drawn, and it is the kind
-/// of thing that creeps back in every time a key moves. One unit of slack,
-/// because an odd margin cannot be split evenly.
+/// Not simply in the middle of the body: a badge carries both its side keys on
+/// one edge, so its screen is pushed off-centre by exactly the column those
+/// keys need. Asserting plain symmetry there would be asserting the device is
+/// something other than it is.
 #[test]
-fn every_panel_is_centred_across_its_body() {
+fn every_panel_is_centred_in_the_room_it_has() {
     for (board, bezel) in bezels() {
         let (x, _, width, _) = bezel.panel_rect();
         let (left, right) = (x, bezel.body.0 - (x + width));
 
+        let (_, top, _, height) = bezel.panel_rect();
+        // Only keys level with the screen take room from its margins. One below
+        // it is in the footer and costs the sides nothing.
+        let flanking = |on_the_right: bool| {
+            bezel
+                .buttons
+                .iter()
+                .filter(|key| key.centre.1 < top + height)
+                .filter(|key| {
+                    let beside = key.centre.0 < x || key.centre.0 > x + width;
+                    beside && (key.centre.0 > x) == on_the_right
+                })
+                .map(|key| key.size.0)
+                .max()
+                .unwrap_or(0)
+        };
+
+        // What each side needs for the keys on it, and what is left over.
+        let spare = |margin: i32, keys: i32| margin - keys;
+
         assert!(
-            (left - right).abs() <= 1,
-            "{}: {left} on the left and {right} on the right",
-            board.name
+            (spare(left, flanking(false)) - spare(right, flanking(true))).abs() <= 2,
+            "{}: {left} on the left and {right} on the right, with {} and {} of \
+             that taken by keys — the screen is not centred in what remains",
+            board.name,
+            flanking(false),
+            flanking(true)
         );
     }
+}
+
+/// How many keys sit below the panel, which is how many hints there is room to
+/// label.
+fn bottom_keys(board: Board) -> u8 {
+    let Some(bezel) = board.bezel else { return 4 };
+    let (_, y, _, height) = bezel.panel_rect();
+
+    bezel
+        .buttons
+        .iter()
+        .filter(|key| key.centre.1 > y + height)
+        .count() as u8
+}
+
+/// A board must not label more keys than it has.
+///
+/// Four hints over three keys is worse than none: every label after the first
+/// sits over the wrong key, and the last names one that is not there.
+#[test]
+fn a_board_labels_only_the_keys_it_has() {
+    for board in Board::ALL {
+        if board.touch {
+            continue;
+        }
+        assert_eq!(
+            board.tokens.hint_slots,
+            bottom_keys(board),
+            "{}: it draws {} hints over {} keys",
+            board.name,
+            board.tokens.hint_slots,
+            bottom_keys(board)
+        );
+    }
+}
+
+// -- the shapes the keys are in --------------------------------------------
+//
+// Every body here is described as a row along the footer and a column down an
+// edge, with the centres derived rather than written down. These say what
+// "derived" has to come out as, so a plan that spaced a run by hand — or by
+// arithmetic that is subtly wrong — is caught the way the misplaced panels
+// were.
+
+use xpui_boards::PhysicalButton;
+
+/// The keys below the panel, left to right: a board's footer row.
+fn footer_of(bezel: Bezel) -> Vec<PhysicalButton> {
+    let (_, y, _, height) = bezel.panel_rect();
+    let mut keys: Vec<PhysicalButton> = bezel
+        .buttons
+        .iter()
+        .copied()
+        .filter(|key| key.centre.1 > y + height)
+        .collect();
+    keys.sort_by_key(|key| key.centre.0);
+    keys
+}
+
+/// The keys beside the panel on one side, top to bottom: a board's edge column.
+fn column_of(bezel: Bezel, on_the_right: bool) -> Vec<PhysicalButton> {
+    let (x, y, width, height) = bezel.panel_rect();
+    let mut keys: Vec<PhysicalButton> = bezel
+        .buttons
+        .iter()
+        .copied()
+        .filter(|key| key.centre.1 < y + height)
+        .filter(|key| {
+            let beside = key.centre.0 < x || key.centre.0 > x + width;
+            beside && (key.centre.0 > x) == on_the_right
+        })
+        .collect();
+    keys.sort_by_key(|key| key.centre.1);
+    keys
+}
+
+/// The shell between one key and the next, along a run.
+///
+/// Between the *edges* rather than between the centres: a sleep key is shorter
+/// than the page keys beside it, so even centres would be uneven shell — and
+/// the shell is what a thumb feels.
+fn gaps(along: impl Iterator<Item = (i32, i32)>) -> Vec<i32> {
+    let mut gaps = Vec::new();
+    let mut previous: Option<i32> = None;
+    for (centre, size) in along {
+        if let Some(end) = previous {
+            gaps.push(centre - size / 2 - end);
+        }
+        previous = Some(centre + size / 2);
+    }
+    gaps
+}
+
+/// A gap of one tenth of a millimetre either way, which is integer division
+/// dividing a body by five rather than anything anybody would see.
+fn evenly_spaced(gaps: &[i32]) -> bool {
+    match (gaps.iter().min(), gaps.iter().max()) {
+        (Some(least), Some(most)) => most - least <= 1,
+        _ => true,
+    }
+}
+
+/// A footer of three and a footer of five differ by a number, not by a table of
+/// positions — so the shell between one key and the next is the same all the
+/// way along, and the same at both ends of the row.
+#[test]
+fn a_row_of_keys_is_evenly_spaced() {
+    let mut rows = 0;
+    for (board, bezel) in bezels() {
+        let keys = footer_of(bezel);
+        if keys.len() < 2 {
+            continue;
+        }
+        rows += 1;
+
+        let between = gaps(keys.iter().map(|key| (key.centre.0, key.size.0)));
+        assert!(
+            evenly_spaced(&between),
+            "{}: the keys along the footer are spaced {between:?}",
+            board.name
+        );
+
+        let first = &keys[0];
+        let last = &keys[keys.len() - 1];
+        let (before, after) = (
+            first.centre.0 - first.size.0 / 2,
+            bezel.body.0 - (last.centre.0 + last.size.0 / 2),
+        );
+        assert!(
+            (before - after).abs() <= 1,
+            "{}: {before} of shell before the row and {after} after it — the \
+             row is not centred on the body",
+            board.name
+        );
+
+        for key in &keys {
+            assert_eq!(
+                key.size, first.size,
+                "{}: {:?} is not the size of the rest of the row",
+                board.name, key.label
+            );
+        }
+    }
+    assert!(rows >= 4, "only {rows} boards have a row to check");
+}
+
+/// The same, down an edge — and a column's keys share a width even when a sleep
+/// key makes them differ in height.
+#[test]
+fn a_column_of_keys_is_evenly_spaced() {
+    let mut columns = 0;
+    for (board, bezel) in bezels() {
+        for on_the_right in [false, true] {
+            let keys = column_of(bezel, on_the_right);
+            if keys.len() < 2 {
+                continue;
+            }
+            columns += 1;
+
+            let between = gaps(keys.iter().map(|key| (key.centre.1, key.size.1)));
+            assert!(
+                evenly_spaced(&between),
+                "{}: the keys down its {} edge are spaced {between:?}",
+                board.name,
+                if on_the_right { "right" } else { "left" }
+            );
+
+            for key in &keys {
+                assert_eq!(
+                    key.size.0, keys[0].size.0,
+                    "{}: {:?} is not the width of the rest of the column",
+                    board.name, key.label
+                );
+                assert_eq!(
+                    key.centre.0, keys[0].centre.0,
+                    "{}: {:?} is out of the column",
+                    board.name, key.label
+                );
+            }
+        }
+    }
+    assert!(columns >= 4, "only {columns} boards have a column to check");
+}
+
+/// The board the builder was written for: five keys along the footer and
+/// nothing down either edge, which no board here had before.
+#[test]
+fn the_inky_frame_is_a_footer_and_nothing_else() {
+    let bezel = Board::INKY_FRAME.bezel.expect("the Inky Frame has a body");
+
+    assert_eq!(
+        footer_of(bezel).len(),
+        5,
+        "Pimoroni's own module exposes button_a through button_e"
+    );
+    assert!(
+        column_of(bezel, false).is_empty() && column_of(bezel, true).is_empty(),
+        "nothing sits beside this panel"
+    );
+    assert_eq!(
+        bezel.buttons.len(),
+        5,
+        "and nothing is anywhere else either"
+    );
+}
+
+/// Its diagonal, against the figure Pimoroni publish that is not a diagonal.
+///
+/// They quote a 0.1915mm dot pitch, which is 132 ppi; the panel is sold as
+/// 5.7". A digit wrong in either is invisible until something is measured in
+/// millimetres, and then it is wrong everywhere at once.
+#[test]
+fn the_inky_frames_diagonal_agrees_with_its_dot_pitch() {
+    // Both in ten-thousandths of a millimetre: an inch over one dot.
+    let from_pitch = 254_000 / 1915;
+    let derived = Board::INKY_FRAME.ppi().expect("a measured panel");
+
+    assert!(
+        (derived - from_pitch).abs() <= 2,
+        "a 5.7\" diagonal derives {derived} ppi; a 0.1915mm pitch is {from_pitch}"
+    );
 }
