@@ -3,7 +3,8 @@
 //! Geometry and capabilities read from the CrossPoint simulator's own
 //! `BoardConfig.h`, which is what the firmware compiles against.
 
-use crate::Board;
+use crate::{Bezel, Board, PhysicalButton};
+use xpui::Button;
 use xpui_chrome::Tokens;
 
 impl Board {
@@ -20,6 +21,7 @@ impl Board {
         tokens: Tokens::DEFAULT,
         touch: false,
         refresh_ms: 1200,
+        bezel: Some(X3_BEZEL),
     };
 
     /// Xteink X4 — ESP32-C3, 800x480 monochrome e-ink, landscape.
@@ -35,5 +37,62 @@ impl Board {
         tokens: Tokens::DEFAULT,
         touch: false,
         refresh_ms: 1200,
+        bezel: None,
     };
 }
+
+/// The X3's body, with its side buttons.
+///
+/// **Every dimension here is an estimate.** Xteink publish no mechanical
+/// drawing, so the body is derived from the panel: a 792x528 e-ink panel at
+/// roughly 150 dpi is about 134 x 89 mm of active area, and the surrounding
+/// body is scaled from product photographs. Replace these with measurements
+/// from the hardware when someone has one to hand.
+///
+/// The arrangement is what matters and is not in doubt: Up and Down are on the
+/// **side**, under the thumb of the hand holding it, and the four front buttons
+/// run along the bottom edge below the panel.
+pub const X3_BEZEL: Bezel = Bezel {
+    body: (1560, 1090),
+    panel_origin: (100, 80),
+    panel_size: (1320, 890),
+    buttons: &[
+        PhysicalButton {
+            label: "Up",
+            button: Button::Up,
+            centre: (1490, 380),
+            size: (90, 190),
+        },
+        PhysicalButton {
+            label: "Dn",
+            button: Button::Down,
+            centre: (1490, 640),
+            size: (90, 190),
+        },
+        PhysicalButton {
+            label: "Back",
+            button: Button::Back,
+            centre: (300, 1030),
+            size: (200, 70),
+        },
+        PhysicalButton {
+            label: "OK",
+            button: Button::Confirm,
+            centre: (620, 1030),
+            size: (200, 70),
+        },
+        PhysicalButton {
+            label: "Prev",
+            button: Button::PageBack,
+            centre: (940, 1030),
+            size: (200, 70),
+        },
+        PhysicalButton {
+            label: "Next",
+            button: Button::PageForward,
+            centre: (1260, 1030),
+            size: (200, 70),
+        },
+    ],
+    artwork: None,
+};

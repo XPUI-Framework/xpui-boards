@@ -1,6 +1,7 @@
 //! Pimoroni's RP2040 badges.
 
-use crate::Board;
+use crate::{Bezel, Board, PhysicalButton};
+use xpui::Button;
 use xpui_chrome::Tokens;
 
 impl Board {
@@ -18,6 +19,7 @@ impl Board {
         // A full UC8151 update is close to a second; the partial modes are
         // faster but still nothing you would drive an animation with.
         refresh_ms: 900,
+        bezel: Some(BADGER_BEZEL),
     };
 
     /// Pimoroni Tufty 2040 — RP2040, 320x240 colour IPS LCD (ST7789v).
@@ -33,5 +35,100 @@ impl Board {
         tokens: Tokens::COMPACT,
         touch: false,
         refresh_ms: 0,
+        bezel: Some(TUFTY_BEZEL),
     };
 }
+
+/// The Badger's body and its five front buttons.
+///
+/// Body from Pimoroni's published dimensions: 85.6 x 48.7 mm, the size of a
+/// credit card. The panel is a 2.9 inch strip roughly 66.9 x 29.1 mm of active
+/// area, centred across the width and sitting above the button row.
+///
+/// Button placement is **estimated** from product photographs: A, B and C run
+/// along the bottom edge, with up and down stacked on the right-hand side.
+/// Pimoroni publish the GPIO map but not the millimetre positions.
+pub const BADGER_BEZEL: Bezel = Bezel {
+    body: (856, 487),
+    panel_origin: (94, 60),
+    panel_size: (669, 291),
+    buttons: &[
+        PhysicalButton {
+            label: "A",
+            button: Button::Back,
+            centre: (150, 430),
+            size: (90, 60),
+        },
+        PhysicalButton {
+            label: "B",
+            button: Button::Confirm,
+            centre: (300, 430),
+            size: (90, 60),
+        },
+        PhysicalButton {
+            label: "C",
+            button: Button::PageForward,
+            centre: (450, 430),
+            size: (90, 60),
+        },
+        PhysicalButton {
+            label: "Up",
+            button: Button::Up,
+            centre: (800, 150),
+            size: (70, 60),
+        },
+        PhysicalButton {
+            label: "Dn",
+            button: Button::Down,
+            centre: (800, 260),
+            size: (70, 60),
+        },
+    ],
+    artwork: None,
+};
+
+/// The Tufty's body and its five buttons.
+///
+/// Body from Pimoroni's published dimensions: 65.2 x 52.7 mm. The panel is a
+/// 2.4 inch display of roughly 48.9 x 36.7 mm active area.
+///
+/// Button placement is **estimated** from product photographs, as for the
+/// Badger: A, B and C along the bottom, up and down on the right edge.
+pub const TUFTY_BEZEL: Bezel = Bezel {
+    body: (652, 527),
+    panel_origin: (81, 60),
+    panel_size: (489, 367),
+    buttons: &[
+        PhysicalButton {
+            label: "A",
+            button: Button::Back,
+            centre: (130, 470),
+            size: (80, 55),
+        },
+        PhysicalButton {
+            label: "B",
+            button: Button::Confirm,
+            centre: (250, 470),
+            size: (80, 55),
+        },
+        PhysicalButton {
+            label: "C",
+            button: Button::PageForward,
+            centre: (370, 470),
+            size: (80, 55),
+        },
+        PhysicalButton {
+            label: "Up",
+            button: Button::Up,
+            centre: (600, 160),
+            size: (60, 55),
+        },
+        PhysicalButton {
+            label: "Dn",
+            button: Button::Down,
+            centre: (600, 270),
+            size: (60, 55),
+        },
+    ],
+    artwork: None,
+};

@@ -17,5 +17,6 @@ impl Board {
         tokens: Tokens::DEFAULT,
         touch: true,
         refresh_ms: 1200,
+        bezel: None,
     };
 }

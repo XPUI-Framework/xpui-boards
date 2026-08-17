@@ -17,4 +17,5 @@ crate-type = ["rlib"]
 [dependencies]
 # Only for the token presets. A board describes a panel; the chrome sized for
 # it is the one thing it borrows.
+xpui.workspace = true
 xpui-chrome.workspace = true

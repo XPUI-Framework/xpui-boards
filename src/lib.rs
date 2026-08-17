@@ -15,10 +15,12 @@
 
 #![cfg_attr(target_os = "none", no_std)]
 
+mod bezel;
 mod pimoroni;
 mod seeed;
 mod xteink;
 
+pub use bezel::{Bezel, PhysicalButton};
 pub use xpui_chrome::Tokens;
 
 /// A panel, its chrome, and what it can be driven with.
@@ -42,6 +44,12 @@ pub struct Board {
     /// E-ink is the reason the framework repaints only when something changed.
     /// A board that answers 0 is a display fast enough not to care.
     pub refresh_ms: u32,
+    /// The body around the panel, when one has been described.
+    ///
+    /// `None` means the simulator opens a window that is exactly the panel, as
+    /// it always did. Bezels arrive one device at a time rather than all five
+    /// at once.
+    pub bezel: Option<Bezel>,
 }
 
 impl Board {
@@ -85,6 +93,7 @@ impl Board {
             tokens: Tokens::for_panel(width, height),
             touch,
             refresh_ms: 0,
+            bezel: None,
         }
     }
 

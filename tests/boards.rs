@@ -97,3 +97,124 @@ fn the_aliases_work() {
     assert_eq!(Board::from_slug("badger"), Some(Board::BADGER_2040));
     assert_eq!(Board::from_slug("tufty"), Some(Board::TUFTY_2040));
 }
+
+// -- bezels ----------------------------------------------------------------
+
+use xpui_boards::Bezel;
+
+fn bezels() -> impl Iterator<Item = (Board, Bezel)> {
+    Board::ALL
+        .into_iter()
+        .filter_map(|board| board.bezel.map(|bezel| (board, bezel)))
+}
+
+/// A button has to be somewhere a thumb can reach: on the body, and not on top
+/// of the screen.
+#[test]
+fn every_button_is_on_the_body_and_off_the_panel() {
+    for (board, bezel) in bezels() {
+        let (px, py, pw, ph) = bezel.panel_rect();
+
+        for button in bezel.buttons {
+            let (cx, cy) = button.centre;
+            let (w, h) = button.size;
+            let (left, top) = (cx - w / 2, cy - h / 2);
+            let (right, bottom) = (cx + w / 2, cy + h / 2);
+
+            assert!(
+                left >= 0 && top >= 0 && right <= bezel.body.0 && bottom <= bezel.body.1,
+                "{}: {:?} is off the body",
+                board.name,
+                button.label
+            );
+
+            let overlaps = right > px && left < px + pw && bottom > py && top < py + ph;
+            assert!(
+                !overlaps,
+                "{}: {:?} sits on the panel. A physical button belongs beside \
+                 the screen — one drawn over it would take taps the firmware \
+                 should have had",
+                board.name, button.label
+            );
+        }
+    }
+}
+
+/// The panel has to fit inside the body it is set into.
+#[test]
+fn the_panel_fits_in_the_body() {
+    for (board, bezel) in bezels() {
+        let (x, y, w, h) = bezel.panel_rect();
+        assert!(
+            x >= 0 && y >= 0 && x + w <= bezel.body.0 && y + h <= bezel.body.1,
+            "{}: the panel hangs off the body",
+            board.name
+        );
+    }
+}
+
+/// Two buttons in the same place means one of them can never be pressed.
+#[test]
+fn no_two_buttons_overlap() {
+    for (board, bezel) in bezels() {
+        for (index, first) in bezel.buttons.iter().enumerate() {
+            for second in &bezel.buttons[index + 1..] {
+                let apart = (first.centre.0 - second.centre.0).abs()
+                    >= (first.size.0 + second.size.0) / 2
+                    || (first.centre.1 - second.centre.1).abs()
+                        >= (first.size.1 + second.size.1) / 2;
+                assert!(
+                    apart,
+                    "{}: {:?} and {:?} overlap",
+                    board.name, first.label, second.label
+                );
+            }
+        }
+    }
+}
+
+/// Hit-testing has to find the button you aimed at, and nothing where there is
+/// none.
+#[test]
+fn a_press_finds_the_button_under_it() {
+    for (board, bezel) in bezels() {
+        for button in bezel.buttons {
+            assert_eq!(
+                bezel.button_at(button.centre).map(|found| found.label),
+                Some(button.label),
+                "{}: pressing the middle of {:?} found something else",
+                board.name,
+                button.label
+            );
+        }
+
+        // The middle of the panel is not a button on any of these.
+        let (x, y, w, h) = bezel.panel_rect();
+        assert!(
+            bezel.button_at((x + w / 2, y + h / 2)).is_none(),
+            "{}: the middle of the screen reported a button",
+            board.name
+        );
+    }
+}
+
+/// The X3 carries its Up and Down on the side, which is the thing that makes it
+/// feel like that device rather than a generic slab.
+#[test]
+fn the_x3_has_side_buttons() {
+    let bezel = Board::X3.bezel.expect("the X3 has a bezel");
+    let (px, _, pw, _) = bezel.panel_rect();
+
+    for label in ["Up", "Dn"] {
+        let button = bezel
+            .buttons
+            .iter()
+            .find(|button| button.label == label)
+            .unwrap_or_else(|| panic!("the X3 has a {label} button"));
+
+        assert!(
+            button.centre.0 > px + pw,
+            "{label} should be beside the panel, not below it"
+        );
+    }
+}
