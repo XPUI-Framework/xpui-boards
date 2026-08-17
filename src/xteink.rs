@@ -144,7 +144,7 @@ pub const X3_BEZEL: Bezel = Bezel {
 /// X3 and the X4 Pro.
 pub const X4_BEZEL: Bezel = Bezel {
     body: (580, 1020),
-    panel_origin: (60, 80),
+    panel_origin: (80, 80),
     panel_size: (420, 700),
     buttons: &[
         // Both page keys stacked on one side rather than one per edge — the
@@ -205,7 +205,7 @@ pub const X4_BEZEL: Bezel = Bezel {
 /// the panel rather than being a pin.
 pub const X4_PRO_BEZEL: Bezel = Bezel {
     body: (580, 1020),
-    panel_origin: (60, 80),
+    panel_origin: (80, 80),
     panel_size: (420, 700),
     buttons: &[
         // Previous on the left edge, next on the right, and sleep above next.

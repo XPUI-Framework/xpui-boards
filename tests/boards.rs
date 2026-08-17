@@ -366,3 +366,22 @@ fn the_x4_pro_is_the_x4_with_a_touchscreen() {
     const _: () = assert!(!Board::X4.touch && Board::X4_PRO.touch);
     assert_ne!(Board::X4.slug, Board::X4_PRO.slug);
 }
+
+/// A panel sits in the middle of its body.
+///
+/// Off-centre by forty units is not subtle once it is drawn, and it is the kind
+/// of thing that creeps back in every time a key moves. One unit of slack,
+/// because an odd margin cannot be split evenly.
+#[test]
+fn every_panel_is_centred_across_its_body() {
+    for (board, bezel) in bezels() {
+        let (x, _, width, _) = bezel.panel_rect();
+        let (left, right) = (x, bezel.body.0 - (x + width));
+
+        assert!(
+            (left - right).abs() <= 1,
+            "{}: {left} on the left and {right} on the right",
+            board.name
+        );
+    }
+}

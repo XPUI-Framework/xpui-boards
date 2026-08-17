@@ -38,7 +38,7 @@ impl Board {
 /// they sit, and its own themes model this pair as a stacked rocker instead.
 pub const STICKY_BEZEL: Bezel = Bezel {
     body: (560, 1010),
-    panel_origin: (52, 95),
+    panel_origin: (55, 95),
     panel_size: (450, 750),
     buttons: &[
         // Seeed call this one the AI Voice key: a short press goes home or
