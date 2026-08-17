@@ -74,7 +74,38 @@ pub struct Board {
     /// rather than a change of shape — the X3 has a gyroscope and the touch
     /// readers rotate.
     pub orientation: Orientation,
-    /// The chrome sized for this panel.
+    /// The panel's diagonal, in hundredths of an inch — 426 is 4.26" — or
+    /// `None` for a panel whose physical size nobody has written down.
+    ///
+    /// Hundredths of an inch because that is the unit these panels are sold
+    /// in, and an integer because `Board` is `Eq` and every preset is a
+    /// `const`. It is here so [`ppi`](Board::ppi) can be derived rather than
+    /// stored, and so a test can ask the only question that means anything
+    /// about chrome on a 200-ppi panel: how big is it in millimetres.
+    pub diagonal_hundredths_inch: Option<u16>,
+    /// How much larger this board's chrome is than the button-era baseline, as
+    /// a percentage: 100 keeps the original pixel sizes, 120 turns a 40px row
+    /// into 48.
+    ///
+    /// It exists because a pixel is not a size. These panels run from 111 ppi
+    /// on a Badger to 257 on an X3, and across the 218-257 ppi the readers sit
+    /// at, **a 30px row is about 3mm of glass** — legible when a button walks
+    /// the selection, and far too small to put a finger on. So the touch
+    /// boards take 120 and the button boards stay at 100.
+    ///
+    /// Hand-tuned per board rather than derived from the ppi, because the ppi
+    /// alone cannot tell a 4.26" X4 from a 3.97" Sticky, and because these are
+    /// the numbers CrossPoint's own `BoardConfig` carries for each profile: a
+    /// screen laid out here matches the firmware rather than merely resembling
+    /// it.
+    ///
+    /// A percentage rather than an `f32` for the same reasons
+    /// [`Tokens::scaled`] takes one: `Eq`, `const`, and no FPU on the device.
+    pub ui_scale_percent: u16,
+    /// The chrome sized for this panel, with [`ui_scale_percent`] already
+    /// applied.
+    ///
+    /// [`ui_scale_percent`]: Board::ui_scale_percent
     pub tokens: Tokens,
     /// Whether a finger can reach it. A board with buttons and no touchscreen
     /// should not have its layout widened to finger-sized targets, and a screen
@@ -134,6 +165,13 @@ impl Board {
             height,
             framebuffer: (width, height),
             orientation: Orientation::Landscape,
+            // A panel nobody has measured cannot answer in millimetres, and
+            // guessing an inch count would make `ppi` confidently wrong.
+            diagonal_hundredths_inch: None,
+            // The button-era baseline: an unknown panel gets the chrome it
+            // always got, and a caller with a touchscreen to fit passes its
+            // own scaled `Tokens`.
+            ui_scale_percent: 100,
             tokens: Tokens::for_panel(width, height),
             touch,
             refresh_ms: 0,
@@ -145,5 +183,43 @@ impl Board {
     /// decides whether a screen is usable on it at all.
     pub const fn list_rows(&self) -> i32 {
         self.tokens.list_rows_for(self.height)
+    }
+
+    /// The panel's pixel density, or `None` when its physical size is unknown.
+    ///
+    /// Derived from the diagonal rather than stored, so the two cannot drift
+    /// apart — and because the diagonal is the number a datasheet prints.
+    pub const fn ppi(&self) -> Option<i32> {
+        let Some(diagonal) = self.diagonal_hundredths_inch else {
+            return None;
+        };
+        if diagonal == 0 {
+            return None;
+        }
+        let (width, height) = self.framebuffer;
+        // Integer square root, not `f32::sqrt`: this is a `const fn`, and the
+        // targets it compiles for have no floating-point unit.
+        let diagonal_px = (width * width + height * height).isqrt();
+        Some(diagonal_px * 100 / diagonal as i32)
+    }
+
+    /// What `pixels` of this panel measure, in tenths of a millimetre.
+    ///
+    /// The question the chrome is actually judged by. A row is 40 pixels on
+    /// two of the readers here and 4.6mm on one, 3.9mm on the other, because
+    /// the panels differ in density — and 3mm is where a finger stops finding
+    /// it.
+    ///
+    /// Tenths because a millimetre is a coarse unit for a 4mm row, and because
+    /// tenths keep this integer on a device with no FPU.
+    pub const fn tenths_of_a_mm(&self, pixels: i32) -> Option<i32> {
+        let Some(ppi) = self.ppi() else {
+            return None;
+        };
+        if ppi <= 0 {
+            return None;
+        }
+        // 254 tenths of a millimetre to the inch.
+        Some(pixels * 254 / ppi)
     }
 }

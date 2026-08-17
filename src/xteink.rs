@@ -16,6 +16,12 @@ impl Board {
     ///
     /// No touchscreen. Four keys along the bottom edge and one on each side,
     /// which is the arrangement the firmware calls edge side buttons.
+    ///
+    /// The densest panel here at 257 ppi, and a button board, so it keeps the
+    /// baseline chrome: its 40px row is 3.9mm, the smallest of the five.
+    /// Deliberate rather than overlooked — the firmware gives this profile
+    /// `uiScale = 1.0`, and a selection walked with a key does not have to be
+    /// finger-sized.
     pub const X3: Board = Board {
         name: "Xteink X3",
         slug: "x3",
@@ -23,6 +29,10 @@ impl Board {
         height: 792,
         framebuffer: (792, 528),
         orientation: Orientation::Portrait,
+        // 3.7", the size Xteink sell it as. The only diagonal here not taken
+        // from the firmware's board table, which records none for this profile.
+        diagonal_hundredths_inch: Some(370),
+        ui_scale_percent: 100,
         tokens: Tokens::DEFAULT,
         touch: false,
         refresh_ms: 1200,
@@ -34,6 +44,9 @@ impl Board {
     /// No touchscreen, and its page keys are a rocker stacked on one side
     /// rather than one per edge — the firmware's themes branch on exactly that
     /// difference.
+    ///
+    /// A button board, so the baseline chrome: 218 ppi makes its 40px row
+    /// 4.6mm.
     pub const X4: Board = Board {
         name: "Xteink X4",
         slug: "x4",
@@ -41,6 +54,10 @@ impl Board {
         height: 800,
         framebuffer: (800, 480),
         orientation: Orientation::Portrait,
+        // 4.26", which is the figure the firmware's own board table quotes
+        // where it explains the UI scale; 4.3" is the rounded selling size.
+        diagonal_hundredths_inch: Some(426),
+        ui_scale_percent: 100,
         tokens: Tokens::DEFAULT,
         touch: false,
         refresh_ms: 1200,
@@ -53,6 +70,10 @@ impl Board {
     /// which is why only two navigation keys are wired: the reader's page pair,
     /// one on each side edge. A capacitive Home key sits below the panel and is
     /// reported by the touch controller too, not by a pin.
+    ///
+    /// The X4's panel, so the X4's 218 ppi — but everything here is chosen with
+    /// a finger, so the chrome takes the touch scale and a row becomes 48px, or
+    /// 5.6mm.
     pub const X4_PRO: Board = Board {
         name: "Xteink X4 Pro",
         slug: "x4pro",
@@ -60,7 +81,9 @@ impl Board {
         height: 800,
         framebuffer: (800, 480),
         orientation: Orientation::Portrait,
-        tokens: Tokens::DEFAULT,
+        diagonal_hundredths_inch: Some(426),
+        ui_scale_percent: 120,
+        tokens: Tokens::DEFAULT.scaled(120),
         touch: true,
         refresh_ms: 1200,
         bezel: Some(X4_PRO_BEZEL),

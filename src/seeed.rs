@@ -9,6 +9,11 @@ impl Board {
     ///
     /// A touchscreen with three keys beside it. Back and the directions come
     /// from touch; what is wired is a shared OK/Power key and a page pair.
+    ///
+    /// The X4's framebuffer in a smaller body — 3.97" against 4.26", so 234
+    /// ppi against 218, and every pixel here is 7% smaller than the same pixel
+    /// on an X4. A touch device, so it takes the scale its firmware profile
+    /// gives it, which puts a row at 5.2mm.
     pub const STICKY: Board = Board {
         name: "Seeed Sticky",
         slug: "sticky",
@@ -16,7 +21,9 @@ impl Board {
         height: 800,
         framebuffer: (800, 480),
         orientation: Orientation::Portrait,
-        tokens: Tokens::DEFAULT,
+        diagonal_hundredths_inch: Some(397),
+        ui_scale_percent: 120,
+        tokens: Tokens::DEFAULT.scaled(120),
         touch: true,
         refresh_ms: 1200,
         bezel: Some(STICKY_BEZEL),

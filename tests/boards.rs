@@ -98,6 +98,106 @@ fn the_aliases_work() {
     assert_eq!(Board::from_slug("tufty"), Some(Board::TUFTY_2040));
 }
 
+// -- how big a pixel is ----------------------------------------------------
+
+use xpui_boards::Tokens;
+
+/// A panel with no diagonal cannot be asked how big its chrome is, and every
+/// preset here has to be able to answer.
+#[test]
+fn every_preset_panel_has_been_measured() {
+    for board in Board::ALL {
+        assert!(
+            board.ppi().is_some(),
+            "{} has no diagonal, so nothing can say what its chrome measures",
+            board.name
+        );
+    }
+
+    assert_eq!(
+        Board::custom("Mine", 800, 480, false).ppi(),
+        None,
+        "a panel nobody has measured says so rather than guessing"
+    );
+}
+
+/// The derivation, against the densities these panels are sold with. A digit
+/// wrong in a diagonal is invisible until something is measured in
+/// millimetres, and then it is wrong everywhere at once.
+#[test]
+fn the_derived_density_matches_the_panel() {
+    for (board, published) in [
+        (Board::X3, 257),
+        (Board::X4, 218),
+        (Board::X4_PRO, 218),
+        (Board::STICKY, 234),
+        (Board::BADGER_2040, 111),
+        (Board::TUFTY_2040, 166),
+    ] {
+        let ppi = board.ppi().expect("a measured panel");
+        assert!(
+            (ppi - published).abs() <= 2,
+            "{}: {}x{} over {}\" derives {ppi} ppi, not the {published} it is sold as",
+            board.name,
+            board.framebuffer.0,
+            board.framebuffer.1,
+            board.diagonal_hundredths_inch.unwrap_or(0) as f32 / 100.0
+        );
+    }
+}
+
+/// The scale is the firmware's, board for board: a finger bumps it, a button
+/// does not.
+///
+/// If a board ever needs one without the other, this is the place to say why —
+/// the rule is `BoardConfig`'s, not an accident of which boards exist.
+#[test]
+fn the_touch_boards_are_the_scaled_ones() {
+    for board in Board::ALL {
+        let expected = if board.touch { 120 } else { 100 };
+        assert_eq!(
+            board.ui_scale_percent,
+            expected,
+            "{} is a {} board",
+            board.name,
+            if board.touch { "touch" } else { "button" }
+        );
+    }
+}
+
+/// A board carries both the factor and the chrome it produced, so the two can
+/// disagree. This is what stops them.
+#[test]
+fn a_boards_chrome_is_its_own_preset_scaled() {
+    for board in Board::ALL {
+        assert_eq!(
+            board.tokens,
+            Tokens::for_panel(board.width, board.height).scaled(board.ui_scale_percent),
+            "{}: its tokens are not the preset for its panel at its own scale",
+            board.name
+        );
+    }
+}
+
+/// The point of the scale, in the only units that matter. A touch board's row
+/// has to be findable by a fingertip; the firmware's own note is that 3mm is
+/// not.
+#[test]
+fn a_touch_boards_row_is_wider_than_a_fingertip() {
+    for board in Board::ALL.into_iter().filter(|board| board.touch) {
+        let tenths = board
+            .tenths_of_a_mm(board.tokens.list_row_height)
+            .expect("a measured panel");
+        assert!(
+            tenths >= 50,
+            "{}: a row is {}.{}mm",
+            board.name,
+            tenths / 10,
+            tenths % 10
+        );
+    }
+}
+
 // -- bezels ----------------------------------------------------------------
 
 use xpui_boards::Bezel;

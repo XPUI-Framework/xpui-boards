@@ -9,6 +9,9 @@ impl Board {
     ///
     /// The panel that made small-panel tokens necessary: the default chrome
     /// leaves 28 pixels of content here, which is not enough for one list row.
+    ///
+    /// Buttons only, so the baseline scale — and at 111 ppi it needs no help:
+    /// a 24px row on this strip is 5.5mm, wider than a 40px row on a reader.
     pub const BADGER_2040: Board = Board {
         name: "Badger 2040",
         slug: "badger2040",
@@ -16,6 +19,9 @@ impl Board {
         height: 128,
         framebuffer: (296, 128),
         orientation: Orientation::Landscape,
+        // Pimoroni's 2.9" UC8151 strip.
+        diagonal_hundredths_inch: Some(290),
+        ui_scale_percent: 100,
         tokens: Tokens::SMALL,
         touch: false,
         // A full UC8151 update is close to a second; the partial modes are
@@ -29,6 +35,9 @@ impl Board {
     /// Colour hardware running a monochrome framework: the backend maps ink and
     /// background onto any two `Rgb565` values, so the same screens render
     /// black-on-white, or amber-on-black, without a screen knowing.
+    ///
+    /// Buttons only, so the baseline scale. 166 ppi puts its 30px row at
+    /// 4.6mm.
     pub const TUFTY_2040: Board = Board {
         name: "Tufty 2040",
         slug: "tufty2040",
@@ -36,6 +45,9 @@ impl Board {
         height: 240,
         framebuffer: (320, 240),
         orientation: Orientation::Landscape,
+        // Pimoroni's 2.4" ST7789v.
+        diagonal_hundredths_inch: Some(240),
+        ui_scale_percent: 100,
         tokens: Tokens::COMPACT,
         touch: false,
         refresh_ms: 0,
