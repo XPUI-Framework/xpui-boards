@@ -20,7 +20,7 @@ mod pimoroni;
 mod seeed;
 mod xteink;
 
-pub use bezel::{Bezel, PhysicalButton};
+pub use bezel::{Bezel, KeyAction, PhysicalButton};
 
 pub use xpui_chrome::Tokens;
 

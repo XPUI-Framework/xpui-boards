@@ -11,13 +11,29 @@
 
 use xpui::Button;
 
-/// A physical button: what it does, and where your thumb finds it.
+/// What pressing a key means.
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+pub enum KeyAction {
+    /// A logical button the firmware reads.
+    Press(Button),
+    /// Go home.
+    ///
+    /// Not a button: on the reader that has one this is a capacitive pad below
+    /// the panel, reported by the touch controller rather than by a pin, and
+    /// the framework receives it as a gesture.
+    Home,
+}
+
+/// A physical key: what it does, and where your thumb finds it.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub struct PhysicalButton {
     /// What is printed beside it, or nothing if the device leaves it bare.
+    ///
+    /// This is what the key *does*, which is not always what its pin is called.
+    /// A reader's side keys sit on pins named up and down and turn pages.
     pub label: &'static str,
     /// What the firmware receives when it is pressed.
-    pub button: Button,
+    pub action: KeyAction,
     /// Centre, in tenths of a millimetre from the body's top-left.
     pub centre: (i32, i32),
     /// Size, in the same units.

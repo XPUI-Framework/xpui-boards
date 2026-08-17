@@ -1,6 +1,6 @@
 //! Seeed's Sticky.
 
-use crate::{Bezel, Board, Orientation, PhysicalButton};
+use crate::{Bezel, Board, KeyAction, Orientation, PhysicalButton};
 use xpui::Button;
 use xpui_chrome::Tokens;
 
@@ -37,27 +37,33 @@ impl Board {
 /// than from the code: the firmware wires the pins but says nothing about where
 /// they sit, and its own themes model this pair as a stacked rocker instead.
 pub const STICKY_BEZEL: Bezel = Bezel {
-    body: (580, 1010),
-    panel_origin: (55, 90),
-    panel_size: (420, 700),
+    body: (560, 1010),
+    panel_origin: (52, 95),
+    panel_size: (450, 750),
     buttons: &[
+        // Seeed call this one the AI Voice key: a short press goes home or
+        // starts voice input, and three seconds powers the device on. There is
+        // no separate power key. CrossPoint puts confirm and power on that same
+        // pin — a click confirms, four hundred milliseconds sleeps — so the
+        // label is what this firmware does with it rather than what is printed
+        // beside it on the device.
         PhysicalButton {
             label: "OK",
-            button: Button::Confirm,
-            centre: (545, 260),
-            size: (50, 130),
+            action: KeyAction::Press(Button::Confirm),
+            centre: (528, 250),
+            size: (44, 120),
         },
         PhysicalButton {
-            label: "Up",
-            button: Button::Up,
-            centre: (545, 430),
-            size: (50, 130),
+            label: "Prev",
+            action: KeyAction::Press(Button::PageBack),
+            centre: (528, 430),
+            size: (44, 140),
         },
         PhysicalButton {
-            label: "Dn",
-            button: Button::Down,
-            centre: (545, 590),
-            size: (50, 130),
+            label: "Next",
+            action: KeyAction::Press(Button::PageForward),
+            centre: (528, 590),
+            size: (44, 140),
         },
     ],
     artwork: None,

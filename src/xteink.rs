@@ -7,7 +7,7 @@
 //! canvas is the framebuffer turned a quarter. The framebuffer itself is never
 //! rotated: a renderer transforms each pixel on its way out.
 
-use crate::{Bezel, Board, Orientation, PhysicalButton};
+use crate::{Bezel, Board, KeyAction, Orientation, PhysicalButton};
 use xpui::Button;
 use xpui_chrome::Tokens;
 
@@ -79,45 +79,58 @@ impl Board {
 /// right edges, and the themes lay out Up on the left and Down on the right
 /// against exactly that.
 pub const X3_BEZEL: Bezel = Bezel {
-    body: (620, 1000),
+    body: (620, 1010),
     panel_origin: (75, 80),
     panel_size: (470, 705),
     buttons: &[
+        // The side pair. Their pins are named up and down, which is a leftover
+        // from the X4's rocker: on this board they sit on the screen's left and
+        // right edges and turn pages. In a list they move the selection, a row
+        // per tap and a page per hold.
         PhysicalButton {
-            label: "Up",
-            button: Button::Up,
-            centre: (37, 400),
+            label: "Prev",
+            action: KeyAction::Press(Button::PageBack),
+            centre: (37, 380),
             size: (50, 170),
         },
         PhysicalButton {
-            label: "Dn",
-            button: Button::Down,
-            centre: (583, 400),
+            label: "Next",
+            action: KeyAction::Press(Button::PageForward),
+            centre: (583, 380),
             size: (50, 170),
         },
+        PhysicalButton {
+            label: "Sleep",
+            action: KeyAction::Press(Button::Power),
+            centre: (583, 170),
+            size: (50, 110),
+        },
+        // The bottom row. Its pins are named back, confirm, left and right;
+        // the labels are what a list screen prints above them, which is where
+        // Up and Down come from.
         PhysicalButton {
             label: "Back",
-            button: Button::Back,
-            centre: (110, 890),
-            size: (130, 60),
+            action: KeyAction::Press(Button::Back),
+            centre: (95, 905),
+            size: (125, 60),
         },
         PhysicalButton {
-            label: "OK",
-            button: Button::Confirm,
-            centre: (265, 890),
-            size: (130, 60),
+            label: "Select",
+            action: KeyAction::Press(Button::Confirm),
+            centre: (240, 905),
+            size: (125, 60),
         },
         PhysicalButton {
-            label: "<",
-            button: Button::Left,
-            centre: (400, 890),
-            size: (90, 60),
+            label: "Up",
+            action: KeyAction::Press(Button::Left),
+            centre: (385, 905),
+            size: (125, 60),
         },
         PhysicalButton {
-            label: ">",
-            button: Button::Right,
-            centre: (515, 890),
-            size: (90, 60),
+            label: "Down",
+            action: KeyAction::Press(Button::Right),
+            centre: (525, 905),
+            size: (125, 60),
         },
     ],
     artwork: None,
@@ -130,45 +143,54 @@ pub const X3_BEZEL: Bezel = Bezel {
 /// on it, drawing both keys on one side for this board and one per edge for the
 /// X3 and the X4 Pro.
 pub const X4_BEZEL: Bezel = Bezel {
-    body: (580, 1010),
+    body: (580, 1020),
     panel_origin: (60, 80),
     panel_size: (420, 700),
     buttons: &[
+        // Both page keys stacked on one side rather than one per edge — the
+        // firmware's themes branch on exactly this, drawing their hints in two
+        // different places.
         PhysicalButton {
-            label: "Up",
-            button: Button::Up,
-            centre: (545, 330),
+            label: "Sleep",
+            action: KeyAction::Press(Button::Power),
+            centre: (545, 200),
+            size: (50, 110),
+        },
+        PhysicalButton {
+            label: "Prev",
+            action: KeyAction::Press(Button::PageBack),
+            centre: (545, 380),
             size: (50, 140),
         },
         PhysicalButton {
-            label: "Dn",
-            button: Button::Down,
-            centre: (545, 490),
+            label: "Next",
+            action: KeyAction::Press(Button::PageForward),
+            centre: (545, 540),
             size: (50, 140),
         },
         PhysicalButton {
             label: "Back",
-            button: Button::Back,
-            centre: (100, 900),
-            size: (120, 60),
+            action: KeyAction::Press(Button::Back),
+            centre: (90, 915),
+            size: (115, 60),
         },
         PhysicalButton {
-            label: "OK",
-            button: Button::Confirm,
-            centre: (240, 900),
-            size: (120, 60),
+            label: "Select",
+            action: KeyAction::Press(Button::Confirm),
+            centre: (220, 915),
+            size: (115, 60),
         },
         PhysicalButton {
-            label: "<",
-            button: Button::Left,
-            centre: (360, 900),
-            size: (90, 60),
+            label: "Up",
+            action: KeyAction::Press(Button::Left),
+            centre: (350, 915),
+            size: (115, 60),
         },
         PhysicalButton {
-            label: ">",
-            button: Button::Right,
-            centre: (470, 900),
-            size: (90, 60),
+            label: "Down",
+            action: KeyAction::Press(Button::Right),
+            centre: (480, 915),
+            size: (115, 60),
         },
     ],
     artwork: None,
@@ -182,28 +204,37 @@ pub const X4_BEZEL: Bezel = Bezel {
 /// the page pair one per edge, and the Home key is capacitive and sits below
 /// the panel rather than being a pin.
 pub const X4_PRO_BEZEL: Bezel = Bezel {
-    body: (580, 1010),
+    body: (580, 1020),
     panel_origin: (60, 80),
     panel_size: (420, 700),
     buttons: &[
+        // Previous on the left edge, next on the right, and sleep above next.
+        // There is no bottom row: this board leaves back, confirm, left and
+        // right unassigned and takes them from the touchscreen instead.
         PhysicalButton {
-            label: "Up",
-            button: Button::Up,
-            centre: (30, 330),
-            size: (44, 150),
+            label: "Prev",
+            action: KeyAction::Press(Button::PageBack),
+            centre: (30, 380),
+            size: (44, 160),
         },
         PhysicalButton {
-            label: "Dn",
-            button: Button::Down,
-            centre: (545, 330),
-            size: (50, 150),
+            label: "Sleep",
+            action: KeyAction::Press(Button::Power),
+            centre: (550, 200),
+            size: (44, 110),
         },
-        // Round on the device. It is the only key on the face, because the
-        // touchscreen does everything the other readers give to buttons.
+        PhysicalButton {
+            label: "Next",
+            action: KeyAction::Press(Button::PageForward),
+            centre: (550, 380),
+            size: (44, 160),
+        },
+        // Round, and capacitive: the touch controller reports it rather than a
+        // pin, which is why it is a gesture and not a key press.
         PhysicalButton {
             label: "Home",
-            button: Button::Back,
-            centre: (270, 905),
+            action: KeyAction::Home,
+            centre: (270, 910),
             size: (100, 100),
         },
     ],

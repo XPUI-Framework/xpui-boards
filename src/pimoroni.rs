@@ -1,6 +1,6 @@
 //! Pimoroni's RP2040 badges.
 
-use crate::{Bezel, Board, Orientation, PhysicalButton};
+use crate::{Bezel, Board, KeyAction, Orientation, PhysicalButton};
 use xpui::Button;
 use xpui_chrome::Tokens;
 
@@ -59,31 +59,31 @@ pub const BADGER_BEZEL: Bezel = Bezel {
     buttons: &[
         PhysicalButton {
             label: "A",
-            button: Button::Back,
+            action: KeyAction::Press(Button::Back),
             centre: (150, 430),
             size: (90, 60),
         },
         PhysicalButton {
             label: "B",
-            button: Button::Confirm,
+            action: KeyAction::Press(Button::Confirm),
             centre: (300, 430),
             size: (90, 60),
         },
         PhysicalButton {
             label: "C",
-            button: Button::PageForward,
+            action: KeyAction::Press(Button::PageForward),
             centre: (450, 430),
             size: (90, 60),
         },
         PhysicalButton {
             label: "Up",
-            button: Button::Up,
+            action: KeyAction::Press(Button::Up),
             centre: (800, 150),
             size: (70, 60),
         },
         PhysicalButton {
             label: "Dn",
-            button: Button::Down,
+            action: KeyAction::Press(Button::Down),
             centre: (800, 260),
             size: (70, 60),
         },
@@ -105,31 +105,31 @@ pub const TUFTY_BEZEL: Bezel = Bezel {
     buttons: &[
         PhysicalButton {
             label: "A",
-            button: Button::Back,
+            action: KeyAction::Press(Button::Back),
             centre: (130, 470),
             size: (80, 55),
         },
         PhysicalButton {
             label: "B",
-            button: Button::Confirm,
+            action: KeyAction::Press(Button::Confirm),
             centre: (250, 470),
             size: (80, 55),
         },
         PhysicalButton {
             label: "C",
-            button: Button::PageForward,
+            action: KeyAction::Press(Button::PageForward),
             centre: (370, 470),
             size: (80, 55),
         },
         PhysicalButton {
             label: "Up",
-            button: Button::Up,
+            action: KeyAction::Press(Button::Up),
             centre: (600, 160),
             size: (60, 55),
         },
         PhysicalButton {
             label: "Dn",
-            button: Button::Down,
+            action: KeyAction::Press(Button::Down),
             centre: (600, 270),
             size: (60, 55),
         },

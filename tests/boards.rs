@@ -220,21 +220,21 @@ fn the_page_keys_sit_where_the_firmware_says() {
         };
 
         assert!(
-            key("Up").centre.0 < left_edge,
-            "{}: Up belongs on the left edge",
+            key("Prev").centre.0 < left_edge,
+            "{}: the previous-page key belongs on the left edge",
             board.name
         );
         assert!(
-            key("Dn").centre.0 > right_edge,
-            "{}: Down belongs on the right edge",
+            key("Next").centre.0 > right_edge,
+            "{}: the next-page key belongs on the right edge",
             board.name
         );
     }
 
     // The X4 is the other arrangement: both on one side.
     let bezel = Board::X4.bezel.expect("the X4 has a body");
-    let up = bezel.buttons.iter().find(|b| b.label == "Up").unwrap();
-    let down = bezel.buttons.iter().find(|b| b.label == "Dn").unwrap();
+    let up = bezel.buttons.iter().find(|b| b.label == "Prev").unwrap();
+    let down = bezel.buttons.iter().find(|b| b.label == "Next").unwrap();
     assert_eq!(
         up.centre.0, down.centre.0,
         "the X4 stacks its page keys on one side rather than splitting them"
