@@ -1,6 +1,6 @@
 //! Pimoroni's RP2040 badges.
 
-use crate::{Bezel, Board, PhysicalButton};
+use crate::{Bezel, Board, Orientation, PhysicalButton};
 use xpui::Button;
 use xpui_chrome::Tokens;
 
@@ -14,6 +14,8 @@ impl Board {
         slug: "badger2040",
         width: 296,
         height: 128,
+        framebuffer: (296, 128),
+        orientation: Orientation::Landscape,
         tokens: Tokens::SMALL,
         touch: false,
         // A full UC8151 update is close to a second; the partial modes are
@@ -32,6 +34,8 @@ impl Board {
         slug: "tufty2040",
         width: 320,
         height: 240,
+        framebuffer: (320, 240),
+        orientation: Orientation::Landscape,
         tokens: Tokens::COMPACT,
         touch: false,
         refresh_ms: 0,

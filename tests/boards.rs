@@ -198,23 +198,171 @@ fn a_press_finds_the_button_under_it() {
     }
 }
 
-/// The X3 carries its Up and Down on the side, which is the thing that makes it
-/// feel like that device rather than a generic slab.
+/// The X3 and the X4 Pro put one page key on each side edge; the X4 stacks
+/// both on the same side.
+///
+/// That difference is not cosmetic — the firmware branches on it, in
+/// `HalGPIO::hasEdgeSideButtons` and in every theme that draws a hint beside a
+/// key. A simulator that got it wrong would teach the wrong muscle memory.
 #[test]
-fn the_x3_has_side_buttons() {
-    let bezel = Board::X3.bezel.expect("the X3 has a bezel");
-    let (px, _, pw, _) = bezel.panel_rect();
+fn the_page_keys_sit_where_the_firmware_says() {
+    for board in [Board::X3, Board::X4_PRO] {
+        let bezel = board.bezel.expect("this board has a body");
+        let (left_edge, _, panel_width, _) = bezel.panel_rect();
+        let right_edge = left_edge + panel_width;
 
-    for label in ["Up", "Dn"] {
-        let button = bezel
-            .buttons
-            .iter()
-            .find(|button| button.label == label)
-            .unwrap_or_else(|| panic!("the X3 has a {label} button"));
+        let key = |label: &str| {
+            bezel
+                .buttons
+                .iter()
+                .find(|button| button.label == label)
+                .unwrap_or_else(|| panic!("{} has no {label} key", board.name))
+        };
 
         assert!(
-            button.centre.0 > px + pw,
-            "{label} should be beside the panel, not below it"
+            key("Up").centre.0 < left_edge,
+            "{}: Up belongs on the left edge",
+            board.name
+        );
+        assert!(
+            key("Dn").centre.0 > right_edge,
+            "{}: Down belongs on the right edge",
+            board.name
         );
     }
+
+    // The X4 is the other arrangement: both on one side.
+    let bezel = Board::X4.bezel.expect("the X4 has a body");
+    let up = bezel.buttons.iter().find(|b| b.label == "Up").unwrap();
+    let down = bezel.buttons.iter().find(|b| b.label == "Dn").unwrap();
+    assert_eq!(
+        up.centre.0, down.centre.0,
+        "the X4 stacks its page keys on one side rather than splitting them"
+    );
+}
+
+/// The X4 Pro's face carries one key, because the touchscreen does the rest.
+#[test]
+fn the_x4_pro_has_a_home_key_below_the_panel() {
+    let bezel = Board::X4_PRO.bezel.expect("the X4 Pro has a body");
+    let (_, top, _, panel_height) = bezel.panel_rect();
+
+    let home = bezel
+        .buttons
+        .iter()
+        .find(|button| button.label == "Home")
+        .expect("the X4 Pro has a Home key");
+
+    assert!(
+        home.centre.1 > top + panel_height,
+        "the Home key sits below the panel, not beside it"
+    );
+    assert_eq!(
+        home.size.0, home.size.1,
+        "it is round, so its box is square"
+    );
+}
+
+/// The Sticky's three keys are a column, not a row.
+#[test]
+fn the_sticky_stacks_its_three_keys() {
+    let bezel = Board::STICKY.bezel.expect("the Sticky has a body");
+    assert_eq!(
+        bezel.buttons.len(),
+        3,
+        "the firmware wires exactly three pins"
+    );
+
+    let column = bezel.buttons[0].centre.0;
+    for button in bezel.buttons {
+        assert_eq!(
+            button.centre.0, column,
+            "{:?} is out of the column",
+            button.label
+        );
+    }
+
+    let mut heights: Vec<i32> = bezel.buttons.iter().map(|b| b.centre.1).collect();
+    let sorted = {
+        let mut copy = heights.clone();
+        copy.sort_unstable();
+        copy
+    };
+    heights.dedup();
+    assert_eq!(heights.len(), 3, "three keys at three heights");
+    assert_eq!(
+        bezel.buttons.iter().map(|b| b.centre.1).collect::<Vec<_>>(),
+        sorted,
+        "declared top to bottom, so the order reads as the device does"
+    );
+}
+
+// -- orientation -----------------------------------------------------------
+
+/// The readers scan landscape and are held portrait, so their canvas is the
+/// framebuffer turned a quarter. Getting this backwards lays every screen out
+/// against the wrong shape.
+#[test]
+fn a_portrait_board_presents_its_framebuffer_turned() {
+    for board in Board::ALL {
+        let (width, height) = board.orientation.canvas(board.framebuffer);
+        assert_eq!(
+            (width, height),
+            (board.width, board.height),
+            "{}: a {:?} board with a {}x{} framebuffer presents {}x{}, not {}x{}",
+            board.name,
+            board.orientation,
+            board.framebuffer.0,
+            board.framebuffer.1,
+            width,
+            height,
+            board.width,
+            board.height
+        );
+    }
+}
+
+/// Every Xteink reader is used upright, whatever way its controller scans.
+#[test]
+fn the_readers_are_portrait() {
+    use xpui_boards::Orientation;
+
+    for board in [Board::X3, Board::X4, Board::X4_PRO, Board::STICKY] {
+        assert_eq!(board.orientation, Orientation::Portrait, "{}", board.name);
+        assert!(
+            board.height > board.width,
+            "{}: a portrait canvas is taller than it is wide",
+            board.name
+        );
+        assert!(
+            board.framebuffer.0 > board.framebuffer.1,
+            "{}: these panels scan landscape",
+            board.name
+        );
+    }
+}
+
+/// The touch boards are the ones with a touchscreen, and only those.
+#[test]
+fn touch_is_recorded_where_the_hardware_has_it() {
+    // Const, because these are compile-time facts: changing one fails the
+    // build rather than a test run.
+    const _: () = assert!(Board::X4_PRO.touch, "the X4 Pro has a touchscreen");
+    const _: () = assert!(Board::STICKY.touch, "the Sticky has one");
+
+    for board in [Board::X3, Board::X4, Board::BADGER_2040, Board::TUFTY_2040] {
+        assert!(!board.touch, "{} has buttons only", board.name);
+    }
+}
+
+/// The X4 and the X4 Pro share a panel and differ in what is on top of it.
+#[test]
+fn the_x4_pro_is_the_x4_with_a_touchscreen() {
+    assert_eq!(
+        (Board::X4.width, Board::X4.height),
+        (Board::X4_PRO.width, Board::X4_PRO.height)
+    );
+    assert_eq!(Board::X4.framebuffer, Board::X4_PRO.framebuffer);
+    const _: () = assert!(!Board::X4.touch && Board::X4_PRO.touch);
+    assert_ne!(Board::X4.slug, Board::X4_PRO.slug);
 }

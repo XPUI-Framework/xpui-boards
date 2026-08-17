@@ -21,7 +21,31 @@ mod seeed;
 mod xteink;
 
 pub use bezel::{Bezel, PhysicalButton};
+
 pub use xpui_chrome::Tokens;
+
+/// Which way up a canvas sits on its framebuffer.
+///
+/// A device scans its panel in one order and is held in another. Nothing
+/// rotates yet; this records which is which so that when something does, the
+/// numbers are already here.
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+pub enum Orientation {
+    /// The canvas is the framebuffer turned a quarter: tall on a wide panel.
+    Portrait,
+    /// The canvas is the framebuffer as it is scanned.
+    Landscape,
+}
+
+impl Orientation {
+    /// The canvas a framebuffer of `size` presents in this orientation.
+    pub const fn canvas(self, size: (i32, i32)) -> (i32, i32) {
+        match self {
+            Orientation::Portrait => (size.1, size.0),
+            Orientation::Landscape => size,
+        }
+    }
+}
 
 /// A panel, its chrome, and what it can be driven with.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
@@ -31,8 +55,25 @@ pub struct Board {
     /// The short name a command line accepts. Stored rather than derived: the
     /// X4 and the Sticky are both 800x480, so a size cannot tell them apart.
     pub slug: &'static str,
+    /// The canvas a screen is laid out against, in the orientation the device
+    /// is normally held.
     pub width: i32,
     pub height: i32,
+    /// The panel's own framebuffer, in the order the controller scans it.
+    ///
+    /// These readers all scan landscape and are held portrait, so the two
+    /// differ: an X3 scans 792x528 and presents 528x792. The framebuffer is
+    /// never rotated — a renderer transforms each pixel on its way out — so a
+    /// backend that talks to real hardware needs this number, not the other.
+    pub framebuffer: (i32, i32),
+    /// How the canvas sits on the framebuffer.
+    ///
+    /// Only `Portrait` and `Landscape` are described today, and only the
+    /// orientation a device is normally used in. The field exists so adding
+    /// the inverted pair, and letting a device turn, is a change of value
+    /// rather than a change of shape — the X3 has a gyroscope and the touch
+    /// readers rotate.
+    pub orientation: Orientation,
     /// The chrome sized for this panel.
     pub tokens: Tokens,
     /// Whether a finger can reach it. A board with buttons and no touchscreen
@@ -55,9 +96,10 @@ pub struct Board {
 impl Board {
     /// Every board, so an example can offer them all without a table of its own
     /// that would fall behind this one.
-    pub const ALL: [Board; 5] = [
+    pub const ALL: [Board; 6] = [
         Board::X3,
         Board::X4,
+        Board::X4_PRO,
         Board::STICKY,
         Board::BADGER_2040,
         Board::TUFTY_2040,
@@ -90,6 +132,8 @@ impl Board {
             slug: "custom",
             width,
             height,
+            framebuffer: (width, height),
+            orientation: Orientation::Landscape,
             tokens: Tokens::for_panel(width, height),
             touch,
             refresh_ms: 0,
