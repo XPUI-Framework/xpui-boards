@@ -226,3 +226,14 @@ impl Board {
         Some(pixels * 254 / ppi)
     }
 }
+
+/// The crate's prose, compiled.
+///
+/// A README that does not build is worse than none — and this crate's was
+/// declared in `Cargo.toml` without existing at all, which made
+/// `cargo package` fail on a crate meant to be published.
+#[cfg(doctest)]
+mod guides {
+    #[doc = include_str!("../README.md")]
+    pub mod readme {}
+}
