@@ -1,6 +1,7 @@
 //! What a board promises about itself.
 
 use xpui_boards::Board;
+use xpui_chrome::RowKey;
 
 /// A slug has to survive the round trip, or `--board x3` opens something else.
 #[test]
@@ -176,7 +177,7 @@ fn a_boards_chrome_is_its_own_preset_scaled() {
         let expected = if board.touch {
             expected.without_button_hints()
         } else {
-            expected.with_hint_slots(bottom_keys(board))
+            expected.with_row(board.tokens.row)
         };
 
         assert_eq!(
@@ -558,6 +559,10 @@ fn bottom_keys(board: Board) -> u8 {
 ///
 /// Four hints over three keys is worse than none: every label after the first
 /// sits over the wrong key, and the last names one that is not there.
+///
+/// The row is written by hand and the count is derived from where the bezel
+/// actually puts the keys, so this is the two disagreeing rather than a
+/// restatement of one of them.
 #[test]
 fn a_board_labels_only_the_keys_it_has() {
     for board in Board::ALL {
@@ -565,12 +570,63 @@ fn a_board_labels_only_the_keys_it_has() {
             continue;
         }
         assert_eq!(
-            board.tokens.hint_slots,
-            bottom_keys(board),
-            "{}: it draws {} hints over {} keys",
+            board.tokens.row.len(),
+            bottom_keys(board) as usize,
+            "{}: its row describes {} keys and its body has {}",
             board.name,
-            board.tokens.hint_slots,
+            board.tokens.row.len(),
             bottom_keys(board)
+        );
+    }
+}
+
+/// No board names the same job on two keys, and every board can be left.
+///
+/// A row is written by hand, and a duplicated entry is the kind of typo that
+/// paints plausibly — two keys both labelled `Back`, one of which does
+/// nothing. A row with no `Back` at all is legitimate (a three-key badge
+/// spends its keys elsewhere and reaches Back by a double press), so that is
+/// asserted separately where it is true.
+#[test]
+fn a_row_gives_each_job_to_at_most_one_key() {
+    for board in Board::ALL {
+        let mut seen: Vec<RowKey> = Vec::new();
+        for key in board.tokens.row {
+            if *key == RowKey::Unassigned {
+                continue;
+            }
+            assert!(
+                !seen.contains(key),
+                "{}: {:?} is on two keys of the same row",
+                board.name,
+                key
+            );
+            seen.push(*key);
+        }
+    }
+}
+
+/// Every board with a bottom row keeps Back and Confirm reachable from it.
+///
+/// The five-key boards here all have a key to spare, so spending one on Back
+/// costs nothing — and a board that can be entered but not left is the fault
+/// this pins. A genuine three-key badge would be the exception, and there is
+/// not one in `Board::ALL`; if one is added, this test is the conversation.
+#[test]
+fn every_row_can_be_entered_and_left() {
+    for board in Board::ALL {
+        if board.touch || board.tokens.button_hints_height == 0 {
+            continue;
+        }
+        assert!(
+            board.tokens.row.contains(&RowKey::Back),
+            "{}: its row has no Back key",
+            board.name
+        );
+        assert!(
+            board.tokens.row.contains(&RowKey::Confirm),
+            "{}: its row has no Confirm key",
+            board.name
         );
     }
 }

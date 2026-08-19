@@ -2,7 +2,23 @@
 
 use crate::{Bezel, Board, Key, Orientation, PhysicalButton, Plan, Run};
 use xpui::Button;
-use xpui_chrome::Tokens;
+use xpui_chrome::{RowKey, Tokens};
+
+/// A, B and C along the bottom edge, with a dedicated up/down pair elsewhere
+/// on the board — so unlike a three-key badge, there *is* a key for Back, and
+/// it is the first one. C has nothing on it; giving it a job is one entry
+/// here and one line in the firmware's `Buttons::new`.
+const BADGE_ROW: &[RowKey] = &[RowKey::Back, RowKey::Confirm, RowKey::Unassigned];
+
+/// Five keys along the bottom and nothing down either edge, so the pair that
+/// walks the list lives in the row too. The fifth has nothing on it.
+const INKY_ROW: &[RowKey] = &[
+    RowKey::Back,
+    RowKey::Confirm,
+    RowKey::Previous,
+    RowKey::Next,
+    RowKey::Unassigned,
+];
 
 impl Board {
     /// Pimoroni Badger 2040 — RP2040, 296x128 monochrome e-ink (UC8151).
@@ -22,7 +38,7 @@ impl Board {
         // Pimoroni's 2.9" UC8151 strip.
         diagonal_hundredths_inch: Some(290),
         ui_scale_percent: 100,
-        tokens: Tokens::SMALL.with_hint_slots(3),
+        tokens: Tokens::SMALL.with_row(BADGE_ROW),
         touch: false,
         // A full UC8151 update is close to a second; the partial modes are
         // faster but still nothing you would drive an animation with.
@@ -48,7 +64,7 @@ impl Board {
         // Pimoroni's 2.4" ST7789v.
         diagonal_hundredths_inch: Some(240),
         ui_scale_percent: 100,
-        tokens: Tokens::COMPACT.with_hint_slots(3),
+        tokens: Tokens::COMPACT.with_row(BADGE_ROW),
         touch: false,
         refresh_ms: 0,
         bezel: Some(TUFTY_BEZEL),
@@ -61,9 +77,8 @@ impl Board {
     /// and nothing down either edge. Buttons only, so the baseline scale, and
     /// at 131 ppi a 40px row is 7.7mm — the roomiest chrome of the seven.
     ///
-    /// Five keys means five hint slots, one more than the standard four have
-    /// labels for, so the last is left blank rather than shifting every label
-    /// one key to the left.
+    /// Five keys, and the standard row names four of them, so the last is
+    /// [`RowKey::Unassigned`] rather than shifting every label one key left.
     pub const INKY_FRAME: Board = Board {
         name: "Inky Frame 5.7\"",
         slug: "inkyframe",
@@ -75,7 +90,7 @@ impl Board {
         // the active area's own diagonal a shade under that, at 5.65".
         diagonal_hundredths_inch: Some(570),
         ui_scale_percent: 100,
-        tokens: Tokens::DEFAULT.with_hint_slots(5),
+        tokens: Tokens::DEFAULT.with_row(INKY_ROW),
         touch: false,
         // **A documented estimate.** Pimoroni quote "about 30 seconds"; a
         // seven-colour panel cycles through each colour, and the figure people
