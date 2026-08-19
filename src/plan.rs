@@ -75,6 +75,18 @@ impl Key {
         }
     }
 
+    /// A key with nothing mapped to it yet.
+    ///
+    /// Pressing it does nothing. It exists here because the board has it, and
+    /// a row that omits it puts every later label over the wrong key.
+    pub const fn unassigned(label: &'static str) -> Key {
+        Key {
+            label,
+            action: KeyAction::Unassigned,
+            span: 0,
+        }
+    }
+
     /// The same key, shorter or longer along its run than its neighbours.
     ///
     /// The case that needs it is a sleep key stacked above a page pair: same

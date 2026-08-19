@@ -22,6 +22,12 @@ pub enum KeyAction {
     /// the panel, reported by the touch controller rather than by a pin, and
     /// the framework receives it as a gesture.
     Home,
+    /// A key the board has with nothing mapped to it.
+    ///
+    /// It is still described, because it is still under a thumb: a hint bar
+    /// divides its band by the keys that exist, so a key left out here shifts
+    /// every label after it onto the wrong neighbour.
+    Unassigned,
 }
 
 /// A physical key: what it does, and where your thumb finds it.

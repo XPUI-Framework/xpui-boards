@@ -1,6 +1,8 @@
 //! What a board promises about itself.
 
+use xpui::Button;
 use xpui_boards::Board;
+use xpui_boards::KeyAction;
 use xpui_chrome::RowKey;
 
 /// A slug has to survive the round trip, or `--board x3` opens something else.
@@ -577,6 +579,96 @@ fn a_board_labels_only_the_keys_it_has() {
             board.tokens.row.len(),
             bottom_keys(board)
         );
+    }
+}
+
+/// The hint painted over a key names the job that key actually does.
+///
+/// Two descriptions of the same thing sit in `crates/boards`: the row, which
+/// is what the hint bar paints, and the footer keys, which are what pressing
+/// one sends. Nothing makes them agree, and they did not — a change to the row
+/// left the keys alone, so on both Pimoroni boards every label sat one key to
+/// the left of what it named and no key anywhere sent `Back`. The suite was
+/// green and a person found it by clicking.
+///
+/// This is the check that was missing. It walks every board rather than the
+/// one someone happened to open.
+#[test]
+fn a_boards_keys_match_the_row_it_paints() {
+    // Three `continue`s below, and a board added before its body is described
+    // would slip past all of them. A test that skips everything passes.
+    let mut checked = 0;
+
+    for board in Board::ALL {
+        // A board that takes Back and Confirm from a touchscreen paints no
+        // hint band, so there is nothing to agree with.
+        if board.touch || board.tokens.button_hints_height == 0 {
+            continue;
+        }
+        let Some(bezel) = board.bezel else { continue };
+        let keys = footer_of(bezel);
+
+        assert_eq!(
+            board.tokens.row.len(),
+            keys.len(),
+            "{}: its row describes {} keys and its footer has {}",
+            board.name,
+            board.tokens.row.len(),
+            keys.len()
+        );
+
+        checked += 1;
+        for (index, (row_key, key)) in board.tokens.row.iter().zip(&keys).enumerate() {
+            assert_eq!(
+                *row_key,
+                names(key.action),
+                "{}: slot {} paints {:?} over a key that does {:?}",
+                board.name,
+                index,
+                row_key,
+                key.action
+            );
+        }
+    }
+
+    // Five boards paint a hint bar: three readers, and the two badges. The X4
+    // Pro and the Sticky take Back from a touchscreen and have no bar.
+    assert_eq!(
+        checked, 5,
+        "the loop skipped a board it should have checked"
+    );
+}
+
+/// Which hint names a key, given what pressing it sends.
+///
+/// `Previous` and `Next` are `Left` and `Right`: a reader's footer calls them
+/// Up and Down because that is what they do to a list, and the pins are named
+/// for the direction. Anything the hint vocabulary has no word for — a Power
+/// key, an unassigned one — is [`RowKey::Unassigned`], which draws nothing.
+fn names(action: KeyAction) -> RowKey {
+    match action {
+        KeyAction::Press(Button::Back) => RowKey::Back,
+        KeyAction::Press(Button::Confirm) => RowKey::Confirm,
+        KeyAction::Press(Button::Left) => RowKey::Previous,
+        KeyAction::Press(Button::Right) => RowKey::Next,
+        // Every remaining action, spelled out. A catch-all here reads the same
+        // and lets half the fault through: a key that gains a job the bar has
+        // no word for still maps to `Unassigned`, so the row keeps painting
+        // nothing over a key that now does something, and this test — whose
+        // whole purpose is to notice that — stays green.
+        KeyAction::Press(Button::Up)
+        | KeyAction::Press(Button::Down)
+        | KeyAction::Press(Button::Power)
+        | KeyAction::Press(Button::PageBack)
+        | KeyAction::Press(Button::PageForward)
+        | KeyAction::Press(Button::NavNext)
+        | KeyAction::Press(Button::NavPrevious)
+        | KeyAction::Press(Button::ScreenLeft)
+        | KeyAction::Press(Button::ScreenRight)
+        | KeyAction::Press(Button::ScreenUp)
+        | KeyAction::Press(Button::ScreenDown)
+        | KeyAction::Home
+        | KeyAction::Unassigned => RowKey::Unassigned,
     }
 }
 

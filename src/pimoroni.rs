@@ -111,8 +111,8 @@ impl Board {
 /// along the bottom edge, with up and down stacked on the right-hand side.
 /// Pimoroni publish the GPIO map but not the millimetre positions.
 ///
-/// A single press of a confirms; two in quick succession go back, because there
-/// is no key for it.
+/// `a` goes back and `b` confirms, matching the row painted above them and the
+/// firmware that reads the pins. `c` has nothing on it yet.
 const BADGER: Plan = Plan::new((856, 487), (669, 291), 60)
     .footer(Run::new((110, 60), &BADGE_FOOTER))
     .right(Run::new((60, 60), &BADGE_EDGE));
@@ -121,10 +121,19 @@ const BADGER_KEYS: [PhysicalButton; BADGER.count()] = BADGER.keys();
 pub const BADGER_BEZEL: Bezel = BADGER.bezel(&BADGER_KEYS);
 
 /// a, b and c along the footer, as the silkscreen has them, on both badges.
+///
+/// What each sends has to match [`BADGE_ROW`], which is what the hint bar
+/// paints over them, and `Buttons::new` in the rp2040 firmware, which is what
+/// the hardware sends. They disagreed once, and every label sat one key off
+/// what it named.
+///
+/// `a_boards_keys_match_the_row_it_paints` holds this and the row together.
+/// **Nothing holds the firmware to either** — it compiles only for the board,
+/// so no host test parses it. Closing that is spec 32.
 const BADGE_FOOTER: [Key; 3] = [
-    Key::new("a", Button::Confirm),
-    Key::new("b", Button::Left),
-    Key::new("c", Button::Right),
+    Key::new("a", Button::Back),
+    Key::new("b", Button::Confirm),
+    Key::unassigned("c"),
 ];
 
 /// Up and down beside the screen, stacked on the right edge.
