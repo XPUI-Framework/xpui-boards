@@ -30,6 +30,20 @@ pub enum KeyAction {
     Unassigned,
 }
 
+impl KeyAction {
+    /// The logical button this key sends, or `None` when it sends none.
+    ///
+    /// [`Home`](KeyAction::Home) and [`Unassigned`](KeyAction::Unassigned) both
+    /// answer `None`: a firmware reading switches cares only that neither
+    /// arrives as a [`Button`].
+    pub const fn button(self) -> Option<Button> {
+        match self {
+            KeyAction::Press(button) => Some(button),
+            KeyAction::Home | KeyAction::Unassigned => None,
+        }
+    }
+}
+
 /// A physical key: what it does, and where your thumb finds it.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub struct PhysicalButton {
@@ -100,6 +114,22 @@ impl Bezel {
                 && point.1 >= cy - h / 2
                 && point.1 <= cy + h / 2
         })
+    }
+
+    /// The key with `label` printed beside it, or `None` when the body has no
+    /// such key.
+    ///
+    /// Matched exactly, and the label is the board's own name for the key —
+    /// the silkscreen where it prints one, the direction where it prints an
+    /// arrow. It is how a firmware asks what the switch beside a given pin
+    /// sends, rather than declaring that a second time and letting the two
+    /// drift; a board whose keys are named differently answers `None` rather
+    /// than the nearest match.
+    pub fn button_labelled(&self, label: &str) -> Option<PhysicalButton> {
+        self.buttons
+            .iter()
+            .copied()
+            .find(|button| button.label == label)
     }
 
     /// The panel's rectangle in body units, as `(x, y, width, height)`.

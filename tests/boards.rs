@@ -347,9 +347,7 @@ fn the_page_keys_sit_where_the_firmware_says() {
 
         let key = |label: &str| {
             bezel
-                .buttons
-                .iter()
-                .find(|button| button.label == label)
+                .button_labelled(label)
                 .unwrap_or_else(|| panic!("{} has no {label} key", board.name))
         };
 
@@ -367,8 +365,12 @@ fn the_page_keys_sit_where_the_firmware_says() {
 
     // The X4 is the other arrangement: both on one side.
     let bezel = Board::X4.bezel.expect("the X4 has a body");
-    let up = bezel.buttons.iter().find(|b| b.label == "Prev").unwrap();
-    let down = bezel.buttons.iter().find(|b| b.label == "Next").unwrap();
+    let up = bezel
+        .button_labelled("Prev")
+        .expect("the X4 has a previous key");
+    let down = bezel
+        .button_labelled("Next")
+        .expect("the X4 has a next key");
     assert_eq!(
         up.centre.0, down.centre.0,
         "the X4 stacks its page keys on one side rather than splitting them"
@@ -382,9 +384,7 @@ fn the_x4_pro_has_a_home_key_below_the_panel() {
     let (_, top, _, panel_height) = bezel.panel_rect();
 
     let home = bezel
-        .buttons
-        .iter()
-        .find(|button| button.label == "Home")
+        .button_labelled("Home")
         .expect("the X4 Pro has a Home key");
 
     assert!(
@@ -670,6 +670,58 @@ fn names(action: KeyAction) -> RowKey {
         | KeyAction::Home
         | KeyAction::Unassigned => RowKey::Unassigned,
     }
+}
+
+/// Only a key that presses something sends a button.
+///
+/// A firmware reading pins asks this of every key it wires, so the two arms
+/// that answer `None` decide whether a switch is silent. `Home` is one of them
+/// and no board's footer carries it, so nothing else in the suite reaches that
+/// arm — split it and every other test still passes.
+#[test]
+fn a_key_that_is_not_a_button_sends_nothing() {
+    assert_eq!(
+        KeyAction::Press(Button::Confirm).button(),
+        Some(Button::Confirm),
+        "a key that presses something sends it"
+    );
+    assert_eq!(
+        KeyAction::Home.button(),
+        None,
+        "Home arrives as a gesture from the touch controller, not through a pin"
+    );
+    assert_eq!(
+        KeyAction::Unassigned.button(),
+        None,
+        "an unassigned key is under a thumb and does nothing"
+    );
+}
+
+/// A label no key carries finds nothing rather than the nearest key.
+///
+/// This is the firmware's silent-failure path: `Buttons::new` resolves each pin
+/// through a label, and a name the board does not have leaves that switch
+/// sampled and quiet. Nothing on a device would say so except the boot line, so
+/// the branch is pinned here where it can be.
+#[test]
+fn a_label_no_key_carries_finds_nothing() {
+    let bezel = Board::BADGER_2040.bezel.expect("the Badger has a body");
+
+    assert!(
+        bezel.button_labelled("a").is_some(),
+        "the Badger does carry an `a` key, or the negative below proves nothing"
+    );
+    assert_eq!(
+        bezel.button_labelled("A"),
+        None,
+        "labels are matched exactly — the Inky Frame's keys are `A` to `E` and \
+         the badges' are lower case, so a firmware written for one board finds \
+         nothing on the other rather than the wrong key"
+    );
+    assert!(
+        bezel.button_labelled("").is_none(),
+        "and a blank label matches no key either"
+    );
 }
 
 /// No board names the same job on two keys, and every board can be left.
