@@ -724,6 +724,83 @@ fn a_label_no_key_carries_finds_nothing() {
     );
 }
 
+/// The badges' keys send what the firmware wires them to, by name.
+///
+/// `Buttons::new` in `examples/rp2040` looks each pin's key up here by name, so
+/// **what a key sends has one copy**: `BADGE_FOOTER` for the first three,
+/// `BADGE_EDGE` for the pair. Which switch carries which *name* is written in
+/// two places the firmware reads — those tables, and its own five labels — and
+/// `wired` below is a third, existing only to hold the first against what the
+/// second is expected to say. The firmware's own literals are held by nothing,
+/// because that crate has no host build to run a test in; they are checked on
+/// the first boot instead.
+///
+/// Which GPIO sits under a switch is beyond any test here: its one source of
+/// truth is a schematic this repository does not hold.
+#[test]
+fn the_badges_keys_send_what_the_firmware_wires() {
+    // The labels `Buttons::new` looks its five pins up by, in field order.
+    let wired = ["a", "b", "c", "Up", "Dn"];
+
+    for board in [Board::BADGER_2040, Board::TUFTY_2040] {
+        let bezel = board.bezel.expect("both badges have a body");
+
+        // A key the board describes and the firmware does not wire is a switch
+        // that cannot be pressed; a label renamed here is one that goes quietly
+        // dead. Both are caught before the button values are looked at, because
+        // a missing label would otherwise read as a mapping fault.
+        assert_eq!(
+            bezel.buttons.len(),
+            wired.len(),
+            "{}: the firmware wires {} switches and the board describes {}",
+            board.name,
+            wired.len(),
+            bezel.buttons.len()
+        );
+        for label in wired {
+            assert!(
+                bezel.button_labelled(label).is_some(),
+                "{}: nothing is labelled {label}, so that switch would read as dead",
+                board.name
+            );
+        }
+
+        let sends = |label: &str| bezel.button_labelled(label).map(|key| key.action.button());
+
+        assert_eq!(
+            sends("a"),
+            Some(Some(Button::Back)),
+            "{}: the leftmost key goes back",
+            board.name
+        );
+        assert_eq!(
+            sends("b"),
+            Some(Some(Button::Confirm)),
+            "{}: the second key confirms",
+            board.name
+        );
+        assert_eq!(
+            sends("c"),
+            Some(None),
+            "{}: the third key has nothing on it — giving it a job is an edit to \
+             `BADGE_FOOTER`, to `BADGE_ROW` and to this line, never to the firmware",
+            board.name
+        );
+        assert_eq!(
+            sends("Up"),
+            Some(Some(Button::Up)),
+            "{}: the edge pair walks the list",
+            board.name
+        );
+        assert_eq!(
+            sends("Dn"),
+            Some(Some(Button::Down)),
+            "{}: the edge pair walks the list",
+            board.name
+        );
+    }
+}
+
 /// No board names the same job on two keys, and every board can be left.
 ///
 /// A row is written by hand, and a duplicated entry is the kind of typo that

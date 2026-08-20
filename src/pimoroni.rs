@@ -6,8 +6,10 @@ use xpui_chrome::{RowKey, Tokens};
 
 /// A, B and C along the bottom edge, with a dedicated up/down pair elsewhere
 /// on the board — so unlike a three-key badge, there *is* a key for Back, and
-/// it is the first one. C has nothing on it; giving it a job is one entry
-/// here and one line in the firmware's `Buttons::new`.
+/// it is the first one. C has nothing on it; giving it a job is three edits and
+/// no more — this entry, its twin in [`BADGE_FOOTER`], and the line in
+/// `the_badges_keys_send_what_the_firmware_wires` that pins it. The firmware
+/// needs no edit at all: it reads the footer.
 const BADGE_ROW: &[RowKey] = &[RowKey::Back, RowKey::Confirm, RowKey::Unassigned];
 
 /// Five keys along the bottom and nothing down either edge, so the pair that
@@ -122,14 +124,31 @@ pub const BADGER_BEZEL: Bezel = BADGER.bezel(&BADGER_KEYS);
 
 /// a, b and c along the footer, as the silkscreen has them, on both badges.
 ///
-/// What each sends has to match [`BADGE_ROW`], which is what the hint bar
-/// paints over them, and `Buttons::new` in the rp2040 firmware, which is what
-/// the hardware sends. They disagreed once, and every label sat one key off
-/// what it named.
+/// The edge pair is `Up` and `Dn` because the board prints arrows rather than
+/// words there, and a name is what a firmware can look a key up by.
 ///
-/// `a_boards_keys_match_the_row_it_paints` holds this and the row together.
-/// **Nothing holds the firmware to either** — it compiles only for the board,
-/// so no host test parses it. Closing that is spec 32.
+/// **a goes back and b confirms**, which is the order every one of this
+/// repository's presets has always put them in — `Back` first in
+/// `Tokens::DEFAULT.standard_hints`, in `COMPACT`'s and in `SMALL`'s, and on
+/// the leftmost key of every reader's bottom row. Somebody moving between a
+/// reader and one of these badges presses the same relative position for the
+/// same thing.
+///
+/// **c is left bare** rather than given a third direction: `Right` without a
+/// `Left` is a value that can be raised and never lowered, and walking the list
+/// is what the edge pair is for. A key doing a job badly is worse than a key
+/// doing none, and the row leaves its slot blank to say so.
+///
+/// What each sends has to match [`BADGE_ROW`], which is what the hint bar
+/// paints over them. They disagreed once, and every label sat one key off what
+/// it named; `a_boards_keys_match_the_row_it_paints` holds the two together.
+///
+/// **This is also what the hardware sends.** `Buttons::new` in the rp2040
+/// firmware looks each of its pins up by name — these three, and the two in
+/// [`BADGE_EDGE`] — rather than declaring a copy nothing could reach.
+/// `the_badges_keys_send_what_the_firmware_wires` pins all five names and what
+/// they send. **Rename one and that switch goes quiet on a real board**, which
+/// is why the name is pinned as well as the button.
 const BADGE_FOOTER: [Key; 3] = [
     Key::new("a", Button::Back),
     Key::new("b", Button::Confirm),
@@ -137,6 +156,13 @@ const BADGE_FOOTER: [Key; 3] = [
 ];
 
 /// Up and down beside the screen, stacked on the right edge.
+///
+/// The other two of the five the rp2040 firmware looks up by name, and the pair
+/// most tempting to tidy: `Dn` is an abbreviation because the board prints an
+/// arrow and something had to be written down. Spelling it `Down` compiles,
+/// changes nothing the panel paints, and leaves that switch dead on hardware —
+/// see [`BADGE_FOOTER`]. The one place it shows is the simulator, which prints
+/// each key's own label on the body.
 const BADGE_EDGE: [Key; 2] = [Key::new("Up", Button::Up), Key::new("Dn", Button::Down)];
 
 /// The Tufty's body and its five buttons.
