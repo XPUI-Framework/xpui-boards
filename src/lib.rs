@@ -15,6 +15,8 @@
 
 #![cfg_attr(target_os = "none", no_std)]
 
+use xpui::Button;
+
 mod bezel;
 mod pimoroni;
 mod plan;
@@ -180,6 +182,37 @@ impl Board {
             refresh_ms: 0,
             bezel: None,
         }
+    }
+
+    /// Whether this board has a Left/Right pair to nudge a value with.
+    ///
+    /// Derived from the bezel rather than stored, so it cannot disagree with
+    /// the keys it describes — the same reason [`ppi`](Board::ppi) is derived
+    /// from the diagonal. A key sending [`Button::Left`] and a key sending
+    /// [`Button::Right`], both, because one without the other is a value that
+    /// can be raised and never lowered.
+    ///
+    /// **A board with no bezel answers `false`**, which is the safe direction
+    /// rather than a free one. A control told the pair exists when it does not
+    /// cannot be changed by any key; a control told it does not exist is
+    /// entered and left instead, which every device here can do — at the cost
+    /// of a Back press being spent leaving the value rather than the screen.
+    /// One is unusable, the other is a keystroke.
+    ///
+    /// The device's shape does not predict the answer. The X4 Pro takes back,
+    /// confirm, left and right from its touchscreen — its wired keys turn pages
+    /// and sleep it — so it answers `false`, while the Inky Frame's five-key
+    /// footer carries both on its third and fourth keys and answers `true`.
+    pub fn has_left_right_keys(&self) -> bool {
+        let sends = |wanted: Button| {
+            self.bezel.is_some_and(|bezel| {
+                bezel
+                    .buttons
+                    .iter()
+                    .any(|key| key.action == KeyAction::Press(wanted))
+            })
+        };
+        sends(Button::Left) && sends(Button::Right)
     }
 
     /// How many list rows this board's content band holds. The number that

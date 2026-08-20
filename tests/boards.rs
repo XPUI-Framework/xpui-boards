@@ -631,8 +631,10 @@ fn a_boards_keys_match_the_row_it_paints() {
         }
     }
 
-    // Five boards paint a hint bar: three readers, and the two badges. The X4
-    // Pro and the Sticky take Back from a touchscreen and have no bar.
+    // Five boards paint a hint bar: the X3, the X4, and all three Pimoroni
+    // boards. The X4 Pro and the Sticky take Back from a touchscreen and have
+    // none. Counted by name rather than by family, because "readers" and
+    // "badges" split these five two different ways depending on who is asked.
     assert_eq!(
         checked, 5,
         "the loop skipped a board it should have checked"
@@ -721,6 +723,107 @@ fn a_label_no_key_carries_finds_nothing() {
     assert!(
         bezel.button_labelled("").is_none(),
         "and a blank label matches no key either"
+    );
+}
+
+/// Every board reports the pair its bezel actually carries.
+///
+/// Not a restatement of `has_left_right_keys`: the expected answer is written
+/// out per board, because the answers are not the ones anybody guesses. The
+/// obvious split is "readers yes, badges no" and it is wrong twice — the X4 Pro
+/// is a reader that says no, and the Inky Frame is a badge that says yes.
+///
+/// The pair is what lets a value be nudged where it stands. A board without one
+/// needs a control that can be entered and left instead, which is why anything
+/// reading this must read it rather than assume.
+#[test]
+fn every_board_reports_the_pair_its_bezel_carries() {
+    // Why each is what it is, so a bezel change that moves one of these has to
+    // be an argued edit rather than a re-blessed number.
+    let expected = |slug: &str| match slug {
+        // The readers' shared footer sends Left and Right on its third and
+        // fourth keys, whatever the labels above them read.
+        "x3" | "x4" => Some(true),
+        // A reader with no footer at all: it takes back, confirm, left and
+        // right from the touchscreen, and the keys it does wire turn pages and
+        // sleep it.
+        "x4pro" => Some(false),
+        // Three keys: one confirms, and the pair below it turns pages rather
+        // than moving a value.
+        "sticky" => Some(false),
+        // Five keys, and the two beside the panel are Up and Down — busy
+        // walking the list.
+        "badger2040" | "tufty2040" => Some(false),
+        // Five along the footer, and the third and fourth are the pair.
+        "inkyframe" => Some(true),
+        _ => None,
+    };
+
+    // Driven from `Board::ALL`, not from the table: a board added without an
+    // answer fails here rather than being skipped, and a board dropped from the
+    // table cannot be hidden by another one being listed twice.
+    let mut with_pair = 0;
+    for board in Board::ALL {
+        let wanted = expected(board.slug).unwrap_or_else(|| {
+            panic!(
+                "{} was added without deciding whether it has the pair",
+                board.name
+            )
+        });
+        assert_eq!(
+            board.has_left_right_keys(),
+            wanted,
+            "{} reports the wrong pair",
+            board.name
+        );
+        if wanted {
+            with_pair += 1;
+        }
+    }
+
+    assert_eq!(
+        with_pair, 3,
+        "three boards carry the pair — the X3, the X4 and the Inky Frame"
+    );
+}
+
+/// Half a pair is not a pair.
+///
+/// No board here carries one of Left and Right without the other, so the seven
+/// real answers cannot tell `&&` from `||` — this is the case that can. It is
+/// not hypothetical bookkeeping: a value that can be raised and never lowered
+/// is the fault [`Key::unassigned`] exists to avoid on the badges' third key.
+#[test]
+fn half_a_pair_is_not_a_pair() {
+    const ONLY_RIGHT: [PhysicalButton; 1] = [PhysicalButton {
+        label: "Right",
+        action: KeyAction::Press(Button::Right),
+        centre: (100, 900),
+        size: (60, 60),
+    }];
+    const LOPSIDED: Bezel = Bezel {
+        body: (600, 1000),
+        panel_origin: (50, 50),
+        panel_size: (500, 800),
+        buttons: &ONLY_RIGHT,
+        artwork: None,
+    };
+
+    let board = Board {
+        bezel: Some(LOPSIDED),
+        ..Board::custom("Lopsided", 400, 300, false)
+    };
+
+    assert!(
+        !board.has_left_right_keys(),
+        "one key of the two is not a pair — the value could be raised and never lowered"
+    );
+
+    // And the same board with no body at all, which is what `Board::custom`
+    // gives every panel nobody has described.
+    assert!(
+        !Board::custom("Bare", 400, 300, false).has_left_right_keys(),
+        "a board with no bezel cannot promise keys it has not described"
     );
 }
 
