@@ -103,7 +103,7 @@ fn the_aliases_work() {
 
 // -- how big a pixel is ----------------------------------------------------
 
-use xpui_boards::Tokens;
+use xpui_boards::{Labels, Metrics};
 
 /// A panel with no diagonal cannot be asked how big its chrome is, and every
 /// preset here has to be able to answer.
@@ -175,16 +175,16 @@ fn the_touch_boards_are_the_scaled_ones() {
 #[test]
 fn a_boards_chrome_is_its_own_preset_scaled() {
     for board in Board::ALL {
-        let expected = Tokens::for_panel(board.width, board.height).scaled(board.ui_scale_percent);
+        let expected = Metrics::for_panel(board.width, board.height).scaled(board.ui_scale_percent);
         let expected = if board.touch {
             expected.without_button_hints()
         } else {
-            expected.with_row(board.tokens.row)
+            expected
         };
 
         assert_eq!(
-            board.tokens, expected,
-            "{}: its tokens are not the preset for its panel at its own scale",
+            board.metrics, expected,
+            "{}: its metrics are not the preset for its panel at its own scale",
             board.name
         );
     }
@@ -199,13 +199,13 @@ fn only_a_board_with_keys_reserves_a_hint_band() {
     for board in Board::ALL {
         if board.touch {
             assert_eq!(
-                board.tokens.button_hints_height, 0,
+                board.metrics.button_hints_height, 0,
                 "{}: a touch board must not reserve a band for keys it lacks",
                 board.name
             );
         } else {
             assert!(
-                board.tokens.button_hints_height > 0,
+                board.metrics.button_hints_height > 0,
                 "{}: its keys need labelling",
                 board.name
             );
@@ -220,7 +220,7 @@ fn only_a_board_with_keys_reserves_a_hint_band() {
 fn a_touch_boards_row_is_wider_than_a_fingertip() {
     for board in Board::ALL.into_iter().filter(|board| board.touch) {
         let tenths = board
-            .tenths_of_a_mm(board.tokens.list_row_height)
+            .tenths_of_a_mm(board.metrics.list_row_height)
             .expect("a measured panel");
         assert!(
             tenths >= 50,
@@ -572,11 +572,11 @@ fn a_board_labels_only_the_keys_it_has() {
             continue;
         }
         assert_eq!(
-            board.tokens.row.len(),
+            board.keys.len(),
             bottom_keys(board) as usize,
             "{}: its row describes {} keys and its body has {}",
             board.name,
-            board.tokens.row.len(),
+            board.keys.len(),
             bottom_keys(board)
         );
     }
@@ -602,25 +602,25 @@ fn a_boards_keys_match_the_row_it_paints() {
     for board in Board::ALL {
         // A board that takes Back and Confirm from a touchscreen paints no
         // hint band, so there is nothing to agree with.
-        if board.touch || board.tokens.button_hints_height == 0 {
+        if board.touch || board.metrics.button_hints_height == 0 {
             continue;
         }
         let Some(bezel) = board.bezel else { continue };
         let keys = footer_of(bezel);
 
         assert_eq!(
-            board.tokens.row.len(),
+            board.keys.len(),
             keys.len(),
             "{}: its row describes {} keys and its footer has {}",
             board.name,
-            board.tokens.row.len(),
+            board.keys.len(),
             keys.len()
         );
 
         checked += 1;
-        for (index, (row_key, key)) in board.tokens.row.iter().zip(&keys).enumerate() {
+        for (index, (row_key, key)) in board.keys.iter().zip(&keys).enumerate() {
             assert_eq!(
-                *row_key,
+                row_key,
                 names(key.action),
                 "{}: slot {} paints {:?} over a key that does {:?}",
                 board.name,
@@ -915,17 +915,17 @@ fn the_badges_keys_send_what_the_firmware_wires() {
 fn a_row_gives_each_job_to_at_most_one_key() {
     for board in Board::ALL {
         let mut seen: Vec<RowKey> = Vec::new();
-        for key in board.tokens.row {
-            if *key == RowKey::Unassigned {
+        for key in board.keys.iter() {
+            if key == RowKey::Unassigned {
                 continue;
             }
             assert!(
-                !seen.contains(key),
+                !seen.contains(&key),
                 "{}: {:?} is on two keys of the same row",
                 board.name,
                 key
             );
-            seen.push(*key);
+            seen.push(key);
         }
     }
 }
@@ -939,16 +939,16 @@ fn a_row_gives_each_job_to_at_most_one_key() {
 #[test]
 fn every_row_can_be_entered_and_left() {
     for board in Board::ALL {
-        if board.touch || board.tokens.button_hints_height == 0 {
+        if board.touch || board.metrics.button_hints_height == 0 {
             continue;
         }
         assert!(
-            board.tokens.row.contains(&RowKey::Back),
+            board.keys.contains(RowKey::Back),
             "{}: its row has no Back key",
             board.name
         );
         assert!(
-            board.tokens.row.contains(&RowKey::Confirm),
+            board.keys.contains(RowKey::Confirm),
             "{}: its row has no Confirm key",
             board.name
         );
@@ -1140,4 +1140,41 @@ fn the_inky_frames_diagonal_agrees_with_its_dot_pitch() {
         (derived - from_pitch).abs() <= 2,
         "a 5.7\" diagonal derives {derived} ppi; a 0.1915mm pitch is {from_pitch}"
     );
+}
+
+/// A board's words are the ones its panel size calls for.
+///
+/// The struct used to carry measurements and words together, so
+/// `a_boards_chrome_is_its_own_preset_scaled` pinned both in one assertion.
+/// They are separate types now, and separating them separated the check:
+/// without this, flipping the Badger to full-length English passes every test
+/// in this crate and is caught only by a PNG in another one.
+#[test]
+fn a_boards_words_are_its_own_panels_words() {
+    for board in Board::ALL {
+        assert_eq!(
+            board.labels,
+            Labels::for_panel(board.width, board.height),
+            "{}: its words are not the ones a {}x{} panel calls for",
+            board.name,
+            board.width,
+            board.height
+        );
+    }
+}
+
+/// And so are a custom board's.
+///
+/// `Board::custom` is the escape hatch for the eighth panel, and it chooses
+/// metrics and words at the same call site. Choosing one by panel size and the
+/// other by default is how a hint bar that fitted stops fitting.
+#[test]
+fn a_custom_board_gets_words_that_fit_it() {
+    let strip = Board::custom("strip", 296, 128, false);
+    assert_eq!(strip.labels, Labels::ENGLISH_SHORT);
+    assert_eq!(strip.metrics, Metrics::for_panel(296, 128));
+
+    let reader = Board::custom("reader", 480, 800, false);
+    assert_eq!(reader.labels, Labels::ENGLISH);
+    assert_eq!(reader.metrics, Metrics::for_panel(480, 800));
 }

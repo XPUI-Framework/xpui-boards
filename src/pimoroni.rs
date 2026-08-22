@@ -2,7 +2,8 @@
 
 use crate::{Bezel, Board, Key, Orientation, PhysicalButton, Plan, Run};
 use xpui::Button;
-use xpui_chrome::{RowKey, Tokens};
+use xpui::host::{KeyRow, RowKey};
+use xpui_chrome::{Labels, Metrics};
 
 /// A, B and C along the bottom edge, with a dedicated up/down pair elsewhere
 /// on the board — so unlike a three-key badge, there *is* a key for Back, and
@@ -10,22 +11,22 @@ use xpui_chrome::{RowKey, Tokens};
 /// no more — this entry, its twin in [`BADGE_FOOTER`], and the line in
 /// `the_badges_keys_send_what_the_firmware_wires` that pins it. The firmware
 /// needs no edit at all: it reads the footer.
-const BADGE_ROW: &[RowKey] = &[RowKey::Back, RowKey::Confirm, RowKey::Unassigned];
+const BADGE_ROW: KeyRow = KeyRow::new(&[RowKey::Back, RowKey::Confirm, RowKey::Unassigned]);
 
 /// Five keys along the bottom and nothing down either edge, so the pair that
 /// walks the list lives in the row too. The fifth has nothing on it.
-const INKY_ROW: &[RowKey] = &[
+const INKY_ROW: KeyRow = KeyRow::new(&[
     RowKey::Back,
     RowKey::Confirm,
     RowKey::Previous,
     RowKey::Next,
     RowKey::Unassigned,
-];
+]);
 
 impl Board {
     /// Pimoroni Badger 2040 — RP2040, 296x128 monochrome e-ink (UC8151).
     ///
-    /// The panel that made small-panel tokens necessary: the default chrome
+    /// The panel that made small-panel measurements necessary: the default chrome
     /// leaves 28 pixels of content here, which is not enough for one list row.
     ///
     /// Buttons only, so the baseline scale — and at 111 ppi it needs no help:
@@ -40,7 +41,9 @@ impl Board {
         // Pimoroni's 2.9" UC8151 strip.
         diagonal_hundredths_inch: Some(290),
         ui_scale_percent: 100,
-        tokens: Tokens::SMALL.with_row(BADGE_ROW),
+        metrics: Metrics::SMALL,
+        labels: Labels::ENGLISH_SHORT,
+        keys: BADGE_ROW,
         touch: false,
         // A full UC8151 update is close to a second; the partial modes are
         // faster but still nothing you would drive an animation with.
@@ -66,7 +69,9 @@ impl Board {
         // Pimoroni's 2.4" ST7789v.
         diagonal_hundredths_inch: Some(240),
         ui_scale_percent: 100,
-        tokens: Tokens::COMPACT.with_row(BADGE_ROW),
+        metrics: Metrics::COMPACT,
+        labels: Labels::ENGLISH_NARROW,
+        keys: BADGE_ROW,
         touch: false,
         refresh_ms: 0,
         bezel: Some(TUFTY_BEZEL),
@@ -92,7 +97,9 @@ impl Board {
         // the active area's own diagonal a shade under that, at 5.65".
         diagonal_hundredths_inch: Some(570),
         ui_scale_percent: 100,
-        tokens: Tokens::DEFAULT.with_row(INKY_ROW),
+        metrics: Metrics::DEFAULT,
+        labels: Labels::ENGLISH,
+        keys: INKY_ROW,
         touch: false,
         // **A documented estimate.** Pimoroni quote "about 30 seconds"; a
         // seven-colour panel cycles through each colour, and the figure people
@@ -129,7 +136,7 @@ pub const BADGER_BEZEL: Bezel = BADGER.bezel(&BADGER_KEYS);
 ///
 /// **a goes back and b confirms**, which is the order every one of this
 /// repository's presets has always put them in — `Back` first in
-/// `Tokens::DEFAULT.standard_hints`, in `COMPACT`'s and in `SMALL`'s, and on
+/// `Labels::ENGLISH`, in `ENGLISH_NARROW` and in `ENGLISH_SHORT`, and on
 /// the leftmost key of every reader's bottom row. Somebody moving between a
 /// reader and one of these badges presses the same relative position for the
 /// same thing.

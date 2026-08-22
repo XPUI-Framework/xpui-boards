@@ -1,7 +1,7 @@
 //! The panels this framework has been run on, as data.
 //!
 //! A screen never knows which board it is on. What differs is a handful of
-//! numbers — how big the panel is, which token preset fits it, whether there is
+//! numbers — how big the panel is, which measurements fit it, whether there is
 //! a touchscreen — and those are worth writing down once rather than
 //! rediscovering per project.
 //!
@@ -26,7 +26,8 @@ mod xteink;
 pub use bezel::{Bezel, KeyAction, PhysicalButton};
 pub use plan::{Key, Plan, Run};
 
-pub use xpui_chrome::Tokens;
+pub use xpui::host::{KeyRow, RowKey};
+pub use xpui_chrome::{Labels, Metrics};
 
 /// Which way up a canvas sits on its framebuffer.
 ///
@@ -104,13 +105,18 @@ pub struct Board {
     /// it.
     ///
     /// A percentage rather than an `f32` for the same reasons
-    /// [`Tokens::scaled`] takes one: `Eq`, `const`, and no FPU on the device.
+    /// [`Metrics::scaled`] takes one: `Eq`, `const`, and no FPU on the device.
     pub ui_scale_percent: u16,
     /// The chrome sized for this panel, with [`ui_scale_percent`] already
     /// applied.
     ///
     /// [`ui_scale_percent`]: Board::ui_scale_percent
-    pub tokens: Tokens,
+    pub metrics: Metrics,
+    /// The words its hint bar shows. English here because a board table has to
+    /// say something; an application with a reader supplies its own.
+    pub labels: Labels,
+    /// What the keys along its bottom edge mean, left to right.
+    pub keys: KeyRow,
     /// Whether a finger can reach it. A board with buttons and no touchscreen
     /// should not have its layout widened to finger-sized targets, and a screen
     /// can ask before offering a drag-only control.
@@ -175,9 +181,11 @@ impl Board {
             diagonal_hundredths_inch: None,
             // The button-era baseline: an unknown panel gets the chrome it
             // always got, and a caller with a touchscreen to fit passes its
-            // own scaled `Tokens`.
+            // own scaled `Metrics`.
             ui_scale_percent: 100,
-            tokens: Tokens::for_panel(width, height),
+            metrics: Metrics::for_panel(width, height),
+            labels: Labels::for_panel(width, height),
+            keys: KeyRow::READER,
             touch,
             refresh_ms: 0,
             bezel: None,
@@ -218,7 +226,7 @@ impl Board {
     /// How many list rows this board's content band holds. The number that
     /// decides whether a screen is usable on it at all.
     pub const fn list_rows(&self) -> i32 {
-        self.tokens.list_rows_for(self.height)
+        self.metrics.list_rows_for(self.height)
     }
 
     /// The panel's pixel density, or `None` when its physical size is unknown.
