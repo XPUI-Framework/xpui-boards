@@ -27,7 +27,6 @@ pub use bezel::{Bezel, KeyAction, PhysicalButton};
 pub use plan::{Key, Plan, Run};
 
 pub use xpui::host::{KeyRow, RowKey};
-pub use xpui_chrome::{Labels, Metrics};
 
 /// Which way up a canvas sits on its framebuffer.
 ///
@@ -105,16 +104,8 @@ pub struct Board {
     /// it.
     ///
     /// A percentage rather than an `f32` for the same reasons
-    /// [`Metrics::scaled`] takes one: `Eq`, `const`, and no FPU on the device.
+    /// a chrome scale takes one: `Eq`, `const`, and no FPU on the device.
     pub ui_scale_percent: u16,
-    /// The chrome sized for this panel, with [`ui_scale_percent`] already
-    /// applied.
-    ///
-    /// [`ui_scale_percent`]: Board::ui_scale_percent
-    pub metrics: Metrics,
-    /// The words its hint bar shows. English here because a board table has to
-    /// say something; an application with a reader supplies its own.
-    pub labels: Labels,
     /// What the keys along its bottom edge mean, left to right.
     pub keys: KeyRow,
     /// Whether a finger can reach it. A board with buttons and no touchscreen
@@ -179,12 +170,10 @@ impl Board {
             // A panel nobody has measured cannot answer in millimetres, and
             // guessing an inch count would make `ppi` confidently wrong.
             diagonal_hundredths_inch: None,
-            // The button-era baseline: an unknown panel gets the chrome it
-            // always got, and a caller with a touchscreen to fit passes its
-            // own scaled `Metrics`.
+            // No scaling. A panel nobody described cannot ask for bigger
+            // targets on any grounds, and whoever wires the backend can pass
+            // `Metrics` of their own if this is not what they wanted.
             ui_scale_percent: 100,
-            metrics: Metrics::for_panel(width, height),
-            labels: Labels::for_panel(width, height),
             keys: KeyRow::READER,
             touch,
             refresh_ms: 0,
@@ -221,12 +210,6 @@ impl Board {
             })
         };
         sends(Button::Left) && sends(Button::Right)
-    }
-
-    /// How many list rows this board's content band holds. The number that
-    /// decides whether a screen is usable on it at all.
-    pub const fn list_rows(&self) -> i32 {
-        self.metrics.list_rows_for(self.height)
     }
 
     /// The panel's pixel density, or `None` when its physical size is unknown.

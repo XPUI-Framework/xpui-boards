@@ -1,9 +1,9 @@
 //! What a board promises about itself.
 
 use xpui::Button;
+use xpui::host::RowKey;
 use xpui_boards::Board;
 use xpui_boards::KeyAction;
-use xpui_chrome::RowKey;
 
 /// A slug has to survive the round trip, or `--board x3` opens something else.
 #[test]
@@ -56,22 +56,6 @@ fn a_custom_board_does_not_borrow_another_slug() {
     assert_eq!(Board::from_slug(mine.slug), None);
 }
 
-/// Two rows to compare and one to show there is more. Below that a list is not
-/// a list, and the screen is unusable rather than merely cramped.
-#[test]
-fn every_board_holds_at_least_three_list_rows() {
-    for board in Board::ALL {
-        assert!(
-            board.list_rows() >= 3,
-            "{} ({}x{}) fits {} list rows",
-            board.name,
-            board.width,
-            board.height,
-            board.list_rows()
-        );
-    }
-}
-
 /// Slugs are what a command line accepts, so two boards cannot share one.
 #[test]
 fn no_two_boards_share_a_slug() {
@@ -102,8 +86,6 @@ fn the_aliases_work() {
 }
 
 // -- how big a pixel is ----------------------------------------------------
-
-use xpui_boards::{Labels, Metrics};
 
 /// A panel with no diagonal cannot be asked how big its chrome is, and every
 /// preset here has to be able to answer.
@@ -164,70 +146,6 @@ fn the_touch_boards_are_the_scaled_ones() {
             "{} is a {} board",
             board.name,
             if board.touch { "touch" } else { "button" }
-        );
-    }
-}
-
-/// A board carries both the factor and the chrome it produced, so the two can
-/// disagree. This is what stops them, and it spells out the whole derivation:
-/// the preset its panel calls for, at its own scale, without a hint band if it
-/// has no keys to name.
-#[test]
-fn a_boards_chrome_is_its_own_preset_scaled() {
-    for board in Board::ALL {
-        let expected = Metrics::for_panel(board.width, board.height).scaled(board.ui_scale_percent);
-        let expected = if board.touch {
-            expected.without_button_hints()
-        } else {
-            expected
-        };
-
-        assert_eq!(
-            board.metrics, expected,
-            "{}: its metrics are not the preset for its panel at its own scale",
-            board.name
-        );
-    }
-}
-
-/// A device that takes Back and Confirm from its touchscreen has no row of keys
-/// along the bottom, so a hint bar there names keys that do not exist.
-///
-/// The firmware's themes return before drawing one on exactly these boards.
-#[test]
-fn only_a_board_with_keys_reserves_a_hint_band() {
-    for board in Board::ALL {
-        if board.touch {
-            assert_eq!(
-                board.metrics.button_hints_height, 0,
-                "{}: a touch board must not reserve a band for keys it lacks",
-                board.name
-            );
-        } else {
-            assert!(
-                board.metrics.button_hints_height > 0,
-                "{}: its keys need labelling",
-                board.name
-            );
-        }
-    }
-}
-
-/// The point of the scale, in the only units that matter. A touch board's row
-/// has to be findable by a fingertip; the firmware's own note is that 3mm is
-/// not.
-#[test]
-fn a_touch_boards_row_is_wider_than_a_fingertip() {
-    for board in Board::ALL.into_iter().filter(|board| board.touch) {
-        let tenths = board
-            .tenths_of_a_mm(board.metrics.list_row_height)
-            .expect("a measured panel");
-        assert!(
-            tenths >= 50,
-            "{}: a row is {}.{}mm",
-            board.name,
-            tenths / 10,
-            tenths % 10
         );
     }
 }
@@ -602,7 +520,7 @@ fn a_boards_keys_match_the_row_it_paints() {
     for board in Board::ALL {
         // A board that takes Back and Confirm from a touchscreen paints no
         // hint band, so there is nothing to agree with.
-        if board.touch || board.metrics.button_hints_height == 0 {
+        if board.touch {
             continue;
         }
         let Some(bezel) = board.bezel else { continue };
@@ -939,7 +857,7 @@ fn a_row_gives_each_job_to_at_most_one_key() {
 #[test]
 fn every_row_can_be_entered_and_left() {
     for board in Board::ALL {
-        if board.touch || board.metrics.button_hints_height == 0 {
+        if board.touch {
             continue;
         }
         assert!(
@@ -1140,41 +1058,4 @@ fn the_inky_frames_diagonal_agrees_with_its_dot_pitch() {
         (derived - from_pitch).abs() <= 2,
         "a 5.7\" diagonal derives {derived} ppi; a 0.1915mm pitch is {from_pitch}"
     );
-}
-
-/// A board's words are the ones its panel size calls for.
-///
-/// The struct used to carry measurements and words together, so
-/// `a_boards_chrome_is_its_own_preset_scaled` pinned both in one assertion.
-/// They are separate types now, and separating them separated the check:
-/// without this, flipping the Badger to full-length English passes every test
-/// in this crate and is caught only by a PNG in another one.
-#[test]
-fn a_boards_words_are_its_own_panels_words() {
-    for board in Board::ALL {
-        assert_eq!(
-            board.labels,
-            Labels::for_panel(board.width, board.height),
-            "{}: its words are not the ones a {}x{} panel calls for",
-            board.name,
-            board.width,
-            board.height
-        );
-    }
-}
-
-/// And so are a custom board's.
-///
-/// `Board::custom` is the escape hatch for the eighth panel, and it chooses
-/// metrics and words at the same call site. Choosing one by panel size and the
-/// other by default is how a hint bar that fitted stops fitting.
-#[test]
-fn a_custom_board_gets_words_that_fit_it() {
-    let strip = Board::custom("strip", 296, 128, false);
-    assert_eq!(strip.labels, Labels::ENGLISH_SHORT);
-    assert_eq!(strip.metrics, Metrics::for_panel(296, 128));
-
-    let reader = Board::custom("reader", 480, 800, false);
-    assert_eq!(reader.labels, Labels::ENGLISH);
-    assert_eq!(reader.metrics, Metrics::for_panel(480, 800));
 }

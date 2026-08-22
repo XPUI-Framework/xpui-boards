@@ -3,7 +3,6 @@
 use crate::{Bezel, Board, Key, Orientation, PhysicalButton, Plan, Run};
 use xpui::Button;
 use xpui::host::{KeyRow, RowKey};
-use xpui_chrome::{Labels, Metrics};
 
 /// A, B and C along the bottom edge, with a dedicated up/down pair elsewhere
 /// on the board — so unlike a three-key badge, there *is* a key for Back, and
@@ -41,8 +40,6 @@ impl Board {
         // Pimoroni's 2.9" UC8151 strip.
         diagonal_hundredths_inch: Some(290),
         ui_scale_percent: 100,
-        metrics: Metrics::SMALL,
-        labels: Labels::ENGLISH_SHORT,
         keys: BADGE_ROW,
         touch: false,
         // A full UC8151 update is close to a second; the partial modes are
@@ -69,8 +66,6 @@ impl Board {
         // Pimoroni's 2.4" ST7789v.
         diagonal_hundredths_inch: Some(240),
         ui_scale_percent: 100,
-        metrics: Metrics::COMPACT,
-        labels: Labels::ENGLISH_NARROW,
         keys: BADGE_ROW,
         touch: false,
         refresh_ms: 0,
@@ -97,8 +92,6 @@ impl Board {
         // the active area's own diagonal a shade under that, at 5.65".
         diagonal_hundredths_inch: Some(570),
         ui_scale_percent: 100,
-        metrics: Metrics::DEFAULT,
-        labels: Labels::ENGLISH,
         keys: INKY_ROW,
         touch: false,
         // **A documented estimate.** Pimoroni quote "about 30 seconds"; a

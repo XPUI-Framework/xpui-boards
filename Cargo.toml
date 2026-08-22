@@ -15,7 +15,8 @@ name = "xpui_boards"
 crate-type = ["rlib"]
 
 [dependencies]
-# Only for `Metrics` and `Labels`. A board describes a panel; the chrome sized for
-# it is the one thing it borrows.
+# The only one. `Button` and `KeyRow` are what a device description needs to say
+# which key sends what — and after spec 37 that is all it says. It borrows
+# nothing from the crate that paints, because how large a row should look is the
+# application's decision and not the panel's.
 xpui.workspace = true
-xpui-chrome.workspace = true

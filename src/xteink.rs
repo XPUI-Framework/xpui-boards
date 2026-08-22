@@ -10,7 +10,6 @@
 use crate::{Bezel, Board, Key, KeyAction, Orientation, PhysicalButton, Plan, Run};
 use xpui::Button;
 use xpui::host::KeyRow;
-use xpui_chrome::{Labels, Metrics};
 
 impl Board {
     /// Xteink X3 — ESP32-C3, a 792x528 panel held portrait, so 528x792.
@@ -34,8 +33,6 @@ impl Board {
         // from the firmware's board table, which records none for this profile.
         diagonal_hundredths_inch: Some(370),
         ui_scale_percent: 100,
-        metrics: Metrics::DEFAULT,
-        labels: Labels::ENGLISH,
         keys: KeyRow::READER,
         touch: false,
         refresh_ms: 1200,
@@ -61,8 +58,6 @@ impl Board {
         // where it explains the UI scale; 4.3" is the rounded selling size.
         diagonal_hundredths_inch: Some(426),
         ui_scale_percent: 100,
-        metrics: Metrics::DEFAULT,
-        labels: Labels::ENGLISH,
         keys: KeyRow::READER,
         touch: false,
         refresh_ms: 1200,
@@ -88,8 +83,6 @@ impl Board {
         orientation: Orientation::Portrait,
         diagonal_hundredths_inch: Some(426),
         ui_scale_percent: 120,
-        metrics: Metrics::DEFAULT.scaled(120).without_button_hints(),
-        labels: Labels::ENGLISH,
         keys: KeyRow::READER,
         touch: true,
         refresh_ms: 1200,

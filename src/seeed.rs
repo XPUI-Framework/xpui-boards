@@ -3,7 +3,6 @@
 use crate::{Bezel, Board, Key, Orientation, PhysicalButton, Plan, Run};
 use xpui::Button;
 use xpui::host::KeyRow;
-use xpui_chrome::{Labels, Metrics};
 
 impl Board {
     /// Seeed Sticky — ESP32-S3, an 800x480 panel held portrait, so 480x800.
@@ -24,8 +23,6 @@ impl Board {
         orientation: Orientation::Portrait,
         diagonal_hundredths_inch: Some(397),
         ui_scale_percent: 120,
-        metrics: Metrics::DEFAULT.scaled(120).without_button_hints(),
-        labels: Labels::ENGLISH,
         keys: KeyRow::READER,
         touch: true,
         refresh_ms: 1200,
