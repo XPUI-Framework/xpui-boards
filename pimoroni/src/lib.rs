@@ -1,8 +1,10 @@
 //! Pimoroni's RP2040 boards.
 
-use crate::{Bezel, Board, Key, Orientation, PhysicalButton, Plan, Run};
+#![cfg_attr(target_os = "none", no_std)]
+
 use xpui::Button;
 use xpui::host::{KeyRow, RowKey};
+use xpui_boards_core::{Bezel, Board, Key, Orientation, PhysicalButton, Plan, Run};
 
 /// A, B and C along the bottom edge, with a dedicated up/down pair elsewhere
 /// on the board — so unlike a three-key badge, there *is* a key for Back, and
@@ -22,86 +24,84 @@ const INKY_ROW: KeyRow = KeyRow::new(&[
     RowKey::Unassigned,
 ]);
 
-impl Board {
-    /// Pimoroni Badger 2040 — RP2040, 296x128 monochrome e-ink (UC8151).
-    ///
-    /// The panel that made small-panel measurements necessary: the default chrome
-    /// leaves 28 pixels of content here, which is not enough for one list row.
-    ///
-    /// Buttons only, so the baseline scale — and at 111 ppi it needs no help:
-    /// a 24px row on this strip is 5.5mm, wider than a 40px row on a reader.
-    pub const BADGER_2040: Board = Board {
-        name: "Badger 2040",
-        slug: "badger2040",
-        width: 296,
-        height: 128,
-        framebuffer: (296, 128),
-        orientation: Orientation::Landscape,
-        // Pimoroni's 2.9" UC8151 strip.
-        diagonal_hundredths_inch: Some(290),
-        ui_scale_percent: 100,
-        keys: BADGE_ROW,
-        touch: false,
-        // A full UC8151 update is close to a second; the partial modes are
-        // faster but still nothing you would drive an animation with.
-        refresh_ms: 900,
-        bezel: Some(BADGER_BEZEL),
-    };
+/// Pimoroni Badger 2040 — RP2040, 296x128 monochrome e-ink (UC8151).
+///
+/// The panel that made small-panel measurements necessary: the default chrome
+/// leaves 28 pixels of content here, which is not enough for one list row.
+///
+/// Buttons only, so the baseline scale — and at 111 ppi it needs no help:
+/// a 24px row on this strip is 5.5mm, wider than a 40px row on a reader.
+pub const BADGER_2040: Board = Board {
+    name: "Badger 2040",
+    slug: "badger2040",
+    width: 296,
+    height: 128,
+    framebuffer: (296, 128),
+    orientation: Orientation::Landscape,
+    // Pimoroni's 2.9" UC8151 strip.
+    diagonal_hundredths_inch: Some(290),
+    ui_scale_percent: 100,
+    keys: BADGE_ROW,
+    touch: false,
+    // A full UC8151 update is close to a second; the partial modes are
+    // faster but still nothing you would drive an animation with.
+    refresh_ms: 900,
+    bezel: Some(BADGER_BEZEL),
+};
 
-    /// Pimoroni Tufty 2040 — RP2040, 320x240 colour IPS LCD (ST7789v).
-    ///
-    /// Colour hardware running a monochrome framework: the backend maps ink and
-    /// background onto any two `Rgb565` values, so the same screens render
-    /// black-on-white, or amber-on-black, without a screen knowing.
-    ///
-    /// Buttons only, so the baseline scale. 166 ppi puts its 30px row at
-    /// 4.6mm.
-    pub const TUFTY_2040: Board = Board {
-        name: "Tufty 2040",
-        slug: "tufty2040",
-        width: 320,
-        height: 240,
-        framebuffer: (320, 240),
-        orientation: Orientation::Landscape,
-        // Pimoroni's 2.4" ST7789v.
-        diagonal_hundredths_inch: Some(240),
-        ui_scale_percent: 100,
-        keys: BADGE_ROW,
-        touch: false,
-        refresh_ms: 0,
-        bezel: Some(TUFTY_BEZEL),
-    };
+/// Pimoroni Tufty 2040 — RP2040, 320x240 colour IPS LCD (ST7789v).
+///
+/// Colour hardware running a monochrome framework: the backend maps ink and
+/// background onto any two `Rgb565` values, so the same screens render
+/// black-on-white, or amber-on-black, without a screen knowing.
+///
+/// Buttons only, so the baseline scale. 166 ppi puts its 30px row at
+/// 4.6mm.
+pub const TUFTY_2040: Board = Board {
+    name: "Tufty 2040",
+    slug: "tufty2040",
+    width: 320,
+    height: 240,
+    framebuffer: (320, 240),
+    orientation: Orientation::Landscape,
+    // Pimoroni's 2.4" ST7789v.
+    diagonal_hundredths_inch: Some(240),
+    ui_scale_percent: 100,
+    keys: BADGE_ROW,
+    touch: false,
+    refresh_ms: 0,
+    bezel: Some(TUFTY_BEZEL),
+};
 
-    /// Pimoroni Inky Frame 5.7" — RP2040 with a Pico W aboard, 600x448
-    /// seven-colour e-ink (E Ink Gallery Palette 4000).
-    ///
-    /// The first board here whose keys are only a footer: five of them, A to E,
-    /// and nothing down either edge. Buttons only, so the baseline scale, and
-    /// at 131 ppi a 40px row is 7.7mm — the roomiest chrome of the seven.
-    ///
-    /// Five keys, and the standard row names four of them, so the last is
-    /// [`RowKey::Unassigned`] rather than shifting every label one key left.
-    pub const INKY_FRAME: Board = Board {
-        name: "Inky Frame 5.7\"",
-        slug: "inkyframe",
-        width: 600,
-        height: 448,
-        framebuffer: (600, 448),
-        orientation: Orientation::Landscape,
-        // The size Pimoroni sell it as. Their published 0.1915mm dot pitch puts
-        // the active area's own diagonal a shade under that, at 5.65".
-        diagonal_hundredths_inch: Some(570),
-        ui_scale_percent: 100,
-        keys: INKY_ROW,
-        touch: false,
-        // **A documented estimate.** Pimoroni quote "about 30 seconds"; a
-        // seven-colour panel cycles through each colour, and the figure people
-        // report runs from twenty to forty. Two orders of magnitude slower than
-        // the readers, which is the fact a screen would need to know.
-        refresh_ms: 30_000,
-        bezel: Some(INKY_FRAME_BEZEL),
-    };
-}
+/// Pimoroni Inky Frame 5.7" — RP2040 with a Pico W aboard, 600x448
+/// seven-colour e-ink (E Ink Gallery Palette 4000).
+///
+/// The first board here whose keys are only a footer: five of them, A to E,
+/// and nothing down either edge. Buttons only, so the baseline scale, and
+/// at 131 ppi a 40px row is 7.7mm — the roomiest chrome of the seven.
+///
+/// Five keys, and the standard row names four of them, so the last is
+/// [`RowKey::Unassigned`] rather than shifting every label one key left.
+pub const INKY_FRAME: Board = Board {
+    name: "Inky Frame 5.7\"",
+    slug: "inkyframe",
+    width: 600,
+    height: 448,
+    framebuffer: (600, 448),
+    orientation: Orientation::Landscape,
+    // The size Pimoroni sell it as. Their published 0.1915mm dot pitch puts
+    // the active area's own diagonal a shade under that, at 5.65".
+    diagonal_hundredths_inch: Some(570),
+    ui_scale_percent: 100,
+    keys: INKY_ROW,
+    touch: false,
+    // **A documented estimate.** Pimoroni quote "about 30 seconds"; a
+    // seven-colour panel cycles through each colour, and the figure people
+    // report runs from twenty to forty. Two orders of magnitude slower than
+    // the readers, which is the fact a screen would need to know.
+    refresh_ms: 30_000,
+    bezel: Some(INKY_FRAME_BEZEL),
+};
 
 /// The Badger's body and its five front buttons.
 ///
@@ -115,12 +115,12 @@ impl Board {
 ///
 /// `a` goes back and `b` confirms, matching the row painted above them and the
 /// firmware that reads the pins. `c` has nothing on it yet.
-const BADGER: Plan = Plan::new((856, 487), (669, 291), 60)
+const BADGER_PLAN: Plan = Plan::new((856, 487), (669, 291), 60)
     .footer(Run::new((110, 60), &BADGE_FOOTER))
     .right(Run::new((60, 60), &BADGE_EDGE));
 
-const BADGER_KEYS: [PhysicalButton; BADGER.count()] = BADGER.keys();
-pub const BADGER_BEZEL: Bezel = BADGER.bezel(&BADGER_KEYS);
+const BADGER_KEYS: [PhysicalButton; BADGER_PLAN.count()] = BADGER_PLAN.keys();
+pub const BADGER_BEZEL: Bezel = BADGER_PLAN.bezel(&BADGER_KEYS);
 
 /// a, b and c along the footer, as the silkscreen has them, on both badges.
 ///
@@ -172,12 +172,12 @@ const BADGE_EDGE: [Key; 2] = [Key::new("Up", Button::Up), Key::new("Dn", Button:
 ///
 /// Button placement is **estimated** from product photographs, as for the
 /// Badger: A, B and C along the bottom, up and down on the right edge.
-const TUFTY: Plan = Plan::new((652, 527), (489, 367), 60)
+const TUFTY_PLAN: Plan = Plan::new((652, 527), (489, 367), 60)
     .footer(Run::new((95, 55), &BADGE_FOOTER))
     .right(Run::new((55, 55), &BADGE_EDGE));
 
-const TUFTY_KEYS: [PhysicalButton; TUFTY.count()] = TUFTY.keys();
-pub const TUFTY_BEZEL: Bezel = TUFTY.bezel(&TUFTY_KEYS);
+const TUFTY_KEYS: [PhysicalButton; TUFTY_PLAN.count()] = TUFTY_PLAN.keys();
+pub const TUFTY_BEZEL: Bezel = TUFTY_PLAN.bezel(&TUFTY_KEYS);
 
 /// The Inky Frame's body: five keys along the footer, and nothing on the edges.
 ///
@@ -195,7 +195,7 @@ pub const TUFTY_BEZEL: Bezel = TUFTY.bezel(&TUFTY_KEYS);
 /// `button_a` through `button_e` — and neither is the shape: they are a row
 /// along the footer with no edge keys at all, which is the whole reason this
 /// board is here. Five centres, and not one of them written down.
-const INKY_FRAME: Plan = Plan::new((1314, 1275), (1149, 858), 83).footer(Run::new(
+const INKY_FRAME_PLAN: Plan = Plan::new((1314, 1275), (1149, 858), 83).footer(Run::new(
     (60, 60),
     &[
         Key::new("A", Button::Back),
@@ -209,5 +209,40 @@ const INKY_FRAME: Plan = Plan::new((1314, 1275), (1149, 858), 83).footer(Run::ne
     ],
 ));
 
-const INKY_FRAME_KEYS: [PhysicalButton; INKY_FRAME.count()] = INKY_FRAME.keys();
-pub const INKY_FRAME_BEZEL: Bezel = INKY_FRAME.bezel(&INKY_FRAME_KEYS);
+const INKY_FRAME_KEYS: [PhysicalButton; INKY_FRAME_PLAN.count()] = INKY_FRAME_PLAN.keys();
+pub const INKY_FRAME_BEZEL: Bezel = INKY_FRAME_PLAN.bezel(&INKY_FRAME_KEYS);
+
+/// This vendor's 3 boards, so a caller can offer them without a table of
+/// its own that would fall behind this one.
+///
+/// One vendor's list, not the framework's — there is no such thing. An
+/// application that ships against more than one concatenates them; see
+/// `examples/gallery/src/boards.rs`.
+pub const ALL: [Board; 3] = [BADGER_2040, TUFTY_2040, INKY_FRAME];
+
+/// Looks one of this vendor's boards up by its short name, for a command line.
+///
+/// `None` for a slug this vendor does not own, including one another vendor
+/// does — a caller offering several asks each in turn.
+///
+/// The aliases exist because `badger` and `tufty` are what people say.
+pub fn from_slug(slug: &str) -> Option<Board> {
+    ALL.into_iter()
+        .find(|board| board.slug == slug)
+        .or(match slug {
+            "badger" => Some(BADGER_2040),
+            "tufty" => Some(TUFTY_2040),
+            _ => None,
+        })
+}
+
+/// The crate's prose, compiled.
+///
+/// A README that does not build is worse than none: every figure in it is a
+/// claim about hardware, and the only ones that stay true are the ones a
+/// compiler checks.
+#[cfg(doctest)]
+mod guides {
+    #[doc = include_str!("../README.md")]
+    pub mod readme {}
+}

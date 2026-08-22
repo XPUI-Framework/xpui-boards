@@ -1,0 +1,23 @@
+[package]
+name = "xpui-boards-seeed"
+description = "Seeed devices, described for xpui: the Sticky"
+readme = "README.md"
+keywords = ["ui", "embedded", "no-std", "eink", "xpui"]
+categories = ["embedded", "gui", "no-std"]
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lib]
+name = "xpui_boards_seeed"
+crate-type = ["rlib"]
+
+[dependencies]
+# The vocabulary. This crate is data written in it and holds no logic of its
+# own — which is why one vendor's boards can be taken without the others.
+xpui-boards-core.workspace = true
+# `Button` and `KeyRow`: what a key sends, and what the row along the bottom
+# means. A device description says nothing else about the framework.
+xpui.workspace = true

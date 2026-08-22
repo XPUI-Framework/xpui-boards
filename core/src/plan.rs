@@ -33,7 +33,7 @@
 //!
 //! ```
 //! use xpui::Button;
-//! use xpui_boards::{Bezel, Key, PhysicalButton, Plan, Run};
+//! use xpui_boards_core::{Bezel, Key, PhysicalButton, Plan, Run};
 //!
 //! // A body 60 x 100 mm, a panel 40 x 70 mm, 8 mm of bezel above it.
 //! const PLAN: Plan = Plan::new((600, 1000), (400, 700), 80).footer(Run::new(

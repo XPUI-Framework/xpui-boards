@@ -1,9 +1,15 @@
-//! The panels this framework has been run on, as data.
+//! The vocabulary a device is described in.
 //!
 //! A screen never knows which board it is on. What differs is a handful of
-//! numbers — how big the panel is, which measurements fit it, whether there is
-//! a touchscreen — and those are worth writing down once rather than
-//! rediscovering per project.
+//! numbers — how big the panel is, whether there is a touchscreen, what the
+//! keys along the bottom mean, how big the glass is in millimetres — and this
+//! is the shape those are written in.
+//!
+//! **No device is described here.** The devices live in one crate per vendor —
+//! `xpui-boards-pimoroni`, `xpui-boards-xteink`, `xpui-boards-seeed` — so a
+//! project can take the boards it owns and none of the others. Anything with a
+//! panel nobody has described reaches for [`Board::custom`] and needs no vendor
+//! crate at all.
 //!
 //! The simulator and a real firmware read the same value, which is what makes
 //! "develop in a window, then flash it" true rather than aspirational. Nothing
@@ -18,10 +24,7 @@
 use xpui::Button;
 
 mod bezel;
-mod pimoroni;
 mod plan;
-mod seeed;
-mod xteink;
 
 pub use bezel::{Bezel, KeyAction, PhysicalButton};
 pub use plan::{Key, Plan, Run};
@@ -126,36 +129,12 @@ pub struct Board {
 }
 
 impl Board {
-    /// Every board, so an example can offer them all without a table of its own
-    /// that would fall behind this one.
-    pub const ALL: [Board; 7] = [
-        Board::X3,
-        Board::X4,
-        Board::X4_PRO,
-        Board::STICKY,
-        Board::BADGER_2040,
-        Board::TUFTY_2040,
-        Board::INKY_FRAME,
-    ];
-
-    /// Looks a board up by its short name, for a command line.
+    /// A board of an arbitrary size.
     ///
-    /// The aliases exist because `badger` and `tufty` are what people say.
-    pub fn from_slug(slug: &str) -> Option<Board> {
-        Board::ALL
-            .into_iter()
-            .find(|board| board.slug == slug)
-            .or(match slug {
-                "badger" => Some(Board::BADGER_2040),
-                "tufty" => Some(Board::TUFTY_2040),
-                _ => None,
-            })
-    }
-
-    /// A board of an arbitrary size, with the chrome that fits it.
-    ///
-    /// For a panel not listed here — the point of the framework is that there
-    /// will be many.
+    /// For a panel no vendor crate describes — the point of the framework is
+    /// that there will be many. It has no bezel and no measured diagonal, so
+    /// the simulator opens a window that is exactly the panel and nothing can
+    /// ask it for millimetres.
     pub const fn custom(name: &'static str, width: i32, height: i32, touch: bool) -> Board {
         Board {
             name,
