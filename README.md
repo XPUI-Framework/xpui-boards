@@ -55,3 +55,7 @@ them a caller, never a library below one.
 ```bash
 ./build-and-test.sh
 ```
+
+## License
+
+MIT — see [LICENSE](LICENSE). Copyright (c) 2026 Thiago Holanda.
