@@ -1,7 +1,7 @@
 //! What Pimoroni's own boards promise.
 //!
 //! Only this vendor's. Anything comparing one vendor's board to another's is
-//! in the conformance suite, `examples/gallery/tests/boards.rs`, because there
+//! in the conformance suite, `xpui-gallery`'s `gallery/tests/boards.rs`, because there
 //! is no crate below the caller that knows more than one vendor.
 
 use xpui::Button;

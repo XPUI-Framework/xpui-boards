@@ -48,7 +48,7 @@ three measurements, a key row, a body, and the one check no script can run.
 
 There is no crate that knows all seven, because there is no such thing as
 "every board" — a list is something an application assembles from the vendors
-it ships against. `examples/gallery/src/boards.rs` is one: seven entries, and a
+it ships against. `xpui-gallery`'s `gallery/src/boards.rs` is one: seven entries, and a
 `const` assertion that a vendor cannot gain a board without it noticing.
 
 The simulator and a real firmware read the same value, which is what makes

@@ -41,14 +41,15 @@ assert_eq!(pimoroni::from_slug("x4"), None);
 It depends on [`xpui-boards-core`](../core/) for the vocabulary and on nothing
 else that paints, so taking these three costs you no Xteink and no Seeed.
 
-**The keys are not decoration.** `examples/rp2040/src/buttons.rs` resolves a
+**The keys are not decoration.** `src/buttons.rs` in the RP2040 repository
+resolves a
 real GPIO pin by looking a key up **by its label** in the bezel here, so a
 label changed here changes which switch does what on the hardware. The bezel
 also carries the body in tenths of a millimetre, which is what lets the
 simulator draw a device rather than a rectangle.
 
 **Two of the three run.** The Badger 2040 and the Tufty 2040 have firmware in
-[`examples/rp2040`](https://github.com/XPUI-Framework/xpui-rp2040/tree/main) and have been flashed over a
+[`xpui-rp2040`](https://github.com/XPUI-Framework/xpui-rp2040) and have been flashed over a
 debug probe. The Inky Frame is described but not built: it exists so a screen
 can be laid out and looked at for a 600 × 448 seven-colour panel in the
 simulator.

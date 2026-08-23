@@ -62,7 +62,7 @@ pub const STICKY_BEZEL: Bezel = STICKY_PLAN.bezel(&STICKY_KEYS);
 ///
 /// One vendor's list, not the framework's — there is no such thing. An
 /// application that ships against more than one concatenates them; see
-/// `examples/gallery/src/boards.rs`.
+/// `xpui-gallery`'s `gallery/src/boards.rs`.
 pub const ALL: [Board; 1] = [STICKY];
 
 /// Looks one of this vendor's boards up by its short name, for a command line.

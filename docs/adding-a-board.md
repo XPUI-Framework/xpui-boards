@@ -177,7 +177,7 @@ wider than its neighbours says so with `spanning`.
 
 **A key's label is not decoration.** `Bezel::button_labelled` matches on it, and
 a firmware resolves a real GPIO pin by looking a key up *by that string* —
-`examples/rp2040/src/buttons.rs` in the RP2040 repository does exactly that.
+`src/buttons.rs` in the RP2040 repository does exactly that.
 Spelling `Dn` where the firmware says `Down` compiles, changes nothing the
 panel paints, and leaves that switch dead on hardware.
 
@@ -195,7 +195,8 @@ Two checks a script runs:
 Then look at it:
 
 ```bash
-cargo run -p xpui-gallery -- --board <your-slug>
+git clone https://github.com/XPUI-Framework/xpui-gallery
+cd xpui-gallery && cargo run -p xpui-gallery -- --board <your-slug>
 ```
 
 The simulator draws the body from your millimetres with its keys where a thumb

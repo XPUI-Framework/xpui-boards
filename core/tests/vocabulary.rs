@@ -6,7 +6,7 @@
 //! a pair only when both are there.
 //!
 //! The census over real hardware is in the conformance suite,
-//! `examples/gallery/tests/boards.rs`, because comparing one vendor's board to
+//! `xpui-gallery`'s `gallery/tests/boards.rs`, because comparing one vendor's board to
 //! another's has no home below the caller. Each vendor's own boards are checked
 //! in that vendor's crate.
 

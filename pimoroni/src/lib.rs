@@ -217,7 +217,7 @@ pub const INKY_FRAME_BEZEL: Bezel = INKY_FRAME_PLAN.bezel(&INKY_FRAME_KEYS);
 ///
 /// One vendor's list, not the framework's — there is no such thing. An
 /// application that ships against more than one concatenates them; see
-/// `examples/gallery/src/boards.rs`.
+/// `xpui-gallery`'s `gallery/src/boards.rs`.
 pub const ALL: [Board; 3] = [BADGER_2040, TUFTY_2040, INKY_FRAME];
 
 /// Looks one of this vendor's boards up by its short name, for a command line.

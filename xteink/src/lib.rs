@@ -188,7 +188,7 @@ pub const X4_PRO_BEZEL: Bezel = X4_PRO_PLAN.bezel(&X4_PRO_KEYS);
 ///
 /// One vendor's list, not the framework's — there is no such thing. An
 /// application that ships against more than one concatenates them; see
-/// `examples/gallery/src/boards.rs`.
+/// `xpui-gallery`'s `gallery/src/boards.rs`.
 pub const ALL: [Board; 3] = [X3, X4, X4_PRO];
 
 /// Looks one of this vendor's boards up by its short name, for a command line.
