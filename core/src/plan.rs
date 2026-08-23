@@ -160,8 +160,9 @@ impl Run {
 
 /// A body, a panel, and the shapes the keys are arranged in.
 ///
-/// See the [module documentation](self) for what is derived and what is
-/// measured.
+/// [`new`](Plan::new) takes the three numbers a board cannot derive; the
+/// builders beside it say which keys sit in which shape, and everything else
+/// follows from those. Tenths of a millimetre throughout.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub struct Plan {
     body: (i32, i32),
