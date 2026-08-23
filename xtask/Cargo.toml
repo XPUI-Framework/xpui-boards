@@ -1,0 +1,19 @@
+# This repository's gate, as a program rather than a thousand lines of
+# shell.  It holds only what this repository checks. There is no C++ here
+# and no product name to forbid — these crates *are* the device names — so
+# it holds the common list and nothing else.
+#
+# No dependencies, on purpose: a gate that fails because something it
+# fetched moved is a gate that has to be argued with before it can be
+# believed.
+[package]
+name = "xtask"
+description = "The gate for xpui-boards: format, lint, test, and the prose"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+authors = ["Thiago Holanda <unnamedd@gmail.com>"]
+repository = "https://github.com/XPUI-Framework/xpui-boards"
+publish = false
+
+[dependencies]

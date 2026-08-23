@@ -56,6 +56,10 @@ them a caller, never a library below one.
 ./build-and-test.sh
 ```
 
+The checks themselves are in [`xtask/`](xtask/) — this repository's own list,
+in Rust, holding nothing it does not run. `./build-and-test.sh fix` formats
+in place first.
+
 ## Where it sits
 
 Every arrow is a dependency in a `Cargo.toml`, and they all point inward
