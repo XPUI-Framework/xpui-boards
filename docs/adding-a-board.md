@@ -22,6 +22,7 @@ they are separate: a project takes the boards it targets and none of the rest.
 The shortcut first, because most people want it:
 
 ```rust
+use xpui::host::KeyRow;
 use xpui_boards_core::Board;
 
 // A name, a size, and whether a finger drives it. No bezel, no millimetres.
@@ -32,7 +33,15 @@ assert!(!mine.touch);
 
 // Nobody measured it, so nothing can ask it for millimetres.
 assert_eq!(mine.ppi(), None);
+
+// But it does get a key row, because something has to answer.
+assert_eq!(mine.keys, KeyRow::READER);
 ```
+
+That last line matters more than it looks. `custom` hands out `KeyRow::READER`
+— Back, Confirm, and a pair of page keys — so a device without those keys gets
+a hint bar naming keys nobody can press, which §4 is about. Pass `touch: true`
+if a finger drives it, or write the row out and skip `custom` entirely.
 
 That is enough to open a window and lay out every screen. The rest of this page
 is what you gain by measuring.
@@ -64,10 +73,9 @@ repository:
 ```rust
 use xpui::host::KeyRow;
 use xpui_boards_core::{Board, Orientation};
-# use xpui_boards_seeed::STICKY;
+use xpui_boards_seeed::STICKY;
 
-# let _ = || {
-Board {
+let mine = Board {
     name: "Seeed Sticky",
     slug: "sticky",
     // What a screen is laid out against.
@@ -88,9 +96,13 @@ Board {
     touch: true,
     refresh_ms: 1200,
     bezel: None,
-}
-# };
-assert_eq!(STICKY.ppi(), Some(234));
+};
+
+// This is the shipped Sticky, field for field — so the page cannot drift from
+// the crate without going red. Its bezel is blanked here and nowhere else:
+// that is the one field §5 fills in, and it is `None` until you measure a body.
+assert_eq!(mine, Board { bezel: None, ..STICKY });
+assert_eq!(mine.ppi(), Some(234));
 ```
 
 `width`/`height` against `framebuffer` is the pair to get right. A screen is
@@ -105,11 +117,15 @@ has three:
 
 ```rust
 use xpui::host::{KeyRow, RowKey};
+use xpui_boards_pimoroni::BADGER_2040;
 
 const BADGE_ROW: KeyRow = KeyRow::new(&[RowKey::Back, RowKey::Confirm, RowKey::Unassigned]);
 
 assert_eq!(BADGE_ROW.len(), 3);
 assert!(BADGE_ROW.contains(RowKey::Back));
+
+// And it is the row the Badger actually ships with, not one that resembles it.
+assert_eq!(BADGE_ROW, BADGER_2040.keys);
 ```
 
 **`Unassigned` is not padding.** It holds a position. The hint bar paints one
@@ -144,6 +160,15 @@ const STICKY: Plan = Plan::new((560, 1010), (450, 750), 95).right(Run::new(
 ));
 
 assert_eq!(STICKY.count(), 3);
+
+// Every label here is one the shipped bezel answers to. That is the check the
+// next paragraph is about, run against the real thing rather than this copy.
+for label in ["OK", "Prev", "Next"] {
+    assert!(
+        xpui_boards_seeed::STICKY_BEZEL.button_labelled(label).is_some(),
+        "the shipped Sticky has no key labelled {label}"
+    );
+}
 ```
 
 `Run::new` takes the size of one key and the keys in it; the plan spaces them
