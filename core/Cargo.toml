@@ -33,3 +33,7 @@ xpui.workspace = true
 # could go first. A path-only dev-dependency is stripped from the published
 # manifest entirely, and `cargo build`/`cargo test` are unaffected either way.
 xpui-boards-pimoroni = { path = "../pimoroni" }
+# And Seeed, for `docs/adding-a-board.md`, which works one real board end to
+# end. The guide is about describing a device; showing an invented one would
+# be showing nothing.
+xpui-boards-seeed = { path = "../seeed" }

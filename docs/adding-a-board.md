@@ -1,0 +1,182 @@
+# Adding a board
+
+You have a device nobody here describes, and you want your screens laid out for
+it. This is what that takes: three measurements, a key row, a body, and two
+checks a script can run plus one only you can.
+
+A board is **data**. Nothing in it is code, nothing in it draws, and every
+number in it comes off a datasheet or a ruler.
+
+## 1. Where it goes
+
+| Your device is… | Put it in |
+|---|---|
+| a Pimoroni, Xteink or Seeed board not listed | that vendor's crate here, beside its siblings |
+| anything else | a crate of your own, depending on `xpui-boards-core` |
+| a panel with no case worth drawing | nowhere — call `Board::custom` at the call site |
+
+`core` is the vocabulary and describes no device. A vendor crate is data
+written in it and knows nothing of the other vendors, which is the whole reason
+they are separate: a project takes the boards it targets and none of the rest.
+
+The shortcut first, because most people want it:
+
+```rust
+use xpui_boards_core::Board;
+
+// A name, a size, and whether a finger drives it. No bezel, no millimetres.
+let mine = Board::custom("my reader", 480, 800, false);
+
+assert_eq!((mine.width, mine.height), (480, 800));
+assert!(!mine.touch);
+
+// Nobody measured it, so nothing can ask it for millimetres.
+assert_eq!(mine.ppi(), None);
+```
+
+That is enough to open a window and lay out every screen. The rest of this page
+is what you gain by measuring.
+
+## 2. Three numbers, and everything else follows
+
+From the datasheet, in **tenths of a millimetre** — never pixels:
+
+| | What |
+|---|---|
+| **body** | the case, width × height |
+| **panel** | the glass, width × height |
+| **forehead** | how much case sits *above* the glass |
+
+Only the forehead is asked for separately, and only because a device's chin is
+deeper than its forehead by an amount that is a fact about the device. Guessing
+it symmetrical puts every key in the wrong place. Everything else — the
+margins, the spacing, the key centres, where the panel sits between them —
+derives from those three.
+
+Tenths of a millimetre and not pixels, because a body drawn in pixels stops
+being right the moment somebody zooms.
+
+## 3. The panel, as a `Board`
+
+Here is the Seeed Sticky, which is the smallest complete example in this
+repository:
+
+```rust
+use xpui::host::KeyRow;
+use xpui_boards_core::{Board, Orientation};
+# use xpui_boards_seeed::STICKY;
+
+# let _ = || {
+Board {
+    name: "Seeed Sticky",
+    slug: "sticky",
+    // What a screen is laid out against.
+    width: 480,
+    height: 800,
+    // What the driver scans. These differ when the panel is held turned.
+    framebuffer: (800, 480),
+    orientation: Orientation::Portrait,
+    // The diagonal, in hundredths of an inch. `None` if nobody measured it,
+    // and then `ppi` and `tenths_of_a_mm` both answer `None` rather than
+    // guessing.
+    diagonal_hundredths_inch: Some(397),
+    // How much larger this board's chrome should be than the button-era
+    // baseline. Hand-tuned, because pixels per inch alone cannot tell a
+    // 4.26" X4 from a 3.97" Sticky.
+    ui_scale_percent: 120,
+    keys: KeyRow::READER,
+    touch: true,
+    refresh_ms: 1200,
+    bezel: None,
+}
+# };
+assert_eq!(STICKY.ppi(), Some(234));
+```
+
+`width`/`height` against `framebuffer` is the pair to get right. A screen is
+laid out against the first; a driver scans the second. On every reader here
+they differ, because the panel is held a quarter turn from the way it is
+scanned.
+
+## 4. The key row, and why a blank key matters
+
+`keys` says what the row along the bottom **means**, left to right. The Badger
+has three:
+
+```rust
+use xpui::host::{KeyRow, RowKey};
+
+const BADGE_ROW: KeyRow = KeyRow::new(&[RowKey::Back, RowKey::Confirm, RowKey::Unassigned]);
+
+assert_eq!(BADGE_ROW.len(), 3);
+assert!(BADGE_ROW.contains(RowKey::Back));
+```
+
+**`Unassigned` is not padding.** It holds a position. The hint bar paints one
+word per key, in order, so a key with no job that is simply left out shifts
+every label after it one key to the left — and then the label above a key names
+what its neighbour does. That shipped once, on two boards, with the suite green
+and a person finding it by pressing a key.
+
+A board driven by a finger takes its Back and its directions from the
+touchscreen and has no row to label. Say `touch: true` and the chrome reserves
+no band for hints, because a hint names a key and naming one that is not there
+sends a person looking for it.
+
+## 5. The body, if you want the simulator to draw a device
+
+A `Plan` is a body, a panel, and the shapes the keys are arranged in. Almost
+every device is the same two shapes — a **row** along the footer and a
+**column** down an edge:
+
+```rust
+use xpui::Button;
+use xpui_boards_core::{Key, Plan, Run};
+
+// body, panel, forehead — all in tenths of a millimetre.
+const STICKY: Plan = Plan::new((560, 1010), (450, 750), 95).right(Run::new(
+    (44, 140),
+    &[
+        Key::new("OK", Button::Confirm).spanning(120),
+        Key::new("Prev", Button::PageBack),
+        Key::new("Next", Button::PageForward),
+    ],
+));
+
+assert_eq!(STICKY.count(), 3);
+```
+
+`Run::new` takes the size of one key and the keys in it; the plan spaces them
+and centres the panel in what the edge keys leave. A key that is taller or
+wider than its neighbours says so with `spanning`.
+
+**A key's label is not decoration.** `Bezel::button_labelled` matches on it, and
+a firmware resolves a real GPIO pin by looking a key up *by that string* —
+`examples/rp2040/src/buttons.rs` in the RP2040 repository does exactly that.
+Spelling `Dn` where the firmware says `Down` compiles, changes nothing the
+panel paints, and leaves that switch dead on hardware.
+
+## 6. What proves it
+
+Two checks a script runs:
+
+- **This repository's own tests** — the census, and that every key label the
+  bezel carries is one the firmware can find. `cargo test` here.
+- **`xpui-gallery`'s `tests/chrome_for_a_board.rs`** — that your panel holds at
+  least three list rows, and that a board with keys reserves a band to name
+  them. Those are about the *chrome* derived from your panel, so they live
+  where a board and a backend meet.
+
+Then look at it:
+
+```bash
+cargo run -p xpui-gallery -- --board <your-slug>
+```
+
+The simulator draws the body from your millimetres with its keys where a thumb
+would find them, and they are clickable. A key in the wrong place is obvious in
+a second and invisible in a test.
+
+**And one check no script can run.** Nothing here knows that the key you
+labelled `Down` is wired to the switch a person would call Down. That is a
+person, with the board, pressing it.

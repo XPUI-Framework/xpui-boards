@@ -43,6 +43,9 @@ assert_eq!(mine.slug, "custom");
 assert_eq!(mine.ppi(), None);
 ```
 
+**Adding your own device** is [`docs/adding-a-board.md`](../docs/adding-a-board.md):
+three measurements, a key row, a body, and the one check no script can run.
+
 There is no crate that knows all seven, because there is no such thing as
 "every board" — a list is something an application assembles from the vendors
 it ships against. `examples/gallery/src/boards.rs` is one: seven entries, and a

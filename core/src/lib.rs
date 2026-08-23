@@ -239,4 +239,6 @@ impl Board {
 mod guides {
     #[doc = include_str!("../README.md")]
     pub mod readme {}
+    #[doc = include_str!("../../docs/adding-a-board.md")]
+    pub mod adding_a_board {}
 }
