@@ -1,5 +1,8 @@
 # `xpui-boards-seeed`
 
+> ⚠️ **Under heavy development.** Not production-ready. The API can break
+> without notice. Use at your own risk.
+
 Seeed's Sticky, described for xpui.
 
 | Board | Panel | Driven by |

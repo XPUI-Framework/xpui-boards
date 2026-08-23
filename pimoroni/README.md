@@ -1,5 +1,8 @@
 # `xpui-boards-pimoroni`
 
+> ⚠️ **Under heavy development.** Not production-ready. The API can break
+> without notice. Use at your own risk.
+
 Pimoroni's RP2040 boards, described for xpui.
 
 | Board | Panel | Keys |

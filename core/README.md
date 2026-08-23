@@ -1,5 +1,8 @@
 # `xpui-boards-core`
 
+> ⚠️ **Under heavy development.** Not production-ready. The API can break
+> without notice. Use at your own risk.
+
 The vocabulary a device is described in.
 
 A screen never knows which board it is on. What differs is a handful of
