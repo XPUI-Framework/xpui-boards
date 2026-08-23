@@ -44,8 +44,14 @@ assert_eq!(xteink::from_slug("badger2040"), None);
 
 It depends on [`xpui-boards-core`](../core/) and nothing else.
 
-**None of the three has been run.** There is no published Rust or C++ panel
-driver for these, and [`examples/esp32`](https://github.com/XPUI-Framework/xpui-esp32/tree/main) marks the
-seam where one goes. The geometry here is read from the firmware's own board configuration
-and the simulator that ships beside it — so the screens lay out correctly in a
-window, and what reaches the glass is untested.
+**How a screen reaches one of these panels.** They are driven by the firmware
+that ships on them, so the route is that firmware hosting `xpui` over the C
+ABI — [`xpui-cpp`](https://github.com/XPUI-Framework/xpui-cpp) is that boundary — rather than a second
+driver for the same glass.
+
+[`xpui-esp32`](https://github.com/XPUI-Framework/xpui-esp32) carries a bare-metal image for the X3 that
+builds and links, with `Panel::present` marked where a panel driver would go.
+There is no published Rust or C++ driver for these panels, so what reaches the
+glass on that route is not yet proven; the geometry below is, in the simulator
+and in the firmware's own board configuration, and it is what lays a screen out
+correctly for all three.

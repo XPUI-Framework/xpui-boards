@@ -29,5 +29,23 @@ assert_eq!(seeed::from_slug("x4"), None);
 
 It depends on [`xpui-boards-core`](../core/) and nothing else.
 
-**It has not been run.** There is no published panel driver for it;
-[`examples/esp32`](https://github.com/XPUI-Framework/xpui-esp32/tree/main) marks the seam.
+**What this crate is for.** The Sticky's panel is driven by the firmware that
+ships on it, and a screen reaches it by that firmware hosting `xpui` over the C
+ABI — see [`xpui-cpp`](https://github.com/XPUI-Framework/xpui-cpp). These measurements are what lays a
+screen out for it, in the simulator and in that firmware alike.
+[`xpui-esp32`](https://github.com/XPUI-Framework/xpui-esp32) carries a bare-metal image for the same board,
+with `Panel::present` marked where a driver would go.
+
+## Using it
+
+```toml
+[dependencies]
+xpui-boards-seeed = { git = "https://github.com/XPUI-Framework/xpui-boards", branch = "main" }
+```
+
+One vendor, so one crate: a project targeting a Sticky compiles this board's
+dimensions and nothing else — no Pimoroni, no Xteink. That is why there is a
+crate per manufacturer rather than one list, and why there is deliberately no
+`ALL` across vendors. An application that ships against more than one
+concatenates them.
+

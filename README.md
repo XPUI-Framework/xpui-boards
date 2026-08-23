@@ -14,7 +14,7 @@ has never heard of and why adding one is a literal rather than a patch.
 
 | | |
 |---|---|
-| [`pimoroni`](pimoroni/) | Badger 2040, Tufty 2040, Inky Frame. The first two have firmware and have been run over a debug probe; the Inky Frame is described so a screen can be laid out for its panel, and has not |
+| [`pimoroni`](pimoroni/) | Badger 2040, Tufty 2040, Inky Frame. The first two ship firmware and have been run over a debug probe; the Inky Frame's 600 × 448 seven-colour panel is described so a screen can be laid out for it and seen in the simulator |
 | [`xteink`](xteink/) | X3, X4, X4 Pro |
 | [`seeed`](seeed/) | Sticky |
 | [`core`](core/) | `Board`, `Orientation`, `Bezel`, and the `Plan`/`Run`/`Key` const DSL. Describes no device at all |
@@ -54,6 +54,51 @@ them a caller, never a library below one.
 
 ```bash
 ./build-and-test.sh
+```
+
+## Where it sits
+
+Every arrow is a dependency in a `Cargo.toml`, and they all point inward
+toward `xpui`, which depends on nothing at all. That is the rule the
+organisation is arranged around: a backend can be written without the framework
+knowing it exists, and a firmware reaches whatever it needs directly rather
+than through whoever happens to sit above it.
+
+```mermaid
+flowchart BT
+  xpui["xpui<br/>the framework"]
+  chrome["xpui-chrome<br/>components"]
+  boards["xpui-boards<br/>seven devices"]
+  backends["xpui-backends<br/>two backends"]
+  simulator["xpui-simulator<br/>a window"]
+  gallery["xpui-gallery<br/>the app"]
+  rp2040["xpui-rp2040<br/>firmware"]
+  esp32["xpui-esp32<br/>firmware"]
+  cpp["xpui-cpp<br/>a C++ host"]
+  chrome --> xpui
+  boards --> xpui
+  backends --> xpui
+  backends --> chrome
+  simulator --> xpui
+  simulator --> chrome
+  simulator --> boards
+  simulator --> backends
+  gallery --> xpui
+  gallery --> chrome
+  gallery --> boards
+  gallery --> backends
+  gallery --> simulator
+  rp2040 --> xpui
+  rp2040 --> boards
+  rp2040 --> backends
+  rp2040 --> gallery
+  esp32 --> xpui
+  esp32 --> boards
+  esp32 --> backends
+  esp32 --> gallery
+  cpp --> xpui
+  cpp --> backends
+  style boards stroke-width:3px
 ```
 
 ## License
