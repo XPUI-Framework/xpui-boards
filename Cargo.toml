@@ -1,0 +1,31 @@
+# The devices this framework has been described for, one crate per vendor.
+#
+# `core` is the vocabulary and describes no device; each vendor crate is data
+# written in it and knows nothing of the others. A project depends on the
+# vendor it targets, and on none of the rest.
+[workspace]
+members = ["core", "pimoroni", "seeed", "xteink"]
+resolver = "3"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+authors = ["Thiago Holanda <unnamedd@gmail.com>"]
+repository = "https://github.com/XPUI-Framework/xpui-boards"
+
+[workspace.dependencies]
+# A git dependency, not a version: nothing is published, and a fresh clone of
+# this repository has to build without its siblings on disk.
+xpui = { git = "https://github.com/XPUI-Framework/xpui-framework", branch = "main" }
+xpui-boards-core = { path = "core" }
+xpui-boards-pimoroni = { path = "pimoroni" }
+xpui-boards-seeed = { path = "seeed" }
+xpui-boards-xteink = { path = "xteink" }
+
+# Shared across every repository so host, RISC-V and Xtensa builds agree.
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+panic = "abort"
