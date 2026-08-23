@@ -58,10 +58,9 @@ here touches hardware: it is a description, not a driver.
 Separate from [`xpui-chrome`](https://github.com/XPUI-Framework/xpui-chrome/tree/main) because a panel size is
 not a drawing concern — anything that wants to know how big a screen is can
 depend on this without pulling in code that paints. It is also why
-[`crates/xpui`](https://github.com/XPUI-Framework/xpui-framework/tree/main/crates/xpui) can forbid naming a device: the names live in the
+[`crates/xpui`](https://github.com/XPUI-Framework/xpui-framework) can forbid naming a device: the names live in the
 vendor crates.
 
 A board also carries its **bezel** — the body around the panel, in millimetres,
-so the simulator can draw a device rather than a rectangle. See
-[`docs/devices.md`](https://github.com/XPUI-Framework/xpui-framework/blob/main/docs/devices.md) for every board's figures and what
-has actually been proven about each.
+so the simulator can draw a device rather than a rectangle. [The front page](../README.md) says which vendor crate holds which device,
+and which of them have been run on hardware.

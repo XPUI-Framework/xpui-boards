@@ -51,4 +51,4 @@ simulator draw a device rather than a rectangle.
 [`examples/rp2040`](https://github.com/XPUI-Framework/xpui-rp2040/tree/main) and have been flashed over a
 debug probe. The Inky Frame is described but not built: it exists so a screen
 can be laid out and looked at for a 600 × 448 seven-colour panel in the
-simulator. See [`docs/devices.md`](https://github.com/XPUI-Framework/xpui-framework/blob/main/docs/devices.md).
+simulator.

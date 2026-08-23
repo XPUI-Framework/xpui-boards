@@ -14,7 +14,7 @@ has never heard of and why adding one is a literal rather than a patch.
 
 | | |
 |---|---|
-| [`pimoroni`](pimoroni/) | Badger 2040, Tufty 2040, Inky Frame — the three that have been run on real hardware |
+| [`pimoroni`](pimoroni/) | Badger 2040, Tufty 2040, Inky Frame. The first two have firmware and have been run over a debug probe; the Inky Frame is described so a screen can be laid out for its panel, and has not |
 | [`xteink`](xteink/) | X3, X4, X4 Pro |
 | [`seeed`](seeed/) | Sticky |
 | [`core`](core/) | `Board`, `Orientation`, `Bezel`, and the `Plan`/`Run`/`Key` const DSL. Describes no device at all |

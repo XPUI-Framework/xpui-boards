@@ -30,5 +30,4 @@ assert_eq!(seeed::from_slug("x4"), None);
 It depends on [`xpui-boards-core`](../core/) and nothing else.
 
 **It has not been run.** There is no published panel driver for it;
-[`examples/esp32`](https://github.com/XPUI-Framework/xpui-esp32/tree/main) marks the seam. See
-[`docs/devices.md`](https://github.com/XPUI-Framework/xpui-framework/blob/main/docs/devices.md).
+[`examples/esp32`](https://github.com/XPUI-Framework/xpui-esp32/tree/main) marks the seam.
