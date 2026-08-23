@@ -48,7 +48,7 @@ also carries the body in tenths of a millimetre, which is what lets the
 simulator draw a device rather than a rectangle.
 
 **Two of the three run.** The Badger 2040 and the Tufty 2040 have firmware in
-[`examples/rp2040`](../../../examples/rp2040/) and have been flashed over a
+[`examples/rp2040`](https://github.com/XPUI-Framework/xpui-rp2040/tree/main) and have been flashed over a
 debug probe. The Inky Frame is described but not built: it exists so a screen
 can be laid out and looked at for a 600 × 448 seven-colour panel in the
-simulator. See [`docs/devices.md`](../../../docs/devices.md).
+simulator. See [`docs/devices.md`](https://github.com/XPUI-Framework/xpui-framework/blob/main/docs/devices.md).

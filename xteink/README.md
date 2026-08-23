@@ -45,8 +45,8 @@ assert_eq!(xteink::from_slug("badger2040"), None);
 It depends on [`xpui-boards-core`](../core/) and nothing else.
 
 **None of the three has been run.** There is no published Rust or C++ panel
-driver for these, and [`examples/esp32`](../../../examples/esp32/) marks the
+driver for these, and [`examples/esp32`](https://github.com/XPUI-Framework/xpui-esp32/tree/main) marks the
 seam where one goes. The geometry here is read from the firmware's own board configuration
 and the simulator that ships beside it — so the screens lay out correctly in a
 window, and what reaches the glass is untested. See
-[`docs/devices.md`](../../../docs/devices.md).
+[`docs/devices.md`](https://github.com/XPUI-Framework/xpui-framework/blob/main/docs/devices.md).

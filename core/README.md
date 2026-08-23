@@ -55,13 +55,13 @@ The simulator and a real firmware read the same value, which is what makes
 "develop in a window, then flash it" true rather than aspirational. Nothing
 here touches hardware: it is a description, not a driver.
 
-Separate from [`xpui-chrome`](../../backend/chrome/) because a panel size is
+Separate from [`xpui-chrome`](https://github.com/XPUI-Framework/xpui-chrome/tree/main) because a panel size is
 not a drawing concern — anything that wants to know how big a screen is can
 depend on this without pulling in code that paints. It is also why
-[`crates/xpui`](../../xpui/) can forbid naming a device: the names live in the
+[`crates/xpui`](https://github.com/XPUI-Framework/xpui-framework/tree/main/crates/xpui) can forbid naming a device: the names live in the
 vendor crates.
 
 A board also carries its **bezel** — the body around the panel, in millimetres,
 so the simulator can draw a device rather than a rectangle. See
-[`docs/devices.md`](../../../docs/devices.md) for every board's figures and what
+[`docs/devices.md`](https://github.com/XPUI-Framework/xpui-framework/blob/main/docs/devices.md) for every board's figures and what
 has actually been proven about each.
