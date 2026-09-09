@@ -16,4 +16,7 @@ authors = ["Thiago Holanda <unnamedd@gmail.com>"]
 repository = "https://github.com/XPUI-Framework/xpui-boards"
 publish = false
 
+[lints]
+workspace = true
+
 [dependencies]
