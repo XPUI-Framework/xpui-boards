@@ -6,16 +6,14 @@ use xpui::Button;
 use xpui::host::{KeyRow, RowKey};
 use xpui_boards_core::{Bezel, Board, Key, Orientation, PhysicalButton, Plan, Run};
 
-/// A, B and C along the bottom edge, with a dedicated up/down pair elsewhere
-/// on the board — so unlike a three-key badge, there *is* a key for Back, and
-/// it is the first one. C has nothing on it; giving it a job is three edits and
-/// no more — this entry, its twin in [`BADGE_FOOTER`], and the line in
-/// `the_badges_keys_send_what_the_firmware_wires` that pins it. The firmware
-/// needs no edit at all: it reads the footer.
+/// A, B and C along the bottom edge, with an up/down pair elsewhere on the
+/// board — so there *is* a key for Back, and it is the first. C has nothing
+/// on it; a job for it is this entry, its twin in [`BADGE_FOOTER`], and the
+/// test that pins both.
 const BADGE_ROW: KeyRow = KeyRow::new(&[RowKey::Back, RowKey::Confirm, RowKey::Unassigned]);
 
 /// Five keys along the bottom and nothing down either edge, so the pair that
-/// walks the list lives in the row too. The fifth has nothing on it.
+/// walks the list lives in the row too. The fifth has nothing to label.
 const INKY_ROW: KeyRow = KeyRow::new(&[
     RowKey::Back,
     RowKey::Confirm,
@@ -26,11 +24,8 @@ const INKY_ROW: KeyRow = KeyRow::new(&[
 
 /// Pimoroni Badger 2040 — RP2040, 296x128 monochrome e-ink (UC8151).
 ///
-/// The panel that made small-panel measurements necessary: the default chrome
-/// leaves 28 pixels of content here, which is not enough for one list row.
-///
-/// Buttons only, so the baseline scale — and at 111 ppi it needs no help:
-/// a 24px row on this strip is 5.5mm, wider than a 40px row on a reader.
+/// Buttons only, so the baseline scale; at 111 ppi a 24px row on this strip
+/// is 5.5mm, wider than a 40px row on a reader.
 pub const BADGER_2040: Board = Board {
     name: "Badger 2040",
     slug: "badger2040",
@@ -76,12 +71,10 @@ pub const TUFTY_2040: Board = Board {
 /// Pimoroni Inky Frame 5.7" — RP2040 with a Pico W aboard, 600x448
 /// seven-colour e-ink (E Ink Gallery Palette 4000).
 ///
-/// The first board here whose keys are only a footer: five of them, A to E,
-/// and nothing down either edge. Buttons only, so the baseline scale, and
-/// at 131 ppi a 40px row is 7.7mm — the roomiest chrome of the seven.
-///
-/// Five keys, and the standard row names four of them, so the last is
-/// [`RowKey::Unassigned`] rather than shifting every label one key left.
+/// Keys only along the footer: five, A to E, and nothing down either edge.
+/// Buttons only, so the baseline scale, and at 131 ppi a 40px row is 7.7mm.
+/// The standard row names four, so the fifth is [`RowKey::Unassigned`] rather
+/// than shifting every label one key left.
 pub const INKY_FRAME: Board = Board {
     name: "Inky Frame 5.7\"",
     slug: "inkyframe",
@@ -107,14 +100,14 @@ pub const INKY_FRAME: Board = Board {
 ///
 /// Body from Pimoroni's published dimensions: 85.6 x 48.7 mm, the size of a
 /// credit card. The panel is a 2.9 inch strip roughly 66.9 x 29.1 mm of active
-/// area, centred across the width and sitting above the button row.
+/// area, sitting above the button row in what the edge column leaves.
 ///
 /// Button placement is **estimated** from product photographs: A, B and C run
 /// along the bottom edge, with up and down stacked on the right-hand side.
 /// Pimoroni publish the GPIO map but not the millimetre positions.
 ///
 /// `a` goes back and `b` confirms, matching the row painted above them and the
-/// firmware that reads the pins. `c` has nothing on it yet.
+/// firmware that reads the pins. `c` has nothing on it.
 const BADGER_PLAN: Plan = Plan::new((856, 487), (669, 291), 60)
     .footer(Run::new((110, 60), &BADGE_FOOTER))
     .right(Run::new((60, 60), &BADGE_EDGE));
@@ -123,46 +116,23 @@ const BADGER_KEYS: [PhysicalButton; BADGER_PLAN.count()] = BADGER_PLAN.keys();
 pub const BADGER_BEZEL: Bezel = BADGER_PLAN.bezel(&BADGER_KEYS);
 
 /// a, b and c along the footer, as the silkscreen has them, on both badges.
+/// a goes back, b confirms and c is left bare; `docs/design.md` says why.
 ///
-/// The edge pair is `Up` and `Dn` because the board prints arrows rather than
-/// words there, and a name is what a firmware can look a key up by.
-///
-/// **a goes back and b confirms**, which is the order every one of this
-/// repository's presets has always put them in — `Back` first in
-/// `Labels::ENGLISH`, in `ENGLISH_NARROW` and in `ENGLISH_SHORT`, and on
-/// the leftmost key of every reader's bottom row. Somebody moving between a
-/// reader and one of these badges presses the same relative position for the
-/// same thing.
-///
-/// **c is left bare** rather than given a third direction: `Right` without a
-/// `Left` is a value that can be raised and never lowered, and walking the list
-/// is what the edge pair is for. A key doing a job badly is worse than a key
-/// doing none, and the row leaves its slot blank to say so.
-///
-/// What each sends has to match [`BADGE_ROW`], which is what the hint bar
-/// paints over them. They disagreed once, and every label sat one key off what
-/// it named; `a_boards_keys_match_the_row_it_paints` holds the two together.
-///
-/// **This is also what the hardware sends.** `Buttons::new` in the rp2040
-/// firmware looks each of its pins up by name — these three, and the two in
-/// [`BADGE_EDGE`] — rather than declaring a copy nothing could reach.
-/// `the_badges_keys_send_what_the_firmware_wires` pins all five names and what
-/// they send. **Rename one and that switch goes quiet on a real board**, which
-/// is why the name is pinned as well as the button.
+/// **The names are what the hardware sends.** The rp2040 firmware looks each
+/// pin up by these labels and the two in [`BADGE_EDGE`]: rename one and that
+/// switch goes quiet on a real board. What each sends must match
+/// [`BADGE_ROW`], which the hint bar paints over them; a test holds the two
+/// together.
 const BADGE_FOOTER: [Key; 3] = [
     Key::new("a", Button::Back),
     Key::new("b", Button::Confirm),
     Key::unassigned("c"),
 ];
 
-/// Up and down beside the screen, stacked on the right edge.
-///
-/// The other two of the five the rp2040 firmware looks up by name, and the pair
-/// most tempting to tidy: `Dn` is an abbreviation because the board prints an
-/// arrow and something had to be written down. Spelling it `Down` compiles,
-/// changes nothing the panel paints, and leaves that switch dead on hardware —
-/// see [`BADGE_FOOTER`]. The one place it shows is the simulator, which prints
-/// each key's own label on the body.
+/// Up and down beside the screen, stacked on the right edge. `Dn` because the
+/// board prints an arrow and the firmware looks the key up by name — see
+/// [`BADGE_FOOTER`]: spelling it `Down` compiles and leaves that switch dead
+/// on hardware.
 const BADGE_EDGE: [Key; 2] = [Key::new("Up", Button::Up), Key::new("Dn", Button::Down)];
 
 /// The Tufty's body and its five buttons.
@@ -187,14 +157,11 @@ pub const TUFTY_BEZEL: Bezel = TUFTY_PLAN.bezel(&TUFTY_KEYS);
 /// below the panel where the buttons and the Pico W sit.
 ///
 /// **The forehead and the button size are estimated** from product
-/// photographs, as the badges' are: Pimoroni publish the board's outline and
-/// the dot pitch but not where the buttons sit on it. 8.3mm above the panel is
-/// the side bezel repeated, which leaves a 33mm chin.
-///
-/// The five keys are not estimated — Pimoroni's own module exposes
-/// `button_a` through `button_e` — and neither is the shape: they are a row
-/// along the footer with no edge keys at all, which is the whole reason this
-/// board is here. Five centres, and not one of them written down.
+/// photographs, as the badges' are: Pimoroni publish the outline and the dot
+/// pitch but not where the buttons sit. 8.3mm above the panel is the side
+/// bezel repeated, which leaves a 33mm chin. The five keys and their shape —
+/// a row along the footer, no edge keys — are not estimated: Pimoroni's own
+/// module exposes `button_a` through `button_e`.
 const INKY_FRAME_PLAN: Plan = Plan::new((1314, 1275), (1149, 858), 83).footer(Run::new(
     (60, 60),
     &[
@@ -236,11 +203,8 @@ pub fn from_slug(slug: &str) -> Option<Board> {
         })
 }
 
-/// The crate's prose, compiled.
-///
-/// A README that does not build is worse than none: every figure in it is a
-/// claim about hardware, and the only ones that stay true are the ones a
-/// compiler checks.
+/// The crate's prose, compiled: a README that does not build is worse than
+/// none.
 #[cfg(doctest)]
 mod guides {
     #[doc = include_str!("../README.md")]

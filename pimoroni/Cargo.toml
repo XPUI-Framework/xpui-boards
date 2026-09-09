@@ -10,6 +10,9 @@ license.workspace = true
 authors.workspace = true
 repository.workspace = true
 
+[lints]
+workspace = true
+
 [lib]
 name = "xpui_boards_pimoroni"
 crate-type = ["rlib"]

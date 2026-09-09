@@ -10,15 +10,18 @@ license.workspace = true
 authors.workspace = true
 repository.workspace = true
 
+[lints]
+workspace = true
+
 [lib]
 name = "xpui_boards_core"
 crate-type = ["rlib"]
 
 [dependencies]
-# The only one. `Button` and `KeyRow` are what a device description needs to say
-# which key sends what — and after spec 37 that is all it says. It borrows
-# nothing from the crate that paints, because how large a row should look is the
-# application's decision and not the panel's.
+# The only one: `Button` and `KeyRow` are what a device description needs to
+# say which key sends what. It borrows nothing from the crate that paints,
+# because how large a row should look is the application's decision, not the
+# panel's.
 xpui.workspace = true
 
 [dev-dependencies]

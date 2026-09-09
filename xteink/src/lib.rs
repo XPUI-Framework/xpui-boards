@@ -19,7 +19,7 @@ use xpui_boards_core::{Bezel, Board, Key, KeyAction, Orientation, PhysicalButton
 /// which is the arrangement the firmware calls edge side buttons.
 ///
 /// The densest panel here at 257 ppi, and a button board, so it keeps the
-/// baseline chrome: its 40px row is 3.9mm, the smallest of the five.
+/// baseline chrome: its 40px row is 3.9mm, the smallest of the seven.
 /// Deliberate rather than overlooked — the firmware gives this profile
 /// `uiScale = 1.0`, and a selection walked with a key does not have to be
 /// finger-sized.
@@ -113,9 +113,9 @@ const READER_FOOTER: [Key; 4] = [
 /// right edges, and the themes lay out Up on the left and Down on the right
 /// against exactly that.
 ///
-/// The side pair's pins are named up and down, a leftover from the X4's rocker:
-/// on this board they sit on the screen's left and right edges and turn pages.
-/// In a list they move the selection, a row per tap and a page per hold.
+/// The side pair's pins are named up and down; on this board they sit on the
+/// screen's left and right edges and turn pages. In a list they move the
+/// selection, a row per tap and a page per hold.
 const X3_PLAN: Plan = Plan::new((620, 1010), (470, 705), 80)
     .footer(Run::new((125, 60), &READER_FOOTER))
     .left(Run::new((50, 170), &[Key::new("Prev", Button::PageBack)]))
@@ -200,11 +200,8 @@ pub fn from_slug(slug: &str) -> Option<Board> {
     ALL.into_iter().find(|board| board.slug == slug)
 }
 
-/// The crate's prose, compiled.
-///
-/// A README that does not build is worse than none: every figure in it is a
-/// claim about hardware, and the only ones that stay true are the ones a
-/// compiler checks.
+/// The crate's prose, compiled: a README that does not build is worse than
+/// none.
 #[cfg(doctest)]
 mod guides {
     #[doc = include_str!("../README.md")]

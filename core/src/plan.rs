@@ -1,35 +1,16 @@
 //! Describing a body by the shapes on it, rather than by every coordinate.
 //!
-//! Almost every device here is the same two shapes: a **row** of keys along the
-//! footer and a **column** of them down an edge. A [`Plan`] says which keys are
-//! in each, and derives the rest — the margins, the spacing, the centres, and
-//! where the panel sits between them.
+//! Almost every device here is a **row** of keys along the footer and a
+//! **column** of them down an edge. A [`Plan`] says which keys are in each
+//! and derives the rest — margins, spacing, centres, and where the panel
+//! sits between them — in tenths of a millimetre, as [`Bezel`] is.
 //!
-//! Everything is in tenths of a millimetre, as [`Bezel`] is. A builder that
-//! started taking pixels would lose the thing that makes zoom free.
-//!
-//! Three numbers are a board's own and cannot be derived: how big the body is,
-//! how big the panel is, and how much bezel sits above it. A device's chin is
-//! deeper than its forehead by an amount that is a fact about the device, so
-//! the forehead is measured rather than assumed.
-//!
-//! Everything else follows:
-//!
-//! - **The panel is centred in what the edge keys leave.** Not in the body: a
-//!   badge carrying both its side keys on one edge has its screen pushed off
-//!   centre by exactly the column those keys need.
-//! - **A row spreads evenly across the body**, each key in the middle of its
-//!   own equal share, and the whole row centred in the chin. A footer of three
-//!   and a footer of five differ by a number, not by a table of positions.
-//! - **A column stacks evenly beside the panel**, its keys end to end with one
-//!   key's width of shell between them, the stack centred on the panel's
-//!   middle and the column centred across the margin it sits in. A rail beside
-//!   the screen rather than a strip down its whole edge — which is what these
-//!   devices have, and what makes a page rocker read as a rocker.
-//!
-//! A run states one key size, because the keys in a run are the same size on
-//! every device described here; a key that is the odd one out — a sleep key
-//! beside a page pair — states its own [`span`](Key::spanning) along the run.
+//! Three numbers are a board's own: how big the body is, how big the panel
+//! is, and how much bezel sits above it. The panel is centred in what the
+//! edge keys leave, not in the body; a row spreads evenly across the body and
+//! sits centred in the chin; a column stacks beside the panel with one key's
+//! width of shell between its keys, centred on the panel's middle. A key
+//! that is the odd one out states its own [`span`](Key::spanning).
 //!
 //! ```
 //! use xpui::Button;
@@ -99,17 +80,13 @@ impl Key {
         }
     }
 
-    /// This key's length along its run: its own, or the run's.
     const fn span_or(&self, run: i32) -> i32 {
         if self.span > 0 { self.span } else { run }
     }
 }
 
-/// A row of keys along the footer, or a column of them down an edge.
-///
-/// The keys are named and the size they share is stated once; every centre is
-/// derived, which is what stops a footer of five from being five positions
-/// somebody has to get right.
+/// A row of keys along the footer, or a column of them down an edge. The keys
+/// are named and the size they share is stated once; every centre is derived.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub struct Run {
     keys: &'static [Key],
@@ -132,8 +109,7 @@ impl Run {
         Run { keys, size }
     }
 
-    /// How much of a margin this run needs beside the panel: nothing when it is
-    /// empty, and the width of one key when it is not.
+    /// How much of a margin this run needs beside the panel.
     const fn margin(&self) -> i32 {
         if self.keys.is_empty() { 0 } else { self.size.0 }
     }
@@ -207,13 +183,9 @@ impl Plan {
         Plan { right: run, ..self }
     }
 
-    /// Keys that are in neither shape, placed by hand.
-    ///
-    /// The escape hatch, and the reason this is a builder rather than a
-    /// template: one reader carries a round Home pad below its panel that is in
-    /// no row and no column, and the next odd device will have something else.
-    /// A builder that cannot express a one-off is one that gets abandoned at
-    /// the first awkward board.
+    /// Keys that are in neither shape, placed by hand: one reader carries a
+    /// round Home pad below its panel that is in no row and no column, and the
+    /// next odd device will have something else.
     pub const fn loose(self, keys: &'static [PhysicalButton]) -> Plan {
         Plan {
             loose: keys,
@@ -227,12 +199,9 @@ impl Plan {
         self.footer.keys.len() + self.left.keys.len() + self.right.keys.len() + self.loose.len()
     }
 
-    /// Where the panel's top-left corner lands.
-    ///
-    /// Centred in what the edge keys leave, which is the rule four hand-placed
-    /// panels got wrong. When neither edge carries keys that is the middle of
-    /// the body; when one does, the panel moves over by half of what that
-    /// column needs.
+    /// Where the panel's top-left corner lands: centred in what the edge keys
+    /// leave — the middle of the body when neither edge carries keys, half a
+    /// column over when one does.
     pub const fn panel_origin(&self) -> (i32, i32) {
         let left = self.left.margin();
         let spare = self.body.0 - self.panel.0 - left - self.right.margin();

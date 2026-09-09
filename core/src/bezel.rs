@@ -93,13 +93,12 @@ pub struct Bezel {
     /// The panel's own size, same units. Together with the panel's pixel
     /// dimensions this gives the scale everything else is drawn at.
     pub panel_size: (i32, i32),
+    /// Every physical key, placed in the body.
     pub buttons: &'static [PhysicalButton],
-    /// A licensed image of the device, when there is one.
-    ///
-    /// `None` everywhere today: manufacturer photography is not licensed for
-    /// reuse, and nothing public covers the rest. The slot exists so an image
-    /// somebody holds the rights to can be dropped in later without the layout
-    /// being redesigned around it.
+    /// A licensed image of the device, when there is one. Manufacturer
+    /// photography is not licensed for reuse; the slot exists so an image
+    /// somebody holds the rights to can be dropped in without redesigning
+    /// the layout.
     pub artwork: Option<&'static [u8]>,
 }
 

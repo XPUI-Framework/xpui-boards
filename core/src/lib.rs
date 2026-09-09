@@ -31,11 +31,8 @@ pub use plan::{Key, Plan, Run};
 
 pub use xpui::host::{KeyRow, RowKey};
 
-/// Which way up a canvas sits on its framebuffer.
-///
-/// A device scans its panel in one order and is held in another. Nothing
-/// rotates yet; this records which is which so that when something does, the
-/// numbers are already here.
+/// Which way up a canvas sits on its framebuffer: a device scans its panel
+/// in one order and is held in another.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Orientation {
     /// The canvas is the framebuffer turned a quarter: tall on a wide panel.
@@ -65,6 +62,7 @@ pub struct Board {
     /// The canvas a screen is laid out against, in the orientation the device
     /// is normally held.
     pub width: i32,
+    /// The canvas's height, in the same orientation.
     pub height: i32,
     /// The panel's own framebuffer, in the order the controller scans it.
     ///
@@ -73,43 +71,27 @@ pub struct Board {
     /// never rotated — a renderer transforms each pixel on its way out — so a
     /// backend that talks to real hardware needs this number, not the other.
     pub framebuffer: (i32, i32),
-    /// How the canvas sits on the framebuffer.
-    ///
-    /// Only `Portrait` and `Landscape` are described today, and only the
-    /// orientation a device is normally used in. The field exists so adding
-    /// the inverted pair, and letting a device turn, is a change of value
-    /// rather than a change of shape — the X3 has a gyroscope and the touch
-    /// readers rotate.
+    /// How the canvas sits on the framebuffer, in the orientation a device is
+    /// normally used in.
     pub orientation: Orientation,
     /// The panel's diagonal, in hundredths of an inch — 426 is 4.26" — or
     /// `None` for a panel whose physical size nobody has written down.
     ///
     /// Hundredths of an inch because that is the unit these panels are sold
     /// in, and an integer because `Board` is `Eq` and every preset is a
-    /// `const`. It is here so [`ppi`](Board::ppi) can be derived rather than
-    /// stored, and so a test can ask the only question that means anything
-    /// about chrome on a 200-ppi panel: how big is it in millimetres.
+    /// `const`. [`ppi`](Board::ppi) is derived from it.
     pub diagonal_hundredths_inch: Option<u16>,
-    /// How much larger this board's chrome is than the button-era baseline, as
-    /// a percentage: 100 keeps the original pixel sizes, 120 turns a 40px row
-    /// into 48.
+    /// How much larger this board's chrome is than the baseline, as a
+    /// percentage: 100 keeps the pixel sizes, 120 turns a 40px row into 48.
     ///
-    /// It exists because a pixel is not a size. These panels run from 111 ppi
-    /// on a Badger to 257 on an X3, and across the 218-257 ppi the readers sit
-    /// at, **a 30px row is about 3mm of glass** — legible when a button walks
-    /// the selection, and far too small to put a finger on. So the touch
-    /// boards take 120 and the button boards stay at 100.
-    ///
-    /// Hand-tuned per board rather than derived from the ppi, because the ppi
-    /// alone cannot tell a 4.26" X4 from a 3.97" Sticky, and because these are
-    /// the numbers CrossPoint's own `BoardConfig` carries for each profile: a
-    /// screen laid out here matches the firmware rather than merely resembling
-    /// it.
-    ///
-    /// A percentage rather than an `f32` for the same reasons
-    /// a chrome scale takes one: `Eq`, `const`, and no FPU on the device.
+    /// A pixel is not a size: across the 218–257 ppi the readers sit at, a
+    /// 40px row is 3.9–4.6mm of glass — legible when a key walks the
+    /// selection, small for a finger. So the touch boards take 120 and the
+    /// button boards stay at 100, hand-tuned per board; `docs/design.md`
+    /// says why the ppi alone cannot decide it.
     pub ui_scale_percent: u16,
-    /// What the keys along its bottom edge mean, left to right.
+    /// What the keys along its bottom edge mean, left to right. Inert on a
+    /// touch board, whose consumers pass `hint_band = !touch`.
     pub keys: KeyRow,
     /// Whether a finger can reach it. A board with buttons and no touchscreen
     /// should not have its layout widened to finger-sized targets, and a screen
@@ -120,11 +102,8 @@ pub struct Board {
     /// E-ink is the reason the framework repaints only when something changed.
     /// A board that answers 0 is a display fast enough not to care.
     pub refresh_ms: u32,
-    /// The body around the panel, when one has been described.
-    ///
-    /// `None` means the simulator opens a window that is exactly the panel, as
-    /// it always did. Bezels arrive one device at a time rather than all five
-    /// at once.
+    /// The body around the panel, when one has been described. `None` means
+    /// the simulator opens a window that is exactly the panel.
     pub bezel: Option<Bezel>,
 }
 
@@ -138,20 +117,14 @@ impl Board {
     pub const fn custom(name: &'static str, width: i32, height: i32, touch: bool) -> Board {
         Board {
             name,
-            // Deliberately not any real board's slug. An earlier version
-            // matched on size and fell through to a default, so every custom
-            // board claimed to be one of the presets.
+            // Nothing must match `"custom"`: it is no real board's slug.
             slug: "custom",
             width,
             height,
             framebuffer: (width, height),
             orientation: Orientation::Landscape,
-            // A panel nobody has measured cannot answer in millimetres, and
-            // guessing an inch count would make `ppi` confidently wrong.
             diagonal_hundredths_inch: None,
-            // No scaling. A panel nobody described cannot ask for bigger
-            // targets on any grounds, and whoever wires the backend can pass
-            // `Metrics` of their own if this is not what they wanted.
+            // Whoever wires the backend can pass `Metrics` of their own.
             ui_scale_percent: 100,
             keys: KeyRow::READER,
             touch,
@@ -163,22 +136,13 @@ impl Board {
     /// Whether this board has a Left/Right pair to nudge a value with.
     ///
     /// Derived from the bezel rather than stored, so it cannot disagree with
-    /// the keys it describes — the same reason [`ppi`](Board::ppi) is derived
-    /// from the diagonal. A key sending [`Button::Left`] and a key sending
-    /// [`Button::Right`], both, because one without the other is a value that
-    /// can be raised and never lowered.
+    /// the keys it describes. Both keys, because one without the other is a
+    /// value that can be raised and never lowered.
     ///
-    /// **A board with no bezel answers `false`**, which is the safe direction
-    /// rather than a free one. A control told the pair exists when it does not
-    /// cannot be changed by any key; a control told it does not exist is
-    /// entered and left instead, which every device here can do — at the cost
-    /// of a Back press being spent leaving the value rather than the screen.
-    /// One is unusable, the other is a keystroke.
-    ///
-    /// The device's shape does not predict the answer. The X4 Pro takes back,
-    /// confirm, left and right from its touchscreen — its wired keys turn pages
-    /// and sleep it — so it answers `false`, while the Inky Frame's five-key
-    /// footer carries both on its third and fourth keys and answers `true`.
+    /// **A board with no bezel answers `false`**, the safe direction. The
+    /// shape does not predict the answer: the X4 Pro takes Left and Right
+    /// from its touchscreen and answers `false`; the Inky Frame's five-key
+    /// footer carries both and answers `true`.
     pub fn has_left_right_keys(&self) -> bool {
         let sends = |wanted: Button| {
             self.bezel.is_some_and(|bezel| {
@@ -230,11 +194,8 @@ impl Board {
     }
 }
 
-/// The crate's prose, compiled.
-///
-/// A README that does not build is worse than none — and this crate's was
-/// declared in `Cargo.toml` without existing at all, which made
-/// `cargo package` fail on a crate meant to be published.
+/// The crate's prose, compiled: a README that does not build is worse than
+/// none.
 #[cfg(doctest)]
 mod guides {
     #[doc = include_str!("../README.md")]

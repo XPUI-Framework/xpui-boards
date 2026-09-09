@@ -35,16 +35,13 @@ pub const STICKY: Board = Board {
 /// **Estimated**, like the readers'. The count is not — the firmware wires
 /// exactly three pins — and neither is what they do.
 ///
-/// The top one is the shared OK and Power key, and it is shorter than the two
-/// below it. Seeed call it the AI Voice key: a short press goes home or starts
-/// voice input, and three seconds powers the device on. There is no separate
-/// power key. CrossPoint puts confirm and power on that same pin — a click
-/// confirms, four hundred milliseconds sleeps — so the label is what this
-/// firmware does with it rather than what is printed beside it on the device.
-///
-/// Their side and order are the one thing here taken from the device rather
-/// than from the code: the firmware wires the pins but says nothing about where
-/// they sit, and its own themes model this pair as a stacked rocker instead.
+/// The top one is the shared OK and Power key, shorter than the two below
+/// it: Seeed call it the AI Voice key, and there is no separate power key.
+/// The firmware puts confirm and power on that pin — a click confirms, four
+/// hundred milliseconds sleeps — so the label is what the firmware does with
+/// it rather than what is printed beside it. Their side and order come from
+/// the device; the firmware wires the pins but says nothing about where they
+/// sit.
 const STICKY_PLAN: Plan = Plan::new((560, 1010), (450, 750), 95).right(Run::new(
     (44, 140),
     &[
@@ -57,8 +54,8 @@ const STICKY_PLAN: Plan = Plan::new((560, 1010), (450, 750), 95).right(Run::new(
 const STICKY_KEYS: [PhysicalButton; STICKY_PLAN.count()] = STICKY_PLAN.keys();
 pub const STICKY_BEZEL: Bezel = STICKY_PLAN.bezel(&STICKY_KEYS);
 
-/// This vendor's 1 board, so a caller can offer them without a table of
-/// its own that would fall behind this one.
+/// This vendor's boards, so a caller can offer them without a table of its
+/// own that would fall behind this one.
 ///
 /// One vendor's list, not the framework's — there is no such thing. An
 /// application that ships against more than one concatenates them; see
@@ -74,11 +71,8 @@ pub fn from_slug(slug: &str) -> Option<Board> {
     ALL.into_iter().find(|board| board.slug == slug)
 }
 
-/// The crate's prose, compiled.
-///
-/// A README that does not build is worse than none: every figure in it is a
-/// claim about hardware, and the only ones that stay true are the ones a
-/// compiler checks.
+/// The crate's prose, compiled: a README that does not build is worse than
+/// none.
 #[cfg(doctest)]
 mod guides {
     #[doc = include_str!("../README.md")]
