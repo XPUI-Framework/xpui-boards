@@ -1,7 +1,6 @@
-# `xpui-boards-xteink`
+[![CI](https://github.com/XPUI-Framework/xpui-boards/actions/workflows/ci.yml/badge.svg)](https://github.com/XPUI-Framework/xpui-boards/actions/workflows/ci.yml) [![MIT](https://img.shields.io/badge/license-MIT-blue.svg)](../LICENSE)
 
-> ⚠️ **Under heavy development.** Not production-ready. The API can break
-> without notice. Use at your own risk.
+# `xpui-boards-xteink`
 
 Xteink's e-readers, described for xpui.
 

@@ -1,9 +1,10 @@
+[![CI](https://github.com/XPUI-Framework/xpui-boards/actions/workflows/ci.yml/badge.svg)](https://github.com/XPUI-Framework/xpui-boards/actions/workflows/ci.yml) [![MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 # `xpui-boards`
 
-> ⚠️ **Under heavy development.** Not production-ready. The API can break
-> without notice. Use at your own risk.
-
-[![CI](https://github.com/XPUI-Framework/xpui-boards/actions/workflows/ci.yml/badge.svg)](https://github.com/XPUI-Framework/xpui-boards/actions/workflows/ci.yml) [![MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+> [!WARNING]
+> Under heavy development. Not production-ready. The API can break without
+> notice. Use at your own risk.
 
 Seven devices — six e-ink panels and one LCD — as data: panel size,
 orientation, key row, refresh time, and the body in tenths of a millimetre. Nothing here draws anything. A board
