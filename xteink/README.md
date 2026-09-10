@@ -7,9 +7,9 @@ Xteink's e-readers, described for xpui.
 
 | Board | Panel | Keys |
 |---|---|---|
-| X3 | 528 × 792 e-ink, 257 ppi | `Back` `Select` `Up` `Down` along the bottom, a page key on each edge |
+| X3 | 528 × 792 e-ink, 257 ppi | `Back` `Select` `Up` `Down` along the bottom, `Prev` on the left edge, `Sleep` and `Next` on the right |
 | X4 | 480 × 800 e-ink, 218 ppi | the same four along the bottom, `Sleep` and the page pair stacked on the right |
-| X4 Pro | the X4's panel, with a touchscreen | **no footer at all** — a page key on each edge, and a capacitive `Home` pad below the panel |
+| X4 Pro | the X4's panel, with a touchscreen | **no footer at all** — `Prev` on the left edge, `Sleep` and `Next` on the right, and a capacitive `Home` pad below the panel |
 
 The Pro is the one worth reading twice. It takes Back, Confirm and the pair
 that walks a list from the touchscreen, so the four keys the other two carry
@@ -20,6 +20,13 @@ press.
 All three scan their panel in landscape and are held in portrait, so the canvas
 is the framebuffer turned a quarter. The framebuffer itself is never rotated: a
 renderer transforms each pixel on its way out.
+
+## Using it
+
+```toml
+[dependencies]
+xpui-boards-xteink = { git = "https://github.com/XPUI-Framework/xpui-boards", branch = "main" }
+```
 
 ```rust
 use xpui_boards_xteink as xteink;
@@ -44,14 +51,16 @@ assert_eq!(xteink::from_slug("badger2040"), None);
 
 It depends on [`xpui-boards-core`](../core/) and nothing else.
 
-**How a screen reaches one of these panels.** They are driven by the firmware
-that ships on them, so the route is that firmware hosting `xpui` over the C
-ABI — [`xpui-cpp`](https://github.com/XPUI-Framework/xpui-cpp) is that boundary — rather than a second
-driver for the same glass.
+## Checking it
 
-[`xpui-esp32`](https://github.com/XPUI-Framework/xpui-esp32) carries a bare-metal image for the X3 that
-builds and links, with `Panel::present` marked where a panel driver would go.
-There is no published Rust or C++ driver for these panels, so what reaches the
-glass on that route is not yet proven; the geometry below is, in the simulator
-and in the firmware's own board configuration, and it is what lays a screen out
-correctly for all three.
+The gate is the repository's; run `./build-and-test.sh` from the root.
+
+## Where next
+
+| | |
+|---|---|
+| [`docs/boards.md`](../docs/boards.md) | how a screen reaches these panels, and what is proven on them |
+
+## License
+
+MIT — see [LICENSE](../LICENSE).

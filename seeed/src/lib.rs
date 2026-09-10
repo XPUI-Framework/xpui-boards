@@ -1,6 +1,20 @@
-//! Seeed's Sticky.
+//! Seeed's Sticky, described for `xpui`.
+//!
+//! One board: a 480x800 e-ink panel at 234 ppi with a touchscreen and three
+//! keys beside it. It is the X4's framebuffer in a smaller body — 3.97"
+//! against 4.26" — so every pixel here is about 7% smaller than the same
+//! pixel on an X4, which is why it asks for a larger UI scale despite the
+//! identical resolution. Back and the directions come from touch, so the
+//! three wired keys are a shared OK/Power and a page pair.
+//!
+//! The panel is driven by the firmware that ships on it, and a screen reaches
+//! it by that firmware hosting `xpui` over the C ABI — `xpui-cpp` is that
+//! boundary. `xpui-esp32` carries a bare-metal image for the Sticky that builds and
+//! links, with `Panel::present` marked where a driver would go; nothing has
+//! been run on the board. One vendor, one crate.
 
 #![cfg_attr(target_os = "none", no_std)]
+#![deny(missing_docs)]
 
 use xpui::Button;
 use xpui::host::KeyRow;
@@ -11,10 +25,8 @@ use xpui_boards_core::{Bezel, Board, Key, Orientation, PhysicalButton, Plan, Run
 /// A touchscreen with three keys beside it. Back and the directions come
 /// from touch; what is wired is a shared OK/Power key and a page pair.
 ///
-/// The X4's framebuffer in a smaller body — 3.97" against 4.26", so 234
-/// ppi against 218, and every pixel here is 7% smaller than the same pixel
-/// on an X4. A touch device, so it takes the scale its firmware profile
-/// gives it, which puts a row at 5.2mm.
+/// 234 ppi against the X4's 218 for the same framebuffer; the touch scale its
+/// firmware profile gives it puts a row at 5.2mm.
 pub const STICKY: Board = Board {
     name: "Seeed Sticky",
     slug: "sticky",
@@ -52,6 +64,7 @@ const STICKY_PLAN: Plan = Plan::new((560, 1010), (450, 750), 95).right(Run::new(
 ));
 
 const STICKY_KEYS: [PhysicalButton; STICKY_PLAN.count()] = STICKY_PLAN.keys();
+/// The Sticky's body with its keys placed, for a simulator to draw.
 pub const STICKY_BEZEL: Bezel = STICKY_PLAN.bezel(&STICKY_KEYS);
 
 /// This vendor's boards, so a caller can offer them without a table of its
@@ -71,7 +84,7 @@ pub fn from_slug(slug: &str) -> Option<Board> {
     ALL.into_iter().find(|board| board.slug == slug)
 }
 
-/// The crate's prose, compiled: a README that does not build is worse than
+/// The crate's prose, compiled: a page that does not build is worse than
 /// none.
 #[cfg(doctest)]
 mod guides {

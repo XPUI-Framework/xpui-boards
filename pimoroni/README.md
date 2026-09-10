@@ -17,6 +17,13 @@ hint bar labels. The Inky Frame is the one with five in the row, and its fifth
 takes the job that needs no label: these frames sleep between refreshes and
 wake on a press.
 
+## Using it
+
+```toml
+[dependencies]
+xpui-boards-pimoroni = { git = "https://github.com/XPUI-Framework/xpui-boards", branch = "main" }
+```
+
 ```rust
 use xpui_boards_pimoroni as pimoroni;
 
@@ -41,15 +48,16 @@ assert_eq!(pimoroni::from_slug("x4"), None);
 It depends on [`xpui-boards-core`](../core/) for the vocabulary and on nothing
 else that paints, so taking these three costs you no Xteink and no Seeed.
 
-**The keys are not decoration.** `src/buttons.rs` in the RP2040 repository
-resolves a
-real GPIO pin by looking a key up **by its label** in the bezel here, so a
-label changed here changes which switch does what on the hardware. The bezel
-also carries the body in tenths of a millimetre, which is what lets the
-simulator draw a device rather than a rectangle.
+## Checking it
 
-**Two of the three run.** The Badger 2040 and the Tufty 2040 have firmware in
-[`xpui-rp2040`](https://github.com/XPUI-Framework/xpui-rp2040) and have been flashed over a
-debug probe. The Inky Frame is described but not built: it exists so a screen
-can be laid out and looked at for a 600 × 448 seven-colour panel in the
-simulator.
+The gate is the repository's; run `./build-and-test.sh` from the root.
+
+## Where next
+
+| | |
+|---|---|
+| [`docs/boards.md`](../docs/boards.md) | which of the three run on hardware, and why the key labels are load-bearing |
+
+## License
+
+MIT — see [LICENSE](../LICENSE).

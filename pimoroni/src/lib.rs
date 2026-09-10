@@ -1,6 +1,23 @@
-//! Pimoroni's RP2040 boards.
+//! Pimoroni's RP2040 boards, described for `xpui`: the Badger 2040, the
+//! Tufty 2040 and the Inky Frame.
+//!
+//! Each is a `const` [`Board`]: its panel, key row, refresh time and body in
+//! tenths of a millimetre. The two badges share a key row of three — Back,
+//! Confirm, and one with no job — because the pair that walks a list sits on
+//! the edge rather than in the row a hint bar labels; the Inky Frame carries
+//! five along the bottom, and its fifth takes the job that needs no label,
+//! Power.
+//!
+//! The keys are not decoration. `xpui-rp2040` resolves a real GPIO pin by
+//! looking a key up **by its label** in the bezel here, so a label changed
+//! here changes which switch does what on the hardware. The Badger and the
+//! Tufty have been run over a debug probe; the Inky Frame is described so a
+//! screen can be laid out for it in the simulator, and has not been built.
+//!
+//! One vendor, one crate: taking these three costs no Xteink and no Seeed.
 
 #![cfg_attr(target_os = "none", no_std)]
+#![deny(missing_docs)]
 
 use xpui::Button;
 use xpui::host::{KeyRow, RowKey};
@@ -113,6 +130,8 @@ const BADGER_PLAN: Plan = Plan::new((856, 487), (669, 291), 60)
     .right(Run::new((60, 60), &BADGE_EDGE));
 
 const BADGER_KEYS: [PhysicalButton; BADGER_PLAN.count()] = BADGER_PLAN.keys();
+/// The Badger 2040's body with its keys placed, for a simulator to draw and a
+/// firmware to resolve pins from.
 pub const BADGER_BEZEL: Bezel = BADGER_PLAN.bezel(&BADGER_KEYS);
 
 /// a, b and c along the footer, as the silkscreen has them, on both badges.
@@ -147,6 +166,8 @@ const TUFTY_PLAN: Plan = Plan::new((652, 527), (489, 367), 60)
     .right(Run::new((55, 55), &BADGE_EDGE));
 
 const TUFTY_KEYS: [PhysicalButton; TUFTY_PLAN.count()] = TUFTY_PLAN.keys();
+/// The Tufty 2040's body with its keys placed, for a simulator to draw and a
+/// firmware to resolve pins from.
 pub const TUFTY_BEZEL: Bezel = TUFTY_PLAN.bezel(&TUFTY_KEYS);
 
 /// The Inky Frame's body: five keys along the footer, and nothing on the edges.
@@ -177,6 +198,8 @@ const INKY_FRAME_PLAN: Plan = Plan::new((1314, 1275), (1149, 858), 83).footer(Ru
 ));
 
 const INKY_FRAME_KEYS: [PhysicalButton; INKY_FRAME_PLAN.count()] = INKY_FRAME_PLAN.keys();
+/// The Inky Frame's body with its keys placed, for a simulator to draw and a
+/// firmware to resolve pins from.
 pub const INKY_FRAME_BEZEL: Bezel = INKY_FRAME_PLAN.bezel(&INKY_FRAME_KEYS);
 
 /// This vendor's 3 boards, so a caller can offer them without a table of
@@ -203,7 +226,7 @@ pub fn from_slug(slug: &str) -> Option<Board> {
         })
 }
 
-/// The crate's prose, compiled: a README that does not build is worse than
+/// The crate's prose, compiled: a page that does not build is worse than
 /// none.
 #[cfg(doctest)]
 mod guides {

@@ -14,6 +14,7 @@ dependencies = [
  "xpui",
  "xpui-boards-pimoroni",
  "xpui-boards-seeed",
+ "xpui-boards-xteink",
 ]
 
 [[package]]

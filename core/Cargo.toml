@@ -40,3 +40,5 @@ xpui-boards-pimoroni = { path = "../pimoroni" }
 # end. The guide is about describing a device; showing an invented one would
 # be showing nothing.
 xpui-boards-seeed = { path = "../seeed" }
+# And Xteink, so the root README's example can assemble all seven.
+xpui-boards-xteink = { path = "../xteink" }

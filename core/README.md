@@ -8,16 +8,25 @@ The vocabulary a device is described in.
 A screen never knows which board it is on. What differs is a handful of
 numbers — how big the panel is, whether there is a touchscreen, what the keys
 along the bottom mean, how big the glass is in millimetres — and this crate is
-the shape those are written in.
-
-**No device is described here.** They live one crate per vendor, so a project
-takes the boards it targets and none of the others:
+the shape those are written in. **No device is described here.** They live one
+crate per vendor, so a project takes the boards it targets and none of the
+others:
 
 | Crate | Boards |
 |---|---|
 | [`xpui-boards-pimoroni`](../pimoroni/) | Badger 2040, Tufty 2040, Inky Frame |
 | [`xpui-boards-xteink`](../xteink/) | X3, X4, X4 Pro |
 | [`xpui-boards-seeed`](../seeed/) | Sticky |
+
+## Using it
+
+```toml
+[dependencies]
+xpui-boards-core = { git = "https://github.com/XPUI-Framework/xpui-boards", branch = "main" }
+```
+
+A vendor crate is data written in this vocabulary, and each answers for its
+own boards only:
 
 ```rust
 use xpui_boards_core::Board;
@@ -43,24 +52,21 @@ assert_eq!(mine.slug, "custom");
 assert_eq!(mine.ppi(), None);
 ```
 
-**Adding your own device** is [`docs/adding-a-board.md`](../docs/adding-a-board.md):
-three measurements, a key row, a body, and the one check no script can run.
+It depends on [`xpui`](https://github.com/XPUI-Framework/xpui-framework) for
+`Button` and `KeyRow`, and on nothing else.
 
-There is no crate that knows all seven, because there is no such thing as
-"every board" — a list is something an application assembles from the vendors
-it ships against. `xpui-gallery`'s `gallery/src/boards.rs` is one: seven entries, and a
-`const` assertion that a vendor cannot gain a board without it noticing.
+## Checking it
 
-The simulator and a real firmware read the same value, which is what makes
-"develop in a window, then flash it" true rather than aspirational. Nothing
-here touches hardware: it is a description, not a driver.
+The gate is the repository's; run `./build-and-test.sh` from the root.
 
-Separate from [`xpui-chrome`](https://github.com/XPUI-Framework/xpui-chrome/tree/main) because a panel size is
-not a drawing concern — anything that wants to know how big a screen is can
-depend on this without pulling in code that paints. It is also why
-[`crates/xpui`](https://github.com/XPUI-Framework/xpui-framework) can forbid naming a device: the names live in the
-vendor crates.
+## Where next
 
-A board also carries its **bezel** — the body around the panel, in millimetres,
-so the simulator can draw a device rather than a rectangle. [The front page](../README.md) says which vendor crate holds which device,
-and which of them have been run on hardware.
+| | |
+|---|---|
+| [`docs/adding-a-board.md`](../docs/adding-a-board.md) | describing your own device: three measurements, a key row, a body, and the one check no script can run |
+| [`docs/boards.md`](../docs/boards.md) | the seven that are described, and what runs on hardware |
+| [`docs/design.md`](../docs/design.md) | why a board is not a drawing concern, and the other arguments |
+
+## License
+
+MIT — see [LICENSE](../LICENSE).

@@ -1,13 +1,20 @@
-//! Xteink's e-readers.
+//! Xteink's e-readers, described for `xpui`: the X3 and the X4, each with
+//! four keys under the panel and page keys on the edges, and the X4 Pro, the
+//! X4's panel with a touchscreen and no footer.
 //!
 //! Geometry and capabilities read from the firmware's own board configuration
-//! and the simulator that ships beside it.
+//! and the simulator that ships beside it. None has been run from here: the
+//! panels are driven by the firmware that ships on them, and a screen reaches
+//! one by that firmware hosting `xpui` over the C ABI. `xpui-esp32` carries a
+//! bare-metal image for the X3 that builds and links, with `Panel::present`
+//! marked where a driver would go.
 //!
 //! All three scan their panel in landscape and are held in portrait, so the
 //! canvas is the framebuffer turned a quarter. The framebuffer itself is never
 //! rotated: a renderer transforms each pixel on its way out.
 
 #![cfg_attr(target_os = "none", no_std)]
+#![deny(missing_docs)]
 
 use xpui::Button;
 use xpui::host::KeyRow;
@@ -101,15 +108,15 @@ const READER_FOOTER: [Key; 4] = [
     Key::new("Down", Button::Right),
 ];
 
-/// The X3's body: four keys along the footer, one on each side edge.
+/// The X3's body: four keys along the footer, Prev on the left edge, Sleep
+/// and Next on the right. The arrangement is not estimated.
 ///
 /// **The millimetres are estimated.** Xteink publish no mechanical drawing, so
 /// the body is derived from the panel — 792x528 at roughly 257 ppi is about
 /// 78 x 52 mm of glass — and the surround is scaled from photographs. Replace
 /// them with measurements when somebody has the hardware to hand.
 ///
-/// The arrangement is not estimated. `HalGPIO::hasEdgeSideButtons` names the X3
-/// and the X4 Pro as the boards whose page keys sit on the screen's left and
+/// `HalGPIO::hasEdgeSideButtons` names the X3 and the X4 Pro as the boards whose page keys sit on the screen's left and
 /// right edges, and the themes lay out Up on the left and Down on the right
 /// against exactly that.
 ///
@@ -128,6 +135,7 @@ const X3_PLAN: Plan = Plan::new((620, 1010), (470, 705), 80)
     ));
 
 const X3_KEYS: [PhysicalButton; X3_PLAN.count()] = X3_PLAN.keys();
+/// The X3's body with its keys placed, for a simulator to draw.
 pub const X3_BEZEL: Bezel = X3_PLAN.bezel(&X3_KEYS);
 
 /// The X4's body: the same footer, and a page rocker stacked on the right
@@ -148,6 +156,7 @@ const X4_PLAN: Plan = Plan::new((580, 1020), (420, 700), 80)
     ));
 
 const X4_KEYS: [PhysicalButton; X4_PLAN.count()] = X4_PLAN.keys();
+/// The X4's body with its keys placed, for a simulator to draw.
 pub const X4_BEZEL: Bezel = X4_PLAN.bezel(&X4_KEYS);
 
 /// The X4 Pro's body: a Home key below the panel, the page pair on the side
@@ -181,6 +190,8 @@ const X4_PRO_PLAN: Plan = Plan::new((580, 1020), (420, 700), 80)
     )]);
 
 const X4_PRO_KEYS: [PhysicalButton; X4_PRO_PLAN.count()] = X4_PRO_PLAN.keys();
+/// The X4 Pro's body with its edge keys and Home pad placed, for a simulator
+/// to draw.
 pub const X4_PRO_BEZEL: Bezel = X4_PRO_PLAN.bezel(&X4_PRO_KEYS);
 
 /// This vendor's 3 boards, so a caller can offer them without a table of
@@ -200,7 +211,7 @@ pub fn from_slug(slug: &str) -> Option<Board> {
     ALL.into_iter().find(|board| board.slug == slug)
 }
 
-/// The crate's prose, compiled: a README that does not build is worse than
+/// The crate's prose, compiled: a page that does not build is worse than
 /// none.
 #[cfg(doctest)]
 mod guides {

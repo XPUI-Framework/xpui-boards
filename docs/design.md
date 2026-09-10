@@ -30,3 +30,11 @@ them in, so a person moving between a reader and a badge presses the same
 position for the same thing. c is left bare because `Right` without a `Left`
 is a value that can be raised and never lowered, and walking the list is the
 edge pair's job.
+
+## `Board` is not a drawing concern
+
+The vocabulary is separate from `xpui-chrome` because a panel size is not a
+drawing concern: anything that wants to know how big a screen is can depend
+on this without pulling in code that paints. It is also why `xpui` can forbid
+naming a device — the names live in the vendor crates, and the framework
+depends on none of them.

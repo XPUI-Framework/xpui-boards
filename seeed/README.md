@@ -13,6 +13,13 @@ The X4's framebuffer in a smaller body — 3.97" against 4.26" — so every pixe
 here is about 7% smaller than the same pixel on an X4. That is why it asks for
 a larger UI scale despite the identical resolution.
 
+## Using it
+
+```toml
+[dependencies]
+xpui-boards-seeed = { git = "https://github.com/XPUI-Framework/xpui-boards", branch = "main" }
+```
+
 ```rust
 use xpui_boards_seeed as seeed;
 
@@ -27,25 +34,20 @@ assert_eq!(seeed::from_slug("sticky"), Some(sticky));
 assert_eq!(seeed::from_slug("x4"), None);
 ```
 
-It depends on [`xpui-boards-core`](../core/) and nothing else.
+It depends on [`xpui-boards-core`](../core/) and nothing else. One vendor, so
+one crate: a project targeting a Sticky compiles this board's dimensions and
+nothing else.
 
-**What this crate is for.** The Sticky's panel is driven by the firmware that
-ships on it, and a screen reaches it by that firmware hosting `xpui` over the C
-ABI — see [`xpui-cpp`](https://github.com/XPUI-Framework/xpui-cpp). These measurements are what lays a
-screen out for it, in the simulator and in that firmware alike.
-[`xpui-esp32`](https://github.com/XPUI-Framework/xpui-esp32) carries a bare-metal image for the same board,
-with `Panel::present` marked where a driver would go.
+## Checking it
 
-## Using it
+The gate is the repository's; run `./build-and-test.sh` from the root.
 
-```toml
-[dependencies]
-xpui-boards-seeed = { git = "https://github.com/XPUI-Framework/xpui-boards", branch = "main" }
-```
+## Where next
 
-One vendor, so one crate: a project targeting a Sticky compiles this board's
-dimensions and nothing else — no Pimoroni, no Xteink. That is why there is a
-crate per manufacturer rather than one list, and why there is deliberately no
-`ALL` across vendors. An application that ships against more than one
-concatenates them.
+| | |
+|---|---|
+| [`docs/boards.md`](../docs/boards.md) | how a screen reaches the Sticky's panel, and that nothing has been run on it yet |
 
+## License
+
+MIT — see [LICENSE](../LICENSE).

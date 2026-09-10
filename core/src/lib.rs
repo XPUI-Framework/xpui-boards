@@ -16,10 +16,10 @@
 //! here touches hardware: it is a description, not a driver.
 //!
 //! Separate from the chrome crate because a panel size is not a drawing
-//! concern. Anything that wants to know how big a screen is can depend on this
-//! without pulling in code that paints.
+//! concern.
 
 #![cfg_attr(target_os = "none", no_std)]
+#![deny(missing_docs)]
 
 use xpui::Button;
 
@@ -194,12 +194,18 @@ impl Board {
     }
 }
 
-/// The crate's prose, compiled: a README that does not build is worse than
+/// The crate's prose, compiled: a page that does not build is worse than
 /// none.
 #[cfg(doctest)]
 mod guides {
     #[doc = include_str!("../README.md")]
     pub mod readme {}
+    #[doc = include_str!("../../README.md")]
+    pub mod front_page {}
     #[doc = include_str!("../../docs/adding-a-board.md")]
     pub mod adding_a_board {}
+    #[doc = include_str!("../../docs/boards.md")]
+    pub mod boards {}
+    #[doc = include_str!("../../docs/design.md")]
+    pub mod design {}
 }
