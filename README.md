@@ -5,7 +5,7 @@
   <img src="assets/logo-white.png" alt="XPUI" width="64" height="64">
 </picture>
 
-# `xpui-boards`
+# Boards
 
 > [!WARNING]
 > Under heavy development. Not production-ready. The API can break without
@@ -13,7 +13,7 @@
 
 Seven devices — six e-ink panels and one LCD — as data: panel size,
 orientation, key row, refresh time, and the body in tenths of a millimetre. Nothing here draws anything. A board
-is what an application *injects* into a backend and a simulator, which is why
+is what an application _injects_ into a backend and a simulator, which is why
 the framework can describe a device it has never heard of and why adding one
 is a literal rather than a patch.
 
@@ -21,12 +21,12 @@ Every document in this repository is listed in [docs/README.md](docs/README.md).
 
 ## Which crate you want
 
-| | |
-|---|---|
+|                         |                                                                                                                                                                                                                                |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | [`pimoroni`](pimoroni/) | Badger 2040, Tufty 2040, Inky Frame. The first two ship firmware and have been run over a debug probe; the Inky Frame's 600 × 448 seven-colour panel is described so a screen can be laid out for it and seen in the simulator |
-| [`xteink`](xteink/) | X3, X4, X4 Pro |
-| [`seeed`](seeed/) | Sticky |
-| [`core`](core/) | `Board`, `Orientation`, `Bezel`, and the `Plan`/`Run`/`Key` const DSL. Describes no device at all |
+| [`xteink`](xteink/)     | X3, X4, X4 Pro                                                                                                                                                                                                                 |
+| [`seeed`](seeed/)       | Sticky                                                                                                                                                                                                                         |
+| [`core`](core/)         | `Board`, `Orientation`, `Bezel`, and the `Plan`/`Run`/`Key` const DSL. Describes no device at all                                                                                                                              |
 
 **Take the vendors you target and none of the others.** That is why there is a
 crate per manufacturer rather than one list: a firmware for a Badger has no
@@ -136,9 +136,6 @@ flowchart TD
   dev --> gallery
   style boards stroke-width:3px
 ```
-
-How the ten are checked out side by side, and the rules all of them share, is in
-[`xpui`'s `docs/orientation.md`](https://github.com/XPUI-Framework/xpui-framework/blob/main/docs/orientation.md).
 
 ## License
 
