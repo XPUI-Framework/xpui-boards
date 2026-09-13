@@ -74,7 +74,7 @@ fn a_label_no_key_carries_finds_nothing() {
 
 /// The badges' keys send what the firmware wires them to, by name.
 ///
-/// `Buttons::new` in `examples/rp2040` looks each pin's key up here by name, so
+/// `Buttons::new` in `xpui-rp2040` looks each pin's key up here by name, so
 /// **what a key sends has one copy**: `BADGE_FOOTER` for the first three,
 /// `BADGE_EDGE` for the pair. Which switch carries which *name* is written in
 /// two places the firmware reads — those tables, and its own five labels — and

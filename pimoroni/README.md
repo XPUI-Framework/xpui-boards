@@ -30,7 +30,7 @@ let badger = pimoroni::BADGER_2040;
 assert_eq!((badger.width, badger.height), (296, 128));
 assert!(!badger.touch);
 
-// Three in the row on a frame, three on a badge — and the badge's third has
+// Five in the row on a frame, three on a badge — and the badge's third has
 // no job, so the hint bar has two words to paint.
 assert_eq!(pimoroni::INKY_FRAME.keys.len(), 5);
 assert_eq!(badger.keys.len(), 3);

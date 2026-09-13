@@ -22,6 +22,7 @@ others:
 ```toml
 [dependencies]
 xpui-boards-core = { git = "https://github.com/XPUI-Framework/xpui-boards", branch = "main" }
+xpui-boards-pimoroni = { git = "https://github.com/XPUI-Framework/xpui-boards", branch = "main" }
 ```
 
 A vendor crate is data written in this vocabulary, and each answers for its
@@ -31,7 +32,7 @@ own boards only:
 use xpui_boards_core::Board;
 use xpui_boards_pimoroni as pimoroni;
 
-let badger = pimoroni::BADGER_2040;
+let badger: Board = pimoroni::BADGER_2040;
 assert_eq!((badger.width, badger.height), (296, 128));
 assert!(!badger.touch);
 

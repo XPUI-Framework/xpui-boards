@@ -61,6 +61,7 @@ crates' nested order.
 | Document | Proven by |
 |---|---|
 | [`README.md`](README.md) | its `rust` fence is a doctest, mounted by `core/src/lib.rs` |
+| [`docs/README.md`](docs/README.md) | its paths resolve; the README-heading check exempts it, because it is the index of `docs/`, not a front page |
 | [`core/README.md`](core/README.md), [`pimoroni/README.md`](pimoroni/README.md), [`seeed/README.md`](seeed/README.md), [`xteink/README.md`](xteink/README.md) | doctests, each mounted by its own crate's `src/lib.rs` |
 | [`docs/adding-a-board.md`](docs/adding-a-board.md) | doctests, mounted by `core/src/lib.rs`; every snippet copies a real constant |
 | [`docs/boards.md`](docs/boards.md), [`docs/design.md`](docs/design.md) | mounted by `core/src/lib.rs`; neither carries a `rust` fence, so what is checked is their paths |

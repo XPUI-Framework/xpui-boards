@@ -34,14 +34,16 @@ assert!(!mine.touch);
 // Nobody measured it, so nothing can ask it for millimetres.
 assert_eq!(mine.ppi(), None);
 
-// But it does get a key row, because something has to answer.
+// A board with keys gets the reader's row, because something has to answer;
+// a finger brings its own Back and gets none.
 assert_eq!(mine.keys, KeyRow::READER);
+assert!(Board::custom("my tablet", 480, 800, true).keys.is_empty());
 ```
 
-That last line matters more than it looks. `custom` hands out `KeyRow::READER`
-— Back, Confirm, and a pair of page keys — so a device without those keys gets
-a hint bar naming keys nobody can press, which §4 is about. Pass `touch: true`
-if a finger drives it, or write the row out and skip `custom` entirely.
+The row matters more than it looks. `custom` hands a board with keys
+`KeyRow::READER` — Back, Confirm, and a pair of page keys — so a device without
+those keys gets a hint bar naming keys nobody can press, which §4 is about.
+Write the row out and skip `custom` if yours differs.
 
 That is enough to open a window and lay out every screen. The rest of this page
 is what you gain by measuring.
@@ -86,13 +88,14 @@ let mine = Board {
     orientation: Orientation::Portrait,
     // The diagonal, in hundredths of an inch. `None` if nobody measured it,
     // and then `ppi` and `tenths_of_a_mm` both answer `None` rather than
-    // guessing.
+    // guessing. §5's panel has to agree with it.
     diagonal_hundredths_inch: Some(397),
     // How much larger this board's chrome should be than the button-era
     // baseline. Hand-tuned, because pixels per inch alone cannot tell a
     // 4.26" X4 from a 3.97" Sticky.
     ui_scale_percent: 120,
-    keys: KeyRow::READER,
+    // Its keys are a column on the right, so there is no row to describe.
+    keys: KeyRow::new(&[]),
     touch: true,
     refresh_ms: 1200,
     bezel: None,
@@ -135,9 +138,9 @@ what its neighbour does. That shipped once, on two boards, with the suite green
 and a person finding it by pressing a key.
 
 A board driven by a finger takes its Back and its directions from the
-touchscreen and has no row to label. Say `touch: true` and the chrome reserves
-no band for hints, because a hint names a key and naming one that is not there
-sends a person looking for it.
+touchscreen and often has no row at all. Give it an empty one,
+`KeyRow::new(&[])`, and a consumer reserves no band for hints, because a hint
+names a key and naming one that is not there sends a person looking for it.
 
 ## 5. The body, if you want the simulator to draw a device
 
@@ -150,7 +153,7 @@ use xpui::Button;
 use xpui_boards_core::{Key, Plan, Run};
 
 // body, panel, forehead — all in tenths of a millimetre.
-const STICKY: Plan = Plan::new((560, 1010), (450, 750), 95).right(Run::new(
+const STICKY: Plan = Plan::new((629, 1125), (519, 865), 95).right(Run::new(
     (44, 140),
     &[
         Key::new("OK", Button::Confirm).spanning(120),
@@ -175,6 +178,13 @@ for label in ["OK", "Prev", "Next"] {
 and centres the panel in what the edge keys leave. A key that is taller or
 wider than its neighbours says so with `spanning`.
 
+**The panel here and the diagonal in §3 describe the same glass**, and they
+must agree: every millimetre a screen asks for comes from the diagonal, and the
+simulator draws this. Work the panel out from the diagonal — the pixel count
+over `ppi()`, times 254 — and measure only the case around it. A panel copied
+from a photograph that disagrees makes a row look finger-sized in one and not
+the other; `xpui-gallery` checks every board it ships to within two percent.
+
 **A key's label is not decoration.** `Bezel::button_labelled` matches on it, and
 a firmware resolves a real GPIO pin by looking a key up *by that string* —
 `src/buttons.rs` in the RP2040 repository does exactly that.
@@ -187,15 +197,25 @@ Two checks a script runs:
 
 - **This repository's own tests** — the census, and that every key label the
   bezel carries is one the firmware can find. `cargo test` here.
-- **`xpui-gallery`'s `tests/chrome_for_a_board.rs`** — that your panel holds at
+- **`xpui-gallery`'s `gallery/tests/chrome_for_a_board.rs`** — that your panel holds at
   least three list rows, and that a board with keys reserves a band to name
   them. Those are about the *chrome* derived from your panel, so they live
   where a board and a backend meet.
 
-Then look at it:
+Then look at it. The gallery opens a window through SDL2, which
+[its requirements](https://github.com/XPUI-Framework/xpui-gallery#requirements)
+say how to install, and two things stand between a fresh clone and your board:
+
+- **It builds these crates from pushed `main`**, not from your edit. Point it at
+  your checkout with a `[patch]` table, as
+  [`xpui-dev`'s guide](https://github.com/XPUI-Framework/xpui-dev/blob/main/docs/working-across-repositories.md)
+  shows.
+- **Its `gallery/src/boards.rs` lists every board it ships**, and a `const`
+  assertion stops it compiling the moment a vendor crate gains one. Add yours
+  to that list.
 
 ```bash
-git clone https://github.com/XPUI-Framework/xpui-gallery
+cd .. && git clone https://github.com/XPUI-Framework/xpui-gallery
 cd xpui-gallery && cargo run -p xpui-gallery -- --board <your-slug>
 ```
 

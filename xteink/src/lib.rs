@@ -1,6 +1,8 @@
-//! Xteink's e-readers, described for `xpui`: the X3 and the X4, each with
-//! four keys under the panel and page keys on the edges, and the X4 Pro, the
-//! X4's panel with a touchscreen and no footer.
+//! Xteink's e-readers, described for `xpui`: the X3, with four keys under the
+//! panel, a page key on each side edge and a sleep key; the X4, with the same
+//! four and a sleep key and page rocker stacked on its right; and the X4 Pro,
+//! the X4's panel with a touchscreen, no footer, and its page pair on the
+//! edges.
 //!
 //! Geometry and capabilities read from the firmware's own board configuration
 //! and the simulator that ships beside it. None has been run from here: the
@@ -22,8 +24,9 @@ use xpui_boards_core::{Bezel, Board, Key, KeyAction, Orientation, PhysicalButton
 
 /// Xteink X3 — ESP32-C3, a 792x528 panel held portrait, so 528x792.
 ///
-/// No touchscreen. Four keys along the bottom edge and one on each side,
-/// which is the arrangement the firmware calls edge side buttons.
+/// No touchscreen. Four keys along the bottom edge, Prev on the left edge and
+/// Sleep and Next on the right — seven, in the arrangement the firmware calls
+/// edge side buttons.
 ///
 /// The densest panel here at 257 ppi, and a button board, so it keeps the
 /// baseline chrome: its 40px row is 3.9mm, the smallest of the seven.
@@ -91,7 +94,8 @@ pub const X4_PRO: Board = Board {
     orientation: Orientation::Portrait,
     diagonal_hundredths_inch: Some(426),
     ui_scale_percent: 120,
-    keys: KeyRow::READER,
+    // No row along the bottom: Back and Confirm come from the touchscreen.
+    keys: KeyRow::new(&[]),
     touch: true,
     refresh_ms: 1200,
     bezel: Some(X4_PRO_BEZEL),
@@ -111,19 +115,19 @@ const READER_FOOTER: [Key; 4] = [
 /// The X3's body: four keys along the footer, Prev on the left edge, Sleep
 /// and Next on the right. The arrangement is not estimated.
 ///
-/// **The millimetres are estimated.** Xteink publish no mechanical drawing, so
-/// the body is derived from the panel — 792x528 at roughly 257 ppi is about
-/// 78 x 52 mm of glass — and the surround is scaled from photographs. Replace
-/// them with measurements when somebody has the hardware to hand.
+/// **The surround is estimated.** Xteink publish no mechanical drawing, so the
+/// glass is what the diagonal makes it — 792x528 at 257 ppi is 78.2 x 52.1 mm —
+/// and the case around it is scaled from photographs. Replace the surround with
+/// measurements when somebody has the hardware to hand.
 ///
-/// `HalGPIO::hasEdgeSideButtons` names the X3 and the X4 Pro as the boards whose page keys sit on the screen's left and
-/// right edges, and the themes lay out Up on the left and Down on the right
-/// against exactly that.
+/// `HalGPIO::hasEdgeSideButtons` names the X3 and the X4 Pro as the boards
+/// whose page keys sit on the screen's left and right edges, and the themes lay
+/// out Up on the left and Down on the right against exactly that.
 ///
 /// The side pair's pins are named up and down; on this board they sit on the
 /// screen's left and right edges and turn pages. In a list they move the
 /// selection, a row per tap and a page per hold.
-const X3_PLAN: Plan = Plan::new((620, 1010), (470, 705), 80)
+const X3_PLAN: Plan = Plan::new((671, 1087), (521, 782), 80)
     .footer(Run::new((125, 60), &READER_FOOTER))
     .left(Run::new((50, 170), &[Key::new("Prev", Button::PageBack)]))
     .right(Run::new(
@@ -144,7 +148,7 @@ pub const X3_BEZEL: Bezel = X3_PLAN.bezel(&X3_KEYS);
 /// **Estimated**, as the X3's is. The stacked rocker is not: the themes branch
 /// on it, drawing both keys on one side for this board and one per edge for the
 /// X3 and the X4 Pro.
-const X4_PLAN: Plan = Plan::new((580, 1020), (420, 700), 80)
+const X4_PLAN: Plan = Plan::new((717, 1248), (557, 928), 80)
     .footer(Run::new((115, 60), &READER_FOOTER))
     .right(Run::new(
         (50, 140),
@@ -169,7 +173,7 @@ pub const X4_BEZEL: Bezel = X4_PLAN.bezel(&X4_KEYS);
 ///
 /// What sits below the panel is the Home pad alone, in no row and no column —
 /// the one-off [`Plan::loose`] exists for.
-const X4_PRO_PLAN: Plan = Plan::new((580, 1020), (420, 700), 80)
+const X4_PRO_PLAN: Plan = Plan::new((717, 1248), (557, 928), 80)
     .left(Run::new((44, 160), &[Key::new("Prev", Button::PageBack)]))
     .right(Run::new(
         (44, 160),
@@ -185,7 +189,7 @@ const X4_PRO_PLAN: Plan = Plan::new((580, 1020), (420, 700), 80)
     .loose(&[PhysicalButton::round(
         "Home",
         KeyAction::Home,
-        (290, 900),
+        (359, 1128),
         100,
     )]);
 

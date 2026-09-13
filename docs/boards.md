@@ -54,7 +54,7 @@ route is not yet proven. The geometry is, in the simulator.
 
 ## No list of all seven
 
-There is no crate that knows all seven, because there is no such thing as
+There is no crate here that knows all seven, because there is no such thing as
 "every board" — a list is something an application assembles from the vendors
 it ships against. [`xpui-gallery`](https://github.com/XPUI-Framework/xpui-gallery/blob/main/gallery/src/boards.rs)'s
 is one: seven entries, and a `const` assertion that a vendor cannot gain a

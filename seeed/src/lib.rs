@@ -9,9 +9,9 @@
 //!
 //! The panel is driven by the firmware that ships on it, and a screen reaches
 //! it by that firmware hosting `xpui` over the C ABI — `xpui-cpp` is that
-//! boundary. `xpui-esp32` carries a bare-metal image for the Sticky that builds and
-//! links, with `Panel::present` marked where a driver would go; nothing has
-//! been run on the board. One vendor, one crate.
+//! boundary. `xpui-esp32` carries a bare-metal image for the Sticky that
+//! builds and links, with `Panel::present` marked where a driver would go;
+//! nothing has been run on the board. One vendor, one crate.
 
 #![cfg_attr(target_os = "none", no_std)]
 #![deny(missing_docs)]
@@ -36,7 +36,8 @@ pub const STICKY: Board = Board {
     orientation: Orientation::Portrait,
     diagonal_hundredths_inch: Some(397),
     ui_scale_percent: 120,
-    keys: KeyRow::READER,
+    // No row along the bottom: its three keys are a column on the right.
+    keys: KeyRow::new(&[]),
     touch: true,
     refresh_ms: 1200,
     bezel: Some(STICKY_BEZEL),
@@ -44,7 +45,8 @@ pub const STICKY: Board = Board {
 
 /// The Sticky's body: three keys in a column on the right.
 ///
-/// **Estimated**, like the readers'. The count is not — the firmware wires
+/// **The surround is estimated**, like the readers': the glass is what the
+/// diagonal makes it, 51.9 x 86.5 mm. The count is not — the firmware wires
 /// exactly three pins — and neither is what they do.
 ///
 /// The top one is the shared OK and Power key, shorter than the two below
@@ -54,7 +56,7 @@ pub const STICKY: Board = Board {
 /// it rather than what is printed beside it. Their side and order come from
 /// the device; the firmware wires the pins but says nothing about where they
 /// sit.
-const STICKY_PLAN: Plan = Plan::new((560, 1010), (450, 750), 95).right(Run::new(
+const STICKY_PLAN: Plan = Plan::new((629, 1125), (519, 865), 95).right(Run::new(
     (44, 140),
     &[
         Key::new("OK", Button::Confirm).spanning(120),

@@ -87,11 +87,11 @@ pub struct Board {
     /// A pixel is not a size: across the 218–257 ppi the readers sit at, a
     /// 40px row is 3.9–4.6mm of glass — legible when a key walks the
     /// selection, small for a finger. So the touch boards take 120 and the
-    /// button boards stay at 100, hand-tuned per board; `docs/design.md`
-    /// says why the ppi alone cannot decide it.
+    /// button boards stay at 100, hand-tuned per board.
     pub ui_scale_percent: u16,
-    /// What the keys along its bottom edge mean, left to right. Inert on a
-    /// touch board, whose consumers pass `hint_band = !touch`.
+    /// What the keys along its bottom edge mean, left to right, and empty on a
+    /// board with no row there. A hint band is only worth reserving over a row
+    /// that exists.
     pub keys: KeyRow,
     /// Whether a finger can reach it. A board with buttons and no touchscreen
     /// should not have its layout widened to finger-sized targets, and a screen
@@ -126,7 +126,13 @@ impl Board {
             diagonal_hundredths_inch: None,
             // Whoever wires the backend can pass `Metrics` of their own.
             ui_scale_percent: 100,
-            keys: KeyRow::READER,
+            // A guess either way: a finger brings its own Back, and a board
+            // with keys most often has the reader's four.
+            keys: if touch {
+                KeyRow::new(&[])
+            } else {
+                KeyRow::READER
+            },
             touch,
             refresh_ms: 0,
             bezel: None,

@@ -135,7 +135,7 @@ const BADGER_KEYS: [PhysicalButton; BADGER_PLAN.count()] = BADGER_PLAN.keys();
 pub const BADGER_BEZEL: Bezel = BADGER_PLAN.bezel(&BADGER_KEYS);
 
 /// a, b and c along the footer, as the silkscreen has them, on both badges.
-/// a goes back, b confirms and c is left bare; `docs/design.md` says why.
+/// a goes back, b confirms and c is left bare.
 ///
 /// **The names are what the hardware sends.** The rp2040 firmware looks each
 /// pin up by these labels and the two in [`BADGE_EDGE`]: rename one and that

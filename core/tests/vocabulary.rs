@@ -11,7 +11,7 @@
 //! in that vendor's crate.
 
 use xpui::Button;
-use xpui_boards_core::{Bezel, Board, KeyAction, PhysicalButton};
+use xpui_boards_core::{Bezel, Board, Key, KeyAction, PhysicalButton, Plan, Run};
 
 /// Only a key that presses something sends a button.
 ///
@@ -75,5 +75,34 @@ fn half_a_pair_is_not_a_pair() {
     assert!(
         !Board::custom("Bare", 400, 300, false).has_left_right_keys(),
         "a board with no bezel cannot promise keys it has not described"
+    );
+}
+
+/// The panel sits centred in what the edge keys leave, not in the whole body.
+///
+/// Half a column over when one edge carries keys, so the glass stays clear of
+/// them; in the middle when neither or both do. Centring in the body instead
+/// would put a column's keys against the glass on a narrow board.
+#[test]
+fn the_panel_is_centred_in_what_the_edge_keys_leave() {
+    const KEY: [Key; 1] = [Key::new("Up", Button::Up)];
+    let column = Run::new((100, 100), &KEY);
+    let body = Plan::new((1000, 500), (600, 300), 50);
+
+    assert_eq!(body.panel_origin(), (200, 50), "no edge keys: the middle");
+    assert_eq!(
+        body.right(column).panel_origin(),
+        (150, 50),
+        "keys on the right: centred in the 900 they leave"
+    );
+    assert_eq!(
+        body.left(column).panel_origin(),
+        (250, 50),
+        "keys on the left: the same, from the other side"
+    );
+    assert_eq!(
+        body.left(column).right(column).panel_origin(),
+        (200, 50),
+        "keys on both: the middle again"
     );
 }
