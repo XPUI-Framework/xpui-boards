@@ -1,9 +1,9 @@
-# Vendors
+# Every board, by vendor
 
 Seven boards from three manufacturers, one crate each. Every board is a `const`
 [`Board`](boards.md#xpui_boards_coreboard) with its
 [`Bezel`](bezel.md#xpui_boards_corebezel) beside it. Take the vendors you
-target and none of the others: a firmware for a Badger has no reason to compile
+target and none of the others: a firmware for a [Badger](https://shop.pimoroni.com/products/badger-2040) has no reason to compile
 an X4's dimensions into its image.
 
 ![The gallery's menu on the Xteink X3: seven rows under the header, with Back, Select, Up and Down named along the bottom](https://raw.githubusercontent.com/XPUI-Framework/xpui-gallery/main/gallery/tests/screenshots/menu_x3.png)
@@ -26,7 +26,7 @@ each vendor's `ALL` is what it concatenates.
 
 ## Pimoroni
 
-`xpui_boards_pimoroni`: three RP2040 boards, all held the way they are scanned.
+`xpui_boards_pimoroni`: three [RP2040](https://www.raspberrypi.com/products/rp2040/) boards, all held the way they are scanned.
 
 | Constant | |
 |---|---|
@@ -37,7 +37,7 @@ each vendor's `ALL` is what it concatenates.
 | `xpui_boards_pimoroni::TUFTY_BEZEL` | The Tufty 2040's body with its keys placed, for a simulator to draw and a firmware to resolve pins from. |
 | `xpui_boards_pimoroni::INKY_FRAME_BEZEL` | The Inky Frame's body with its keys placed, for a simulator to draw and a firmware to resolve pins from. |
 
-| | Badger 2040 | Tufty 2040 | Inky Frame |
+| | Badger 2040 | [Tufty 2040](https://shop.pimoroni.com/products/tufty-2040) | [Inky Frame](https://shop.pimoroni.com/products/inky-frame-5-7) |
 |---|---|---|---|
 | The gallery's menu | ![The menu on the Badger 2040's strip: two and a half rows, a scroll bar, and Back and OK named along the bottom](https://raw.githubusercontent.com/XPUI-Framework/xpui-gallery/main/gallery/tests/screenshots/menu_badger2040.png) | ![The menu on the Tufty 2040: four rows, a scroll bar, and Back and OK named along the bottom](https://raw.githubusercontent.com/XPUI-Framework/xpui-gallery/main/gallery/tests/screenshots/menu_tufty2040.png) | ![The menu on the Inky Frame: six rows, a scroll bar, and Back, Select, Up and Down named along the bottom](https://raw.githubusercontent.com/XPUI-Framework/xpui-gallery/main/gallery/tests/screenshots/menu_inkyframe.png) |
 | Slug | `badger2040`, or `badger` | `tufty2040`, or `tufty` | `inkyframe` |
@@ -55,13 +55,13 @@ each vendor's `ALL` is what it concatenates.
 
 **The badges.** A, B and C run along the bottom edge and the pair that walks a
 list sits on the right, so the row a hint bar labels is three keys and the
-third has no job. The body is Pimoroni's published outline; where the keys sit
+third has no job. The body is [Pimoroni](https://shop.pimoroni.com/)'s published outline; where the keys sit
 is **estimated** from product photographs, since Pimoroni publish the GPIO map
-but not the millimetres. At 111 ppi a 24px row on the Badger's strip is 5.5 mm,
+but not the millimetres. At 111 ppi a 24px row on the Badger's strip is 5.4 mm,
 wider than a 40px row on a reader. A full UC8151 update is close to a second.
 The Tufty is colour hardware running a monochrome framework: the backend maps
 ink and background onto any two `Rgb565` values, and at 166 ppi its 30px row is
-4.6 mm.
+4.5 mm.
 
 **The Inky Frame.** Five keys along the footer and nothing down either edge, so
 the pair that walks a list lives in the row too, and the fifth, which a hint
@@ -86,6 +86,11 @@ let numbers = |board: Board| {
 assert_eq!(numbers(pimoroni::BADGER_2040), ((296, 128), Some(111), 900, (856, 487), (669, 291)));
 assert_eq!(numbers(pimoroni::TUFTY_2040), ((320, 240), Some(166), 0, (652, 527), (489, 367)));
 assert_eq!(numbers(pimoroni::INKY_FRAME), ((600, 448), Some(131), 30_000, (1314, 1275), (1149, 858)));
+
+// The rows the prose measures, in tenths of a millimetre, rounded down.
+assert_eq!(pimoroni::BADGER_2040.tenths_of_a_mm(24), Some(54));
+assert_eq!(pimoroni::TUFTY_2040.tenths_of_a_mm(30), Some(45));
+assert_eq!(pimoroni::INKY_FRAME.tenths_of_a_mm(40), Some(77));
 
 for board in pimoroni::ALL {
     assert_eq!(board.orientation, Orientation::Landscape);
@@ -135,7 +140,7 @@ too, because they are what people say.
 
 ## Xteink
 
-`xpui_boards_xteink`: three ESP32-C3 e-readers. All three scan their panel in
+`xpui_boards_xteink`: three [ESP32-C3](https://www.espressif.com/en/products/socs/esp32-c3) e-readers. All three scan their panel in
 landscape and are held in portrait, so the canvas is the framebuffer turned a
 quarter. The geometry and capabilities are read from the firmware's own board
 configuration.
@@ -149,7 +154,7 @@ configuration.
 | `xpui_boards_xteink::X4_BEZEL` | The X4's body with its keys placed, for a simulator to draw. |
 | `xpui_boards_xteink::X4_PRO_BEZEL` | The X4 Pro's body with its edge keys and Home pad placed, for a simulator to draw. |
 
-| | X3 | X4 | X4 Pro |
+| | [X3](https://www.xteink.com/products/xteink-x3) | X4 | [X4 Pro](https://www.xteink.com/products/xteink-x4-pro-pocket-ereader) |
 |---|---|---|---|
 | The gallery's menu | ![The menu on the X3: seven rows, with Back, Select, Up and Down named along the bottom](https://raw.githubusercontent.com/XPUI-Framework/xpui-gallery/main/gallery/tests/screenshots/menu_x3.png) | ![The menu on the X4: seven rows, with Back, Select, Up and Down named along the bottom](https://raw.githubusercontent.com/XPUI-Framework/xpui-gallery/main/gallery/tests/screenshots/menu_x4.png) | ![The menu on the X4 Pro: seven taller rows in larger type, and no hint band](https://raw.githubusercontent.com/XPUI-Framework/xpui-gallery/main/gallery/tests/screenshots/menu_x4pro.png) |
 | Slug | `x3` | `x4` | `x4pro` |
@@ -165,7 +170,7 @@ configuration.
 | Panel | 52.1 × 78.2 mm | 55.7 × 92.8 mm | 55.7 × 92.8 mm |
 | Keys on the body | `Back`, `Select`, `Up`, `Down` along the footer; `Prev` on the left; `Sleep`, `Next` on the right | the same footer; `Sleep`, `Prev`, `Next` stacked on the right | `Prev` on the left; `Sleep`, `Next` on the right; a round `Home` pad below the panel |
 
-**The bodies are estimated.** Xteink publish no mechanical drawing, so the
+**The bodies are estimated.** [Xteink](https://www.xteink.com/) publish no mechanical drawing, so the
 glass is what the diagonal makes it and the case around it is scaled from
 photographs. What is not estimated is where the keys are: the firmware's
 `HalGPIO::hasEdgeSideButtons` names the X3 and the X4 Pro as the boards whose
@@ -185,7 +190,7 @@ takes Back and Confirm from its touchscreen, so only the page pair is wired,
 and its Home pad is reported by the touch controller as
 [`KeyAction::Home`](bezel.md#xpui_boards_corekeyaction), not by a pin.
 Everything on it is chosen with a finger, so it takes the touch scale and a
-row becomes 48px.
+row becomes 48px, or 5.5 mm.
 
 **Example — the Xteink numbers**
 
@@ -201,6 +206,11 @@ let numbers = |board: Board| {
 assert_eq!(numbers(xteink::X3), ((528, 792), Some(257), (671, 1087), (521, 782)));
 assert_eq!(numbers(xteink::X4), ((480, 800), Some(218), (717, 1248), (557, 928)));
 assert_eq!(numbers(xteink::X4_PRO), ((480, 800), Some(218), (717, 1248), (557, 928)));
+
+// The rows the prose measures, in tenths of a millimetre, rounded down.
+assert_eq!(xteink::X3.tenths_of_a_mm(40), Some(39));
+assert_eq!(xteink::X4.tenths_of_a_mm(40), Some(46));
+assert_eq!(xteink::X4_PRO.tenths_of_a_mm(48), Some(55));
 
 for board in xteink::ALL {
     assert_eq!(board.orientation, Orientation::Portrait);
@@ -243,14 +253,14 @@ No aliases: nobody shortens these names.
 
 ## Seeed
 
-`xpui_boards_seeed`: one ESP32-S3 board with a touchscreen and three keys.
+`xpui_boards_seeed`: one [ESP32-S3](https://www.espressif.com/en/products/socs/esp32-s3) board with a touchscreen and three keys.
 
 | Constant | |
 |---|---|
 | `xpui_boards_seeed::STICKY` | Seeed Sticky — ESP32-S3, an 800x480 panel held portrait, so 480x800. |
 | `xpui_boards_seeed::STICKY_BEZEL` | The Sticky's body with its keys placed, for a simulator to draw. |
 
-| | Sticky |
+| | [Sticky](https://www.seeedstudio.com/reTerminal-Sticky-p-6861.html) |
 |---|---|
 | The gallery's menu | ![The menu on the Sticky: seven taller rows in larger type, and no hint band](https://raw.githubusercontent.com/XPUI-Framework/xpui-gallery/main/gallery/tests/screenshots/menu_sticky.png) |
 | Slug | `sticky` |
@@ -270,7 +280,7 @@ No aliases: nobody shortens these names.
 234 ppi to the X4's 218, so every pixel is about 7 % smaller, which is why it
 asks for the touch scale despite the identical resolution; its row is 5.2 mm.
 Back and the directions come from touch. The top key is shorter than the two
-below it and is the shared OK and Power key: Seeed call it the AI Voice key,
+below it and is the shared OK and Power key: [Seeed](https://www.seeedstudio.com/) call it the AI Voice key,
 and the firmware confirms on a click and sleeps on a hold of four hundred
 milliseconds, so its label is what the firmware does with it. **The surround is
 estimated**; the count of three keys, and what each does, is not.
@@ -285,6 +295,7 @@ assert_eq!(seeed::ALL, [STICKY]);
 assert_eq!((STICKY.width, STICKY.height), (480, 800));
 assert_eq!(STICKY.framebuffer, X4.framebuffer, "the X4's framebuffer");
 assert_eq!(STICKY.ppi(), Some(234));
+assert_eq!(STICKY.tenths_of_a_mm(48), Some(52), "a 48px row is 5.2 mm");
 assert_eq!((STICKY.ui_scale_percent, STICKY.touch, STICKY.refresh_ms), (120, true, 1200));
 assert!(STICKY.keys.is_empty());
 assert_eq!((STICKY_BEZEL.body, STICKY_BEZEL.panel_size), ((629, 1125), (519, 865)));

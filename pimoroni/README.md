@@ -2,13 +2,13 @@
 
 # `xpui-boards-pimoroni`
 
-Pimoroni's RP2040 boards, described for xpui.
+[Pimoroni](https://shop.pimoroni.com/)'s [RP2040](https://www.raspberrypi.com/products/rp2040/) boards, described for xpui.
 
 | Board | Panel | Keys |
 |---|---|---|
-| Badger 2040 | 296 × 128 e-ink | `a` `b` `c` along the bottom, `Up` `Dn` stacked on the right edge |
-| Tufty 2040 | 320 × 240 colour LCD | the same arrangement, in a different body |
-| Inky Frame 5.7" | 600 × 448 seven-colour e-ink | `A` to `E` along the bottom, nothing on either edge |
+| [Badger 2040](https://shop.pimoroni.com/products/badger-2040) | 296 × 128 e-ink | `a` `b` `c` along the bottom, `Up` `Dn` stacked on the right edge |
+| [Tufty 2040](https://shop.pimoroni.com/products/tufty-2040) | 320 × 240 colour LCD | the same arrangement, in a different body |
+| [Inky Frame 5.7"](https://shop.pimoroni.com/products/inky-frame-5-7) | 600 × 448 seven-colour e-ink | `A` to `E` along the bottom, nothing on either edge |
 
 The two badges share a key row of three — Back, Confirm, and one with no job —
 because the pair that walks a list sits on the edge rather than in the row a
@@ -45,7 +45,7 @@ assert_eq!(pimoroni::from_slug("x4"), None);
 ```
 
 It depends on [`xpui-boards-core`](../core/) for the vocabulary and on nothing
-else that paints, so taking these three costs you no Xteink and no Seeed.
+else that paints, so taking these three costs you no [Xteink](https://www.xteink.com/) and no [Seeed](https://www.seeedstudio.com/).
 
 ## Checking it
 

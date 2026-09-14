@@ -2,13 +2,13 @@
 
 # `xpui-boards-xteink`
 
-Xteink's e-readers, described for xpui.
+[Xteink](https://www.xteink.com/)'s e-readers, described for xpui.
 
 | Board | Panel | Keys |
 |---|---|---|
-| X3 | 528 × 792 e-ink, 257 ppi | `Back` `Select` `Up` `Down` along the bottom, `Prev` on the left edge, `Sleep` and `Next` on the right |
+| [X3](https://www.xteink.com/products/xteink-x3) | 528 × 792 e-ink, 257 ppi | `Back` `Select` `Up` `Down` along the bottom, `Prev` on the left edge, `Sleep` and `Next` on the right |
 | X4 | 480 × 800 e-ink, 218 ppi | the same four along the bottom, `Sleep` and the page pair stacked on the right |
-| X4 Pro | the X4's panel, with a touchscreen | **no footer at all** — `Prev` on the left edge, `Sleep` and `Next` on the right, and a capacitive `Home` pad below the panel |
+| [X4 Pro](https://www.xteink.com/products/xteink-x4-pro-pocket-ereader) | the X4's panel, with a touchscreen | **no footer at all** — `Prev` on the left edge, `Sleep` and `Next` on the right, and a capacitive `Home` pad below the panel |
 
 The Pro is the one worth reading twice. It takes Back, Confirm and the pair
 that walks a list from the touchscreen, so the four keys the other two carry

@@ -13,9 +13,9 @@ others:
 
 | Crate | Boards |
 |---|---|
-| [`xpui-boards-pimoroni`](../pimoroni/) | Badger 2040, Tufty 2040, Inky Frame |
-| [`xpui-boards-xteink`](../xteink/) | X3, X4, X4 Pro |
-| [`xpui-boards-seeed`](../seeed/) | Sticky |
+| [`xpui-boards-pimoroni`](../pimoroni/) | [Badger 2040](https://shop.pimoroni.com/products/badger-2040), [Tufty 2040](https://shop.pimoroni.com/products/tufty-2040), [Inky Frame](https://shop.pimoroni.com/products/inky-frame-5-7) |
+| [`xpui-boards-xteink`](../xteink/) | [X3](https://www.xteink.com/products/xteink-x3), X4, [X4 Pro](https://www.xteink.com/products/xteink-x4-pro-pocket-ereader) |
+| [`xpui-boards-seeed`](../seeed/) | [Sticky](https://www.seeedstudio.com/reTerminal-Sticky-p-6861.html) |
 
 ## Using it
 

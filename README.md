@@ -23,9 +23,9 @@ Every document in this repository is listed in [docs/README.md](docs/README.md).
 
 |                         |                                                                                                                                                                                                                                |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [`pimoroni`](pimoroni/) | Badger 2040, Tufty 2040, Inky Frame. The first two ship firmware and have been run over a debug probe; the Inky Frame's 600 × 448 seven-colour panel is described so a screen can be laid out for it and seen in the simulator |
-| [`xteink`](xteink/)     | X3, X4, X4 Pro                                                                                                                                                                                                                 |
-| [`seeed`](seeed/)       | Sticky                                                                                                                                                                                                                         |
+| [`pimoroni`](pimoroni/) | [Badger 2040](https://shop.pimoroni.com/products/badger-2040), [Tufty 2040](https://shop.pimoroni.com/products/tufty-2040), [Inky Frame](https://shop.pimoroni.com/products/inky-frame-5-7). The first two ship firmware and have been run over a debug probe; the Inky Frame's 600 × 448 seven-colour panel is described so a screen can be laid out for it and seen in the simulator |
+| [`xteink`](xteink/)     | [X3](https://www.xteink.com/products/xteink-x3), X4, [X4 Pro](https://www.xteink.com/products/xteink-x4-pro-pocket-ereader)                                                                                                                                                                                                                 |
+| [`seeed`](seeed/)       | [Sticky](https://www.seeedstudio.com/reTerminal-Sticky-p-6861.html)                                                                                                                                                                                                                         |
 | [`core`](core/)         | `Board`, `Orientation`, `Bezel`, and the `Plan`/`Run`/`Key` const DSL. Describes no device at all                                                                                                                              |
 
 **Take the vendors you target and none of the others.** That is why there is a
@@ -72,7 +72,7 @@ is the worked example across all three vendors. The crates depend only on
 [`xpui`](https://github.com/XPUI-Framework/xpui-framework), for `Button` and
 `KeyRow` — a key is a fact about hardware, and the crate describing a device
 should not have to depend on the one drawing it to say so. Nothing is on
-crates.io yet, which is why the dependency above is a `git` URL.
+[crates.io](https://crates.io/) yet, which is why the dependency above is a `git` URL.
 
 ## Checking it
 
@@ -81,7 +81,7 @@ crates.io yet, which is why the dependency above is a `git` URL.
 ```
 
 The checks themselves are in [`xtask/`](xtask/) — this repository's own list,
-in Rust, holding nothing it does not run. `./build-and-test.sh fix` formats
+in [Rust](https://rust-lang.org/), holding nothing it does not run. `./build-and-test.sh fix` formats
 in place first. How a change is reviewed is in
 [docs/contributing.md](docs/contributing.md).
 

@@ -1,4 +1,4 @@
-# Boards
+# Describing a board
 
 A board is a panel, the keys around it and the body it sits in, written as a
 `const` that a screen, a simulator and a firmware all read. `xpui_boards_core`
@@ -53,14 +53,14 @@ what lets a screen laid out in a window be flashed unchanged.
 > [!NOTE]
 > `width` and `height` are what a screen is laid out against; `framebuffer` is
 > what a driver scans. They differ on every board held a quarter turn from the
-> way its panel is scanned: an X3 scans 792 × 528 and presents 528 × 792. The
+> way its panel is scanned: an [X3](https://www.xteink.com/products/xteink-x3) scans 792 × 528 and presents 528 × 792. The
 > framebuffer is never rotated. A renderer transforms each pixel on its way
 > out, so a backend that talks to real hardware needs `framebuffer`, and
 > [`orientation`](#xpui_boards_coreorientation) says how the two relate.
 
 **What the other fields are for:**
 
-- **`slug`** is stored rather than derived from the size: the X4 and the Sticky
+- **`slug`** is stored rather than derived from the size: the X4 and the [Sticky](https://www.seeedstudio.com/reTerminal-Sticky-p-6861.html)
   are both 800 × 480, so a size cannot tell them apart.
 - **`diagonal_hundredths_inch`** is in the unit these panels are sold in, and an
   integer because every preset is a `const` and `Board` is `Eq`.
@@ -199,19 +199,26 @@ it describes. Both keys, because one without the other is a value that can be
 raised and never lowered.
 
 > [!NOTE]
-> A board with no bezel answers `false`, the safe direction. The shape of a
-> board does not predict the answer: the X4 Pro takes Left and Right from its
-> touchscreen and answers `false`, while the Inky Frame's five-key footer
-> carries both and answers `true`.
+> A board with no bezel answers `false`, the safe direction. Neither the shape
+> of a board nor its labels predict the answer; what the keys send does. Of the
+> seven boards, three answer `true`: the X3 and the X4, whose footer keys
+> labelled `Up` and `Down` send `Button::Left` and `Button::Right`, and the [Inky
+> Frame](https://shop.pimoroni.com/products/inky-frame-5-7), whose `C` and `D` keys do. The other four answer `false`: the [X4 Pro](https://www.xteink.com/products/xteink-x4-pro-pocket-ereader)
+> and the Sticky take Left and Right from their touchscreens, and the [Badger](https://shop.pimoroni.com/products/badger-2040)'s
+> and the [Tufty](https://shop.pimoroni.com/products/tufty-2040)'s edge pair sends Up and Down.
 
 ```rust
-use xpui_boards_pimoroni::{BADGER_2040, INKY_FRAME};
-use xpui_boards_xteink::{X4, X4_PRO};
+use xpui_boards_pimoroni::{BADGER_2040, INKY_FRAME, TUFTY_2040};
+use xpui_boards_seeed::STICKY;
+use xpui_boards_xteink::{X3, X4, X4_PRO};
 
-assert!(X4.has_left_right_keys());
-assert!(INKY_FRAME.has_left_right_keys());
+assert!(X3.has_left_right_keys(), "its footer's Up and Down send Left and Right");
+assert!(X4.has_left_right_keys(), "the same footer");
+assert!(INKY_FRAME.has_left_right_keys(), "C and D send Left and Right");
 assert!(!X4_PRO.has_left_right_keys(), "Left and Right come from its touchscreen");
+assert!(!STICKY.has_left_right_keys(), "and from the Sticky's");
 assert!(!BADGER_2040.has_left_right_keys(), "its edge pair sends Up and Down");
+assert!(!TUFTY_2040.has_left_right_keys(), "as the Tufty's does");
 ```
 
 ### Physical size
@@ -269,7 +276,7 @@ pub enum Orientation
 | `xpui_boards_core::Orientation::Portrait` | The canvas is the framebuffer turned a quarter: tall on a wide panel. |
 | `xpui_boards_core::Orientation::Landscape` | The canvas is the framebuffer as it is scanned. |
 
-The three Xteink readers and the Sticky are `Portrait`; the three Pimoroni
+The three [Xteink](https://www.xteink.com/) readers and the Sticky are `Portrait`; the three [Pimoroni](https://shop.pimoroni.com/)
 boards are `Landscape`. An orientation says only that the canvas is turned, not
 which way: a renderer that writes to real hardware owns that detail.
 

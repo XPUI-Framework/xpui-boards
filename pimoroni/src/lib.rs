@@ -42,7 +42,7 @@ const INKY_ROW: KeyRow = KeyRow::new(&[
 /// Pimoroni Badger 2040 — RP2040, 296x128 monochrome e-ink (UC8151).
 ///
 /// Buttons only, so the baseline scale; at 111 ppi a 24px row on this strip
-/// is 5.5mm, wider than a 40px row on a reader.
+/// is 5.4mm, wider than a 40px row on a reader.
 pub const BADGER_2040: Board = Board {
     name: "Badger 2040",
     slug: "badger2040",
@@ -68,7 +68,7 @@ pub const BADGER_2040: Board = Board {
 /// black-on-white, or amber-on-black, without a screen knowing.
 ///
 /// Buttons only, so the baseline scale. 166 ppi puts its 30px row at
-/// 4.6mm.
+/// 4.5mm.
 pub const TUFTY_2040: Board = Board {
     name: "Tufty 2040",
     slug: "tufty2040",

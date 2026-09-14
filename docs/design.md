@@ -10,7 +10,7 @@ row is 3.9–4.6mm of glass: legible when a key walks the selection, small for a
 finger. So the touch boards take 120 and the button boards stay at 100.
 
 It is tuned by hand rather than derived, because the ppi alone cannot tell a
-4.26" X4 from a 3.97" Sticky, and the values match the firmware's own
+4.26" X4 from a 3.97" [Sticky](https://www.seeedstudio.com/reTerminal-Sticky-p-6861.html), and the values match the firmware's own
 profiles. It is a percentage rather than an `f32` so that `Board` stays `Eq`,
 every preset stays a `const`, and nothing needs an FPU the device does not
 have.

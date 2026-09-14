@@ -151,7 +151,7 @@ pub const fn round(label: &'static str, action: KeyAction, centre: (i32, i32), d
 
 Square by construction, because a round key described as a rectangle one unit
 off square is drawn as an ellipse, and nobody sees that mistake until it is
-rendered. The X4 Pro's capacitive Home pad is the one here, handed to
+rendered. The [X4 Pro](https://www.xteink.com/products/xteink-x4-pro-pocket-ereader)'s capacitive Home pad is the one here, handed to
 [`Plan::loose`](#xpui_boards_coreplanloose).
 
 ## `xpui_boards_core::KeyAction`
@@ -442,8 +442,8 @@ pub const fn spanning(self, span: i32) -> Key
 | `span` | Its length along the run, in tenths of a millimetre. |
 
 A sleep key stacked above a page pair is the case that needs it: the same
-width, and shorter. The X3, the X4 and the X4 Pro each carry one at 110, and the
-Sticky's OK key is 120 above two keys of 140.
+width, and shorter. The [X3](https://www.xteink.com/products/xteink-x3), the X4 and the X4 Pro each carry one at 110, and the
+[Sticky](https://www.seeedstudio.com/reTerminal-Sticky-p-6861.html)'s OK key is 120 above two keys of 140.
 
 ## Re-exports
 

@@ -11,7 +11,7 @@ number in it comes off a datasheet or a ruler.
 
 | Your device is… | Put it in |
 |---|---|
-| a Pimoroni, Xteink or Seeed board not listed | that vendor's crate here, beside its siblings |
+| a [Pimoroni](https://shop.pimoroni.com/), [Xteink](https://www.xteink.com/) or [Seeed](https://www.seeedstudio.com/) board not listed | that vendor's crate here, beside its siblings |
 | anything else | a crate of your own, depending on `xpui-boards-core` |
 | a panel with no case worth drawing | nowhere — call `Board::custom` at the call site |
 
@@ -69,7 +69,7 @@ being right the moment somebody zooms.
 
 ## 3. The panel, as a `Board`
 
-Here is the Seeed Sticky, which is the smallest complete example in this
+Here is the [Seeed Sticky](https://www.seeedstudio.com/reTerminal-Sticky-p-6861.html), which is the smallest complete example in this
 repository:
 
 ```rust
@@ -115,7 +115,7 @@ scanned.
 
 ## 4. The key row, and why a blank key matters
 
-`keys` says what the row along the bottom **means**, left to right. The Badger
+`keys` says what the row along the bottom **means**, left to right. The [Badger](https://shop.pimoroni.com/products/badger-2040)
 has three:
 
 ```rust
@@ -202,7 +202,7 @@ Two checks a script runs:
   them. Those are about the *chrome* derived from your panel, so they live
   where a board and a backend meet.
 
-Then look at it. The gallery opens a window through SDL2, which
+Then look at it. The gallery opens a window through [SDL2](https://www.libsdl.org/), which
 [its requirements](https://github.com/XPUI-Framework/xpui-gallery#requirements)
 say how to install, and two things stand between a fresh clone and your board:
 

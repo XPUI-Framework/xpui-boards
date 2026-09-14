@@ -152,9 +152,13 @@ impl Board {
     /// value that can be raised and never lowered.
     ///
     /// **A board with no bezel answers `false`**, the safe direction. The
-    /// shape does not predict the answer: the X4 Pro takes Left and Right
-    /// from its touchscreen and answers `false`; the Inky Frame's five-key
-    /// footer carries both and answers `true`.
+    /// shape does not predict the answer, and neither does a label: it is what
+    /// the keys send. Of the seven boards the vendor crates describe, three
+    /// answer `true` — the X3 and the X4, whose footer keys labelled Up and
+    /// Down send `Left` and `Right`, and the Inky Frame, whose C and D keys do.
+    /// The other four answer `false`: the X4 Pro and the Sticky take Left and
+    /// Right from their touchscreens, and the Badger's and the Tufty's edge
+    /// pair sends `Up` and `Down`.
     pub fn has_left_right_keys(&self) -> bool {
         let sends = |wanted: Button| {
             self.bezel.is_some_and(|bezel| {

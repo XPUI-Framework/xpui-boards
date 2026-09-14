@@ -84,7 +84,7 @@ pub const X4: Board = Board {
 ///
 /// The X4's panel, so the X4's 218 ppi — but everything here is chosen with
 /// a finger, so the chrome takes the touch scale and a row becomes 48px, or
-/// 5.6mm.
+/// 5.5mm.
 pub const X4_PRO: Board = Board {
     name: "Xteink X4 Pro",
     slug: "x4pro",

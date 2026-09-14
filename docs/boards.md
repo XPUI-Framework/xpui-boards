@@ -22,9 +22,9 @@ so a label changed here changes which switch does what on the hardware.
 [`Bezel::button_labelled`](reference/bezel.md#xpui_boards_corebezelbutton_labelled)
 is that lookup.
 
-**Two of the three run.** The Badger 2040 and the Tufty 2040 have firmware in
+**Two of the three run.** The [Badger 2040](https://shop.pimoroni.com/products/badger-2040) and the [Tufty 2040](https://shop.pimoroni.com/products/tufty-2040) have firmware in
 [`xpui-rp2040`](https://github.com/XPUI-Framework/xpui-rp2040) and have been
-run over a debug probe. The Inky Frame is described but not built: it
+run over a debug probe. The [Inky Frame](https://shop.pimoroni.com/products/inky-frame-5-7) is described but not built: it
 exists so a screen can be laid out and looked at for its seven-colour
 panel in the simulator.
 
@@ -36,15 +36,15 @@ ABI — [`xpui-cpp`](https://github.com/XPUI-Framework/xpui-cpp) is that
 boundary — rather than a second driver for the same glass.
 
 [`xpui-esp32`](https://github.com/XPUI-Framework/xpui-esp32) carries a
-bare-metal image for the X3 that builds and links, with `Panel::present`
-marked where a panel driver would go. There is no published Rust or C++
+bare-metal image for the [X3](https://www.xteink.com/products/xteink-x3) that builds and links, with `Panel::present`
+marked where a panel driver would go. There is no published [Rust](https://rust-lang.org/) or C++
 driver for these panels, so what reaches the glass on that route is not yet
 proven; the geometry is, in the simulator and in the firmware's own board
 configuration, and it is what lays a screen out correctly for all three.
 
 ## Seeed: Sticky
 
-**What the crate is for.** The Sticky's panel is driven by the firmware that
+**What the crate is for.** The [Sticky](https://www.seeedstudio.com/reTerminal-Sticky-p-6861.html)'s panel is driven by the firmware that
 ships on it, and a screen reaches it by that firmware hosting `xpui` over the
 C ABI — see [`xpui-cpp`](https://github.com/XPUI-Framework/xpui-cpp). Its
 [measurements](reference/vendors.md#seeed) are what lays a screen out for it,

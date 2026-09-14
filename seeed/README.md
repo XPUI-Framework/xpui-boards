@@ -2,7 +2,7 @@
 
 # `xpui-boards-seeed`
 
-Seeed's Sticky, described for xpui.
+[Seeed](https://www.seeedstudio.com/)'s [Sticky](https://www.seeedstudio.com/reTerminal-Sticky-p-6861.html), described for xpui.
 
 | Board | Panel | Driven by |
 |---|---|---|
