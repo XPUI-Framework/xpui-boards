@@ -25,7 +25,7 @@ application assembles its own.
 ```
 
 ```text
-format · file sizes · crates are tested · READMEs warn · prose is compiled · documented paths resolve · rustdoc links resolve · documented commands resolve · lint · tests · doctests · README sections · AGENTS.md · published crates deny missing_docs · comment blocks · comment narration
+format · file sizes · crates are tested · READMEs warn · prose is compiled · documented paths resolve · rustdoc links resolve · the reference mirrors rustdoc · documented commands resolve · lint · tests · doctests · README sections · AGENTS.md · published crates deny missing_docs · comment blocks · comment narration
 ```
 
 There is no `all` mode; this list is the whole of it, and a last stage,
@@ -64,6 +64,7 @@ crates' nested order.
 | [`docs/README.md`](docs/README.md) | its paths resolve; the README-heading check exempts it, because it is the index of `docs/`, not a front page |
 | [`core/README.md`](core/README.md), [`pimoroni/README.md`](pimoroni/README.md), [`seeed/README.md`](seeed/README.md), [`xteink/README.md`](xteink/README.md) | doctests, each mounted by its own crate's `src/lib.rs` |
 | [`docs/adding-a-board.md`](docs/adding-a-board.md) | doctests, mounted by `core/src/lib.rs`; every snippet copies a real constant |
+| [`docs/reference.md`](docs/reference.md), [`docs/reference/`](docs/reference/) | doctests, mounted by `core/src/lib.rs`; every public name in the four crates, crate-prefixed, mirrored by `the reference mirrors rustdoc` |
 | [`docs/boards.md`](docs/boards.md), [`docs/design.md`](docs/design.md) | mounted by `core/src/lib.rs`; neither carries a `rust` fence, so what is checked is their paths |
 | [`docs/contributing.md`](docs/contributing.md) | every path and command it gives resolves; the umbrella command is `xpui-dev`'s |
 | `AGENTS.md` | the stage list above is compared to what the gate runs |

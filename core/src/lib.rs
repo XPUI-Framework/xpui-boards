@@ -56,11 +56,13 @@ impl Orientation {
 pub struct Board {
     /// What to call it, for a window title or a log line.
     pub name: &'static str,
-    /// The short name a command line accepts. Stored rather than derived: the
-    /// X4 and the Sticky are both 800x480, so a size cannot tell them apart.
+    /// The short name a command line accepts.
+    ///
+    /// Stored rather than derived: the X4 and the Sticky are both 800x480, so
+    /// a size cannot tell them apart.
     pub slug: &'static str,
-    /// The canvas a screen is laid out against, in the orientation the device
-    /// is normally held.
+    /// The width of the canvas a screen is laid out against, in the
+    /// orientation the device is normally held.
     pub width: i32,
     /// The canvas's height, in the same orientation.
     pub height: i32,
@@ -90,20 +92,24 @@ pub struct Board {
     /// button boards stay at 100, hand-tuned per board.
     pub ui_scale_percent: u16,
     /// What the keys along its bottom edge mean, left to right, and empty on a
-    /// board with no row there. A hint band is only worth reserving over a row
-    /// that exists.
+    /// board with no row there.
+    ///
+    /// A hint band is only worth reserving over a row that exists.
     pub keys: KeyRow,
-    /// Whether a finger can reach it. A board with buttons and no touchscreen
-    /// should not have its layout widened to finger-sized targets, and a screen
-    /// can ask before offering a drag-only control.
+    /// Whether a finger can reach it.
+    ///
+    /// A board with buttons and no touchscreen should not have its layout
+    /// widened to finger-sized targets, and a screen can ask before offering a
+    /// drag-only control.
     pub touch: bool,
     /// Roughly how long a full refresh takes, in milliseconds.
     ///
     /// E-ink is the reason the framework repaints only when something changed.
     /// A board that answers 0 is a display fast enough not to care.
     pub refresh_ms: u32,
-    /// The body around the panel, when one has been described. `None` means
-    /// the simulator opens a window that is exactly the panel.
+    /// The body around the panel, when one has been described.
+    ///
+    /// `None` means the simulator opens a window that is exactly the panel.
     pub bezel: Option<Bezel>,
 }
 
@@ -214,4 +220,12 @@ mod guides {
     pub mod boards {}
     #[doc = include_str!("../../docs/design.md")]
     pub mod design {}
+    #[doc = include_str!("../../docs/reference.md")]
+    pub mod reference {}
+    #[doc = include_str!("../../docs/reference/boards.md")]
+    pub mod reference_boards {}
+    #[doc = include_str!("../../docs/reference/bezel.md")]
+    pub mod reference_bezel {}
+    #[doc = include_str!("../../docs/reference/vendors.md")]
+    pub mod reference_vendors {}
 }

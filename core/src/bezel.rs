@@ -90,15 +90,18 @@ pub struct Bezel {
     pub body: (i32, i32),
     /// Where the panel's top-left sits in the body, same units.
     pub panel_origin: (i32, i32),
-    /// The panel's own size, same units. Together with the panel's pixel
-    /// dimensions this gives the scale everything else is drawn at.
+    /// The panel's own size, same units.
+    ///
+    /// Together with the panel's pixel dimensions this gives the scale
+    /// everything else is drawn at.
     pub panel_size: (i32, i32),
     /// Every physical key, placed in the body.
     pub buttons: &'static [PhysicalButton],
-    /// A licensed image of the device, when there is one. Manufacturer
-    /// photography is not licensed for reuse; the slot exists so an image
-    /// somebody holds the rights to can be dropped in without redesigning
-    /// the layout.
+    /// A licensed image of the device, when there is one.
+    ///
+    /// Manufacturer photography is not licensed for reuse; the slot exists so
+    /// an image somebody holds the rights to can be dropped in without
+    /// redesigning the layout.
     pub artwork: Option<&'static [u8]>,
 }
 

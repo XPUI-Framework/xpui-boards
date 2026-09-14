@@ -85,8 +85,10 @@ impl Key {
     }
 }
 
-/// A row of keys along the footer, or a column of them down an edge. The keys
-/// are named and the size they share is stated once; every centre is derived.
+/// A row of keys along the footer, or a column of them down an edge.
+///
+/// The keys are named and the size they share is stated once; every centre is
+/// derived.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub struct Run {
     keys: &'static [Key],
@@ -152,7 +154,9 @@ pub struct Plan {
 
 impl Plan {
     /// A body of `body`, holding a panel of `panel`, with `forehead` of bezel
-    /// above it. Tenths of a millimetre throughout.
+    /// above it.
+    ///
+    /// Tenths of a millimetre throughout.
     pub const fn new(body: (i32, i32), panel: (i32, i32), forehead: i32) -> Plan {
         Plan {
             body,
