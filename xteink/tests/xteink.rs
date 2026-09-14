@@ -6,15 +6,15 @@
 
 use xpui_boards_xteink as xteink;
 
-/// The X3 and the X4 Pro put one page key on each side edge; the X4 stacks
-/// both on the same side.
+/// The X3, the X4 Classic and the X4 Pro put one page key on each side edge;
+/// the X4 stacks both on the same side.
 ///
 /// That difference is not cosmetic — the firmware branches on it, in
 /// `HalGPIO::hasEdgeSideButtons` and in every theme that draws a hint beside a
 /// key. A simulator that got it wrong would teach the wrong muscle memory.
 #[test]
 fn the_page_keys_sit_where_the_firmware_says() {
-    for board in [xteink::X3, xteink::X4_PRO] {
+    for board in [xteink::X3, xteink::X4_CLASSIC, xteink::X4_PRO] {
         let bezel = board.bezel.expect("this board has a body");
         let (left_edge, _, panel_width, _) = bezel.panel_rect();
         let right_edge = left_edge + panel_width;
@@ -81,4 +81,43 @@ fn the_x4_pro_is_the_x4_with_a_touchscreen() {
     assert_eq!(xteink::X4.framebuffer, xteink::X4_PRO.framebuffer);
     const _: () = assert!(!xteink::X4.touch && xteink::X4_PRO.touch);
     assert_ne!(xteink::X4.slug, xteink::X4_PRO.slug);
+}
+
+/// The X4 Classic is the X4's panel and footer with the X4 Pro's page keys.
+///
+/// Three boards' worth of facts in one, so each half is asserted against the
+/// board it came from: a Classic that drifted towards either would still look
+/// like a plausible reader.
+#[test]
+fn the_x4_classic_is_the_x4_footer_with_the_x4_pro_edges() {
+    let classic = xteink::X4_CLASSIC;
+    assert_eq!(
+        (classic.width, classic.height, classic.framebuffer),
+        (xteink::X4.width, xteink::X4.height, xteink::X4.framebuffer)
+    );
+    assert_eq!(
+        classic.diagonal_hundredths_inch,
+        xteink::X4.diagonal_hundredths_inch
+    );
+    assert_eq!(classic.keys, xteink::X4.keys);
+    const _: () = assert!(!xteink::X4_CLASSIC.touch, "it has buttons only");
+
+    let keys = |bezel: xpui_boards_core::Bezel| {
+        bezel
+            .buttons
+            .iter()
+            .map(|key| (key.label, key.action))
+            .collect::<Vec<_>>()
+    };
+    let (classic, x4, pro) = (
+        keys(xteink::X4_CLASSIC_BEZEL),
+        keys(xteink::X4_BEZEL),
+        keys(xteink::X4_PRO_BEZEL),
+    );
+    assert_eq!(classic[..4], x4[..4], "the X4's footer, key for key");
+    assert_eq!(
+        classic[4..],
+        pro[..3],
+        "the X4 Pro's edge keys, and no Home pad"
+    );
 }

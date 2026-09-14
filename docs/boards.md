@@ -1,6 +1,6 @@
-# The seven boards
+# The eight boards
 
-What runs on each of the seven, and how a screen reaches each panel. Each
+What runs on each of the eight, and how a screen reaches each panel. Each
 board's numbers — its panel, key row, refresh time and body — are in
 [the vendors reference](reference/vendors.md); this page is what the numbers
 cannot say.
@@ -28,7 +28,7 @@ run over a debug probe. The [Inky Frame](https://shop.pimoroni.com/products/inky
 exists so a screen can be laid out and looked at for its seven-colour
 panel in the simulator.
 
-## Xteink: X3, X4, X4 Pro
+## Xteink: X3, X4, X4 Classic, X4 Pro
 
 **How a screen reaches one of these panels.** They are driven by the firmware
 that ships on them, so the route is that firmware hosting `xpui` over the C
@@ -40,7 +40,12 @@ bare-metal image for the [X3](https://www.xteink.com/products/xteink-x3) that bu
 marked where a panel driver would go. There is no published [Rust](https://rust-lang.org/) or C++
 driver for these panels, so what reaches the glass on that route is not yet
 proven; the geometry is, in the simulator and in the firmware's own board
-configuration, and it is what lays a screen out correctly for all three.
+configuration, and it is what lays a screen out correctly for all four.
+
+**The [X4 Classic](https://www.xteink.com/products/xteink-x4-classic-pocket-ereader) has no image either.** It is the X4 Xteink
+sell today, and it moved from the X4's ESP32-C3 to an ESP32-S3, as the X4 Pro
+did, so the X3's image is not one it can run. Its route is the same as the
+others': the firmware that ships on it, hosting `xpui` over the C ABI.
 
 ## Seeed: Sticky
 
@@ -55,13 +60,13 @@ carries a bare-metal image for the Sticky that builds and links and stops at
 `Panel::present`, where a driver would go; what reaches the glass on either
 route is not yet proven. The geometry is, in the simulator.
 
-## No list of all seven
+## No list of all eight
 
-There is no crate here that knows all seven, because there is no such thing as
+There is no crate here that knows all eight, because there is no such thing as
 "every board" — a list is something an application assembles from the vendors
 it ships against, each vendor's `ALL` concatenated. [`xpui-gallery`](https://github.com/XPUI-Framework/xpui-gallery/blob/main/gallery/src/boards.rs)'s
-is one: seven entries, and a `const` assertion that a vendor cannot gain a
+is one: eight entries, and a `const` assertion that a vendor cannot gain a
 board without it noticing.
 
-A board that is not one of these seven is [adding-a-board.md](adding-a-board.md);
+A board that is not one of these eight is [adding-a-board.md](adding-a-board.md);
 why the vocabulary is a crate of its own is [design.md](design.md).

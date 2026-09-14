@@ -1,6 +1,6 @@
 # Every board, by vendor
 
-Seven boards from three manufacturers, one crate each. Every board is a `const`
+Eight boards from three manufacturers, one crate each. Every board is a `const`
 [`Board`](boards.md#xpui_boards_coreboard) with its
 [`Bezel`](bezel.md#xpui_boards_corebezel) beside it. Take the vendors you
 target and none of the others: a firmware for a [Badger](https://shop.pimoroni.com/products/badger-2040) has no reason to compile
@@ -8,7 +8,7 @@ an X4's dimensions into its image.
 
 ![The gallery's menu on the Xteink X3: seven rows under the header, with Back, Select, Up and Down named along the bottom](https://raw.githubusercontent.com/XPUI-Framework/xpui-gallery/main/gallery/tests/screenshots/menu_x3.png)
 
-[The seven boards](../boards.md) says which of these have run on hardware and
+[The eight boards](../boards.md) says which of these have run on hardware and
 how a screen reaches each panel. This page is their numbers, and each vendor's
 numbers are asserted by the example under its table.
 
@@ -17,7 +17,7 @@ numbers are asserted by the example under its table.
 | | |
 |---|---|
 | [Pimoroni](#pimoroni) | `xpui_boards_pimoroni`: the Badger 2040, the Tufty 2040 and the Inky Frame |
-| [Xteink](#xteink) | `xpui_boards_xteink`: the X3, the X4 and the X4 Pro |
+| [Xteink](#xteink) | `xpui_boards_xteink`: the X3, the X4, the X4 Classic and the X4 Pro |
 | [Seeed](#seeed) | `xpui_boards_seeed`: the Sticky |
 
 There is no list across vendors. An application assembles its own from the
@@ -140,7 +140,8 @@ too, because they are what people say.
 
 ## Xteink
 
-`xpui_boards_xteink`: three [ESP32-C3](https://www.espressif.com/en/products/socs/esp32-c3) e-readers. All three scan their panel in
+`xpui_boards_xteink`: four e-readers, the X3 and the X4 on an [ESP32-C3](https://www.espressif.com/en/products/socs/esp32-c3) and
+the X4 Classic and the X4 Pro on an [ESP32-S3](https://www.espressif.com/en/products/socs/esp32-s3). All four scan their panel in
 landscape and are held in portrait, so the canvas is the framebuffer turned a
 quarter. The geometry and capabilities are read from the firmware's own board
 configuration.
@@ -149,33 +150,36 @@ configuration.
 |---|---|
 | `xpui_boards_xteink::X3` | Xteink X3 — ESP32-C3, a 792x528 panel held portrait, so 528x792. |
 | `xpui_boards_xteink::X4` | Xteink X4 — ESP32-C3, an 800x480 panel held portrait, so 480x800. |
+| `xpui_boards_xteink::X4_CLASSIC` | Xteink X4 Classic — ESP32-S3, the X4's 800x480 panel held portrait, so 480x800. |
 | `xpui_boards_xteink::X4_PRO` | Xteink X4 Pro — the X4's panel with a touchscreen over it. |
 | `xpui_boards_xteink::X3_BEZEL` | The X3's body with its keys placed, for a simulator to draw. |
 | `xpui_boards_xteink::X4_BEZEL` | The X4's body with its keys placed, for a simulator to draw. |
+| `xpui_boards_xteink::X4_CLASSIC_BEZEL` | The X4 Classic's body with its keys placed, for a simulator to draw. |
 | `xpui_boards_xteink::X4_PRO_BEZEL` | The X4 Pro's body with its edge keys and Home pad placed, for a simulator to draw. |
 
-| | [X3](https://www.xteink.com/products/xteink-x3) | X4 | [X4 Pro](https://www.xteink.com/products/xteink-x4-pro-pocket-ereader) |
-|---|---|---|---|
-| The gallery's menu | ![The menu on the X3: seven rows, with Back, Select, Up and Down named along the bottom](https://raw.githubusercontent.com/XPUI-Framework/xpui-gallery/main/gallery/tests/screenshots/menu_x3.png) | ![The menu on the X4: seven rows, with Back, Select, Up and Down named along the bottom](https://raw.githubusercontent.com/XPUI-Framework/xpui-gallery/main/gallery/tests/screenshots/menu_x4.png) | ![The menu on the X4 Pro: seven taller rows in larger type, and no hint band](https://raw.githubusercontent.com/XPUI-Framework/xpui-gallery/main/gallery/tests/screenshots/menu_x4pro.png) |
-| Slug | `x3` | `x4` | `x4pro` |
-| Canvas | 528 × 792 | 480 × 800 | 480 × 800 |
-| Framebuffer | 792 × 528, `Portrait` | 800 × 480, `Portrait` | 800 × 480, `Portrait` |
-| Diagonal | 3.7" | 4.26" | 4.26" |
-| Density | 257 ppi | 218 ppi | 218 ppi |
-| UI scale | 100 % | 100 % | 120 % |
-| Touch | no | no | yes |
-| Key row | Back, Confirm, Previous, Next | Back, Confirm, Previous, Next | none |
-| Full refresh | 1,200 ms | 1,200 ms | 1,200 ms |
-| Body | 67.1 × 108.7 mm | 71.7 × 124.8 mm | 71.7 × 124.8 mm |
-| Panel | 52.1 × 78.2 mm | 55.7 × 92.8 mm | 55.7 × 92.8 mm |
-| Keys on the body | `Back`, `Select`, `Up`, `Down` along the footer; `Prev` on the left; `Sleep`, `Next` on the right | the same footer; `Sleep`, `Prev`, `Next` stacked on the right | `Prev` on the left; `Sleep`, `Next` on the right; a round `Home` pad below the panel |
+| | [X3](https://www.xteink.com/products/xteink-x3) | X4 | [X4 Classic](https://www.xteink.com/products/xteink-x4-classic-pocket-ereader) | [X4 Pro](https://www.xteink.com/products/xteink-x4-pro-pocket-ereader) |
+|---|---|---|---|---|
+| The gallery's menu | ![The menu on the X3: seven rows, with Back, Select, Up and Down named along the bottom](https://raw.githubusercontent.com/XPUI-Framework/xpui-gallery/main/gallery/tests/screenshots/menu_x3.png) | ![The menu on the X4: seven rows, with Back, Select, Up and Down named along the bottom](https://raw.githubusercontent.com/XPUI-Framework/xpui-gallery/main/gallery/tests/screenshots/menu_x4.png) | ![The menu on the X4 Classic: seven rows, with Back, Select, Up and Down named along the bottom](https://raw.githubusercontent.com/XPUI-Framework/xpui-gallery/main/gallery/tests/screenshots/menu_x4classic.png) | ![The menu on the X4 Pro: seven taller rows in larger type, and no hint band](https://raw.githubusercontent.com/XPUI-Framework/xpui-gallery/main/gallery/tests/screenshots/menu_x4pro.png) |
+| Slug | `x3` | `x4` | `x4classic` | `x4pro` |
+| Canvas | 528 × 792 | 480 × 800 | 480 × 800 | 480 × 800 |
+| Framebuffer | 792 × 528, `Portrait` | 800 × 480, `Portrait` | 800 × 480, `Portrait` | 800 × 480, `Portrait` |
+| Diagonal | 3.7" | 4.26" | 4.26" | 4.26" |
+| Density | 257 ppi | 218 ppi | 218 ppi | 218 ppi |
+| UI scale | 100 % | 100 % | 100 % | 120 % |
+| Touch | no | no | no | yes |
+| Key row | Back, Confirm, Previous, Next | Back, Confirm, Previous, Next | Back, Confirm, Previous, Next | none |
+| Full refresh | 1,200 ms | 1,200 ms | 1,200 ms | 1,200 ms |
+| Body | 67.1 × 108.7 mm | 71.7 × 124.8 mm | 69.0 × 114.0 mm | 71.7 × 124.8 mm |
+| Panel | 52.1 × 78.2 mm | 55.7 × 92.8 mm | 55.7 × 92.8 mm | 55.7 × 92.8 mm |
+| Keys on the body | `Back`, `Select`, `Up`, `Down` along the footer; `Prev` on the left; `Sleep`, `Next` on the right | the same footer; `Sleep`, `Prev`, `Next` stacked on the right | the same footer; `Prev` on the left; `Sleep`, `Next` on the right | `Prev` on the left; `Sleep`, `Next` on the right; a round `Home` pad below the panel |
 
 **The bodies are estimated.** [Xteink](https://www.xteink.com/) publish no mechanical drawing, so the
 glass is what the diagonal makes it and the case around it is scaled from
-photographs. What is not estimated is where the keys are: the firmware's
-`HalGPIO::hasEdgeSideButtons` names the X3 and the X4 Pro as the boards whose
-page keys sit one on each edge, and its themes draw both on one side for the
-X4. The X3's 3.7" is the size Xteink sell it as, the only diagonal here not
+photographs; the X4 Classic's outline is the one exception, 69 × 114 mm as
+Xteink sell it, with the keys inside it still estimated. What is not estimated
+is which edge the keys are on: the firmware's `HalGPIO::hasEdgeSideButtons`
+names the X3, the X4 Classic and the X4 Pro as the boards whose page keys sit
+one on each edge, and its themes draw both on one side for the X4. The X3's 3.7" is the size Xteink sell it as, the only diagonal here not
 from the firmware's board table; the X4's 4.26" is that table's figure, and
 4.3" the rounded selling size.
 
@@ -185,7 +189,10 @@ are what a list screen prints above them, so the key labelled `Up` sends
 
 **The X3** is the densest panel here and a button board, so it keeps the
 baseline chrome, as the firmware's `uiScale = 1.0` does: its 40px row is 3.9 mm,
-the smallest of the seven. **The X4's** 40px row is 4.6 mm. **The X4 Pro**
+the smallest of the eight. **The X4's** 40px row is 4.6 mm. **The X4 Classic**
+is the X4 Xteink sell today: the X4's glass and footer, so the same 4.6 mm
+row and the same four keys, with Prev moved to the left edge and Sleep and Next
+to the right, and an ESP32-S3 in place of the X4's ESP32-C3. **The X4 Pro**
 takes Back and Confirm from its touchscreen, so only the page pair is wired,
 and its Home pad is reported by the touch controller as
 [`KeyAction::Home`](bezel.md#xpui_boards_corekeyaction), not by a pin.
@@ -205,11 +212,13 @@ let numbers = |board: Board| {
 };
 assert_eq!(numbers(xteink::X3), ((528, 792), Some(257), (671, 1087), (521, 782)));
 assert_eq!(numbers(xteink::X4), ((480, 800), Some(218), (717, 1248), (557, 928)));
+assert_eq!(numbers(xteink::X4_CLASSIC), ((480, 800), Some(218), (690, 1140), (557, 928)));
 assert_eq!(numbers(xteink::X4_PRO), ((480, 800), Some(218), (717, 1248), (557, 928)));
 
 // The rows the prose measures, in tenths of a millimetre, rounded down.
 assert_eq!(xteink::X3.tenths_of_a_mm(40), Some(39));
 assert_eq!(xteink::X4.tenths_of_a_mm(40), Some(46));
+assert_eq!(xteink::X4_CLASSIC.tenths_of_a_mm(40), Some(46));
 assert_eq!(xteink::X4_PRO.tenths_of_a_mm(48), Some(55));
 
 for board in xteink::ALL {
@@ -218,12 +227,15 @@ for board in xteink::ALL {
     assert_eq!(board.refresh_ms, 1200);
     assert_eq!(board.ui_scale_percent, if board.touch { 120 } else { 100 });
 }
-assert_eq!((xteink::X3.keys, xteink::X4.keys), (KeyRow::READER, KeyRow::READER));
+for board in [xteink::X3, xteink::X4, xteink::X4_CLASSIC] {
+    assert_eq!(board.keys, KeyRow::READER, "{}", board.name);
+}
 assert!(xteink::X4_PRO.touch && xteink::X4_PRO.keys.is_empty());
 
 let labels = |bezel: Bezel| bezel.buttons.iter().map(|key| key.label).collect::<Vec<_>>();
 assert_eq!(labels(xteink::X3_BEZEL), ["Back", "Select", "Up", "Down", "Prev", "Sleep", "Next"]);
 assert_eq!(labels(xteink::X4_BEZEL), ["Back", "Select", "Up", "Down", "Sleep", "Prev", "Next"]);
+assert_eq!(labels(xteink::X4_CLASSIC_BEZEL), ["Back", "Select", "Up", "Down", "Prev", "Sleep", "Next"]);
 assert_eq!(labels(xteink::X4_PRO_BEZEL), ["Prev", "Sleep", "Next", "Home"]);
 ```
 
@@ -231,10 +243,10 @@ assert_eq!(labels(xteink::X4_PRO_BEZEL), ["Prev", "Sleep", "Next", "Home"]);
 
 #### `xpui_boards_xteink::ALL`
 
-This vendor's 3 boards, so a caller can offer them without a table of its own that would fall behind this one.
+This vendor's 4 boards, so a caller can offer them without a table of its own that would fall behind this one.
 
 ```text
-pub const ALL: [Board; 3] = [X3, X4, X4_PRO]
+pub const ALL: [Board; 4] = [X3, X4, X4_CLASSIC, X4_PRO]
 ```
 
 One vendor's list, not the framework's; see

@@ -14,7 +14,7 @@ others:
 | Crate | Boards |
 |---|---|
 | [`xpui-boards-pimoroni`](../pimoroni/) | [Badger 2040](https://shop.pimoroni.com/products/badger-2040), [Tufty 2040](https://shop.pimoroni.com/products/tufty-2040), [Inky Frame](https://shop.pimoroni.com/products/inky-frame-5-7) |
-| [`xpui-boards-xteink`](../xteink/) | [X3](https://www.xteink.com/products/xteink-x3), X4, [X4 Pro](https://www.xteink.com/products/xteink-x4-pro-pocket-ereader) |
+| [`xpui-boards-xteink`](../xteink/) | [X3](https://www.xteink.com/products/xteink-x3), X4, [X4 Classic](https://www.xteink.com/products/xteink-x4-classic-pocket-ereader), [X4 Pro](https://www.xteink.com/products/xteink-x4-pro-pocket-ereader) |
 | [`xpui-boards-seeed`](../seeed/) | [Sticky](https://www.seeedstudio.com/reTerminal-Sticky-p-6861.html) |
 
 ## Using it
@@ -64,7 +64,7 @@ The gate is the repository's; run `./build-and-test.sh` from the root.
 | | |
 |---|---|
 | [`docs/adding-a-board.md`](../docs/adding-a-board.md) | describing your own device: three measurements, a key row, a body, and the one check no script can run |
-| [`docs/boards.md`](../docs/boards.md) | the seven that are described, and what runs on hardware |
+| [`docs/boards.md`](../docs/boards.md) | the eight that are described, and what runs on hardware |
 | [`docs/design.md`](../docs/design.md) | why a board is not a drawing concern, and the other arguments |
 
 ## License

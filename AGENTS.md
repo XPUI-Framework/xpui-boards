@@ -2,7 +2,7 @@
 
 ## What this is, and what it may not become
 
-Seven devices — six e-ink panels and the Tufty's LCD — as data: four crates,
+Eight devices — seven e-ink panels and the Tufty's LCD — as data: four crates,
 one vocabulary and three vendors.
 `xpui-boards-core` is the shape a device is written in — `Board`,
 `Orientation`, `Bezel`, and the `Plan`/`Run`/`Key` const DSL that places keys

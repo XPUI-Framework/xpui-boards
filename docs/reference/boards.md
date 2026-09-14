@@ -2,7 +2,7 @@
 
 A board is a panel, the keys around it and the body it sits in, written as a
 `const` that a screen, a simulator and a firmware all read. `xpui_boards_core`
-holds the shape and describes no device; the seven boards written in it are on
+holds the shape and describes no device; the eight boards written in it are on
 [vendors](vendors.md).
 
 ![The gallery's menu on the Xteink X4, a 480 by 800 portrait canvas: seven rows under the header, with Back, Select, Up and Down named along the bottom](https://raw.githubusercontent.com/XPUI-Framework/xpui-gallery/main/gallery/tests/screenshots/menu_x4.png)
@@ -117,7 +117,7 @@ let every: Vec<Board> = pimoroni::ALL
     .collect();
 
 let slugs: Vec<&str> = every.iter().map(|board| board.slug).collect();
-assert_eq!(slugs, ["badger2040", "tufty2040", "inkyframe", "x3", "x4", "x4pro", "sticky"]);
+assert_eq!(slugs, ["badger2040", "tufty2040", "inkyframe", "x3", "x4", "x4classic", "x4pro", "sticky"]);
 
 // The touch boards take the larger chrome, and the button boards keep the baseline.
 for board in &every {
@@ -201,8 +201,9 @@ raised and never lowered.
 > [!NOTE]
 > A board with no bezel answers `false`, the safe direction. Neither the shape
 > of a board nor its labels predict the answer; what the keys send does. Of the
-> seven boards, three answer `true`: the X3 and the X4, whose footer keys
-> labelled `Up` and `Down` send `Button::Left` and `Button::Right`, and the [Inky
+> eight boards, four answer `true`: the X3, the X4 and the
+> [X4 Classic](https://www.xteink.com/products/xteink-x4-classic-pocket-ereader), whose footer keys labelled `Up` and `Down`
+> send `Button::Left` and `Button::Right`, and the [Inky
 > Frame](https://shop.pimoroni.com/products/inky-frame-5-7), whose `C` and `D` keys do. The other four answer `false`: the [X4 Pro](https://www.xteink.com/products/xteink-x4-pro-pocket-ereader)
 > and the Sticky take Left and Right from their touchscreens, and the [Badger](https://shop.pimoroni.com/products/badger-2040)'s
 > and the [Tufty](https://shop.pimoroni.com/products/tufty-2040)'s edge pair sends Up and Down.
@@ -210,10 +211,11 @@ raised and never lowered.
 ```rust
 use xpui_boards_pimoroni::{BADGER_2040, INKY_FRAME, TUFTY_2040};
 use xpui_boards_seeed::STICKY;
-use xpui_boards_xteink::{X3, X4, X4_PRO};
+use xpui_boards_xteink::{X3, X4, X4_CLASSIC, X4_PRO};
 
 assert!(X3.has_left_right_keys(), "its footer's Up and Down send Left and Right");
 assert!(X4.has_left_right_keys(), "the same footer");
+assert!(X4_CLASSIC.has_left_right_keys(), "the X4's footer again");
 assert!(INKY_FRAME.has_left_right_keys(), "C and D send Left and Right");
 assert!(!X4_PRO.has_left_right_keys(), "Left and Right come from its touchscreen");
 assert!(!STICKY.has_left_right_keys(), "and from the Sticky's");
@@ -260,7 +262,7 @@ assert_eq!(X3.tenths_of_a_mm(40), Some(39), "and 3.9 mm on the denser X3");
 ```
 
 **See also:** [`Orientation`](#xpui_boards_coreorientation),
-[`Bezel`](bezel.md#xpui_boards_corebezel), [the seven boards](vendors.md)
+[`Bezel`](bezel.md#xpui_boards_corebezel), [the eight boards](vendors.md)
 
 ## `xpui_boards_core::Orientation`
 

@@ -16,7 +16,7 @@ compiled and run as a doctest.
 |---|---|
 | [boards](reference/boards.md) | `Board` and `Orientation`: a panel's canvas and framebuffer, its keys, its size, and looking a board up |
 | [bezel](reference/bezel.md) | `Bezel`, `PhysicalButton` and `KeyAction`, the `Plan`, `Run` and `Key` a body is written in, and the re-exported `KeyRow` and `RowKey` |
-| [vendors](reference/vendors.md) | the seven boards, vendor by vendor: every number, the gallery's menu on each, and each crate's `ALL` and `from_slug` |
+| [vendors](reference/vendors.md) | the eight boards, vendor by vendor: every number, the gallery's menu on each, and each crate's `ALL` and `from_slug` |
 
 Names carry their crate, `xpui_boards_core::Board` rather than `Board`, because
 `ALL` and `from_slug` exist in three crates and a bare name would not say which.

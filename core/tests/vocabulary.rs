@@ -40,7 +40,7 @@ fn a_key_that_is_not_a_button_sends_nothing() {
 
 /// Half a pair is not a pair.
 ///
-/// No board here carries one of Left and Right without the other, so the seven
+/// No board here carries one of Left and Right without the other, so the eight
 /// real answers cannot tell `&&` from `||` — this is the case that can. It is
 /// not hypothetical bookkeeping: a value that can be raised and never lowered
 /// is the fault [`Key::unassigned`] exists to avoid on the badges' third key.

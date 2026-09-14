@@ -1,6 +1,7 @@
 //! Xteink's e-readers, described for `xpui`: the X3, with four keys under the
 //! panel, a page key on each side edge and a sleep key; the X4, with the same
-//! four and a sleep key and page rocker stacked on its right; and the X4 Pro,
+//! four and a sleep key and page rocker stacked on its right; the X4 Classic,
+//! the X4's panel and four keys with a page key on each edge; and the X4 Pro,
 //! the X4's panel with a touchscreen, no footer, and its page pair on the
 //! edges.
 //!
@@ -11,7 +12,7 @@
 //! bare-metal image for the X3 that builds and links, with `Panel::present`
 //! marked where a driver would go.
 //!
-//! All three scan their panel in landscape and are held in portrait, so the
+//! All four scan their panel in landscape and are held in portrait, so the
 //! canvas is the framebuffer turned a quarter. The framebuffer itself is never
 //! rotated: a renderer transforms each pixel on its way out.
 
@@ -29,7 +30,7 @@ use xpui_boards_core::{Bezel, Board, Key, KeyAction, Orientation, PhysicalButton
 /// edge side buttons.
 ///
 /// The densest panel here at 257 ppi, and a button board, so it keeps the
-/// baseline chrome: its 40px row is 3.9mm, the smallest of the seven.
+/// baseline chrome: its 40px row is 3.9mm, the smallest of the eight.
 /// Deliberate rather than overlooked — the firmware gives this profile
 /// `uiScale = 1.0`, and a selection walked with a key does not have to be
 /// finger-sized.
@@ -73,6 +74,31 @@ pub const X4: Board = Board {
     touch: false,
     refresh_ms: 1200,
     bezel: Some(X4_BEZEL),
+};
+
+/// Xteink X4 Classic — ESP32-S3, the X4's 800x480 panel held portrait, so
+/// 480x800.
+///
+/// No touchscreen. The X4's four keys along the bottom edge, and the X4 Pro's
+/// page keys: Prev on the left edge, Sleep and Next on the right — the
+/// arrangement the firmware calls edge side buttons, which the X4 lacks.
+///
+/// The X4's glass, so the X4's 218 ppi, and a button board, so the baseline
+/// chrome the firmware's `uiScale = 1.0` gives it: its 40px row is 4.6mm.
+pub const X4_CLASSIC: Board = Board {
+    name: "Xteink X4 Classic",
+    slug: "x4classic",
+    width: 480,
+    height: 800,
+    framebuffer: (800, 480),
+    orientation: Orientation::Portrait,
+    // The X4's 4.26"; Xteink sell it as 4.3" at 219 ppi.
+    diagonal_hundredths_inch: Some(426),
+    ui_scale_percent: 100,
+    keys: KeyRow::READER,
+    touch: false,
+    refresh_ms: 1200,
+    bezel: Some(X4_CLASSIC_BEZEL),
 };
 
 /// Xteink X4 Pro — the X4's panel with a touchscreen over it.
@@ -120,9 +146,9 @@ const READER_FOOTER: [Key; 4] = [
 /// and the case around it is scaled from photographs. Replace the surround with
 /// measurements when somebody has the hardware to hand.
 ///
-/// `HalGPIO::hasEdgeSideButtons` names the X3 and the X4 Pro as the boards
-/// whose page keys sit on the screen's left and right edges, and the themes lay
-/// out Up on the left and Down on the right against exactly that.
+/// `HalGPIO::hasEdgeSideButtons` names the X3, the X4 Classic and the X4 Pro as
+/// the boards whose page keys sit on the screen's left and right edges, and the
+/// themes lay out Up on the left and Down on the right against exactly that.
 ///
 /// The side pair's pins are named up and down; on this board they sit on the
 /// screen's left and right edges and turn pages. In a list they move the
@@ -147,7 +173,7 @@ pub const X3_BEZEL: Bezel = X3_PLAN.bezel(&X3_KEYS);
 ///
 /// **Estimated**, as the X3's is. The stacked rocker is not: the themes branch
 /// on it, drawing both keys on one side for this board and one per edge for the
-/// X3 and the X4 Pro.
+/// others.
 const X4_PLAN: Plan = Plan::new((717, 1248), (557, 928), 80)
     .footer(Run::new((115, 60), &READER_FOOTER))
     .right(Run::new(
@@ -162,6 +188,29 @@ const X4_PLAN: Plan = Plan::new((717, 1248), (557, 928), 80)
 const X4_KEYS: [PhysicalButton; X4_PLAN.count()] = X4_PLAN.keys();
 /// The X4's body with its keys placed, for a simulator to draw.
 pub const X4_BEZEL: Bezel = X4_PLAN.bezel(&X4_KEYS);
+
+/// The X4 Classic's body: the X4's footer, and a page key on each edge where
+/// the X4 stacks both on one.
+///
+/// **The outline is published**, 69 x 114 mm, and the glass is the X4's. The
+/// forehead and where the keys sit are **estimated**: the footer's keys are
+/// sized as the X4's, and the edge keys as the X4 Pro's, whose side keys this
+/// board shares and whose bezel insets the firmware carries for it until
+/// somebody measures one.
+const X4_CLASSIC_PLAN: Plan = Plan::new((690, 1140), (557, 928), 80)
+    .footer(Run::new((115, 60), &READER_FOOTER))
+    .left(Run::new((44, 160), &[Key::new("Prev", Button::PageBack)]))
+    .right(Run::new(
+        (44, 160),
+        &[
+            Key::new("Sleep", Button::Power).spanning(110),
+            Key::new("Next", Button::PageForward),
+        ],
+    ));
+
+const X4_CLASSIC_KEYS: [PhysicalButton; X4_CLASSIC_PLAN.count()] = X4_CLASSIC_PLAN.keys();
+/// The X4 Classic's body with its keys placed, for a simulator to draw.
+pub const X4_CLASSIC_BEZEL: Bezel = X4_CLASSIC_PLAN.bezel(&X4_CLASSIC_KEYS);
 
 /// The X4 Pro's body: a Home key below the panel, the page pair on the side
 /// edges, and the touchscreen for everything else.
@@ -198,13 +247,13 @@ const X4_PRO_KEYS: [PhysicalButton; X4_PRO_PLAN.count()] = X4_PRO_PLAN.keys();
 /// to draw.
 pub const X4_PRO_BEZEL: Bezel = X4_PRO_PLAN.bezel(&X4_PRO_KEYS);
 
-/// This vendor's 3 boards, so a caller can offer them without a table of
+/// This vendor's 4 boards, so a caller can offer them without a table of
 /// its own that would fall behind this one.
 ///
 /// One vendor's list, not the framework's — there is no such thing. An
 /// application that ships against more than one concatenates them; see
 /// `xpui-gallery`'s `gallery/src/boards.rs`.
-pub const ALL: [Board; 3] = [X3, X4, X4_PRO];
+pub const ALL: [Board; 4] = [X3, X4, X4_CLASSIC, X4_PRO];
 
 /// Looks one of this vendor's boards up by its short name, for a command line.
 ///

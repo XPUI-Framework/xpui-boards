@@ -1,6 +1,6 @@
 [package]
 name = "xpui-boards-xteink"
-description = "Xteink devices, described for xpui: X3, X4 and X4 Pro"
+description = "Xteink devices, described for xpui: X3, X4, X4 Classic and X4 Pro"
 readme = "README.md"
 keywords = ["ui", "embedded", "no-std", "eink", "xpui"]
 categories = ["embedded", "gui", "no-std"]

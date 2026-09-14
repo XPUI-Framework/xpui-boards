@@ -11,7 +11,7 @@
 > Under heavy development. Not production-ready. The API can break without
 > notice. Use at your own risk.
 
-Seven devices — six e-ink panels and one LCD — as data: panel size,
+Eight devices — seven e-ink panels and one LCD — as data: panel size,
 orientation, key row, refresh time, and the body in tenths of a millimetre. Nothing here draws anything. A board
 is what an application _injects_ into a backend and a simulator, which is why
 the framework can describe a device it has never heard of and why adding one
@@ -24,7 +24,7 @@ Every document in this repository is listed in [docs/README.md](docs/README.md).
 |                         |                                                                                                                                                                                                                                |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | [`pimoroni`](pimoroni/) | [Badger 2040](https://shop.pimoroni.com/products/badger-2040), [Tufty 2040](https://shop.pimoroni.com/products/tufty-2040), [Inky Frame](https://shop.pimoroni.com/products/inky-frame-5-7). The first two ship firmware and have been run over a debug probe; the Inky Frame's 600 × 448 seven-colour panel is described so a screen can be laid out for it and seen in the simulator |
-| [`xteink`](xteink/)     | [X3](https://www.xteink.com/products/xteink-x3), X4, [X4 Pro](https://www.xteink.com/products/xteink-x4-pro-pocket-ereader)                                                                                                                                                                                                                 |
+| [`xteink`](xteink/)     | [X3](https://www.xteink.com/products/xteink-x3), X4, [X4 Classic](https://www.xteink.com/products/xteink-x4-classic-pocket-ereader), [X4 Pro](https://www.xteink.com/products/xteink-x4-pro-pocket-ereader)                                                                                                                                                                                                                 |
 | [`seeed`](seeed/)       | [Sticky](https://www.seeedstudio.com/reTerminal-Sticky-p-6861.html)                                                                                                                                                                                                                         |
 | [`core`](core/)         | `Board`, `Orientation`, `Bezel`, and the `Plan`/`Run`/`Key` const DSL. Describes no device at all                                                                                                                              |
 
@@ -53,12 +53,13 @@ use xpui_boards_seeed as seeed;
 use xpui_boards_xteink as xteink;
 
 /// Every board this application is built for, in the order a key cycles them.
-const ALL: [Board; 7] = [
+const ALL: [Board; 8] = [
     pimoroni::BADGER_2040,
     pimoroni::TUFTY_2040,
     pimoroni::INKY_FRAME,
     xteink::X3,
     xteink::X4,
+    xteink::X4_CLASSIC,
     xteink::X4_PRO,
     seeed::STICKY,
 ];
@@ -97,7 +98,7 @@ than through whoever happens to sit above it.
 flowchart TD
   xpui["xpui<br/>the framework"]
   chrome["xpui-chrome<br/>components"]
-  boards["xpui-boards<br/>seven devices"]
+  boards["xpui-boards<br/>eight devices"]
   backends["xpui-backends<br/>two backends"]
   simulator["xpui-simulator<br/>a window"]
   gallery["xpui-gallery<br/>the app"]

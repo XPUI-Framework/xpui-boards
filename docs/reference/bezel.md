@@ -442,7 +442,7 @@ pub const fn spanning(self, span: i32) -> Key
 | `span` | Its length along the run, in tenths of a millimetre. |
 
 A sleep key stacked above a page pair is the case that needs it: the same
-width, and shorter. The [X3](https://www.xteink.com/products/xteink-x3), the X4 and the X4 Pro each carry one at 110, and the
+width, and shorter. The [X3](https://www.xteink.com/products/xteink-x3), the X4, the X4 Classic and the X4 Pro each carry one at 110, and the
 [Sticky](https://www.seeedstudio.com/reTerminal-Sticky-p-6861.html)'s OK key is 120 above two keys of 140.
 
 ## Re-exports
